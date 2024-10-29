@@ -1,14 +1,17 @@
-# CharlotteOS Limine Rust Barebones
+# Lavender
+## An Experimental Modern Operating System Project
 
-This repository serves as a template for developing a Limine Boot Protocol compliant operating system kernel in the Rust Programming Langauge.
+### Implementation Languages
+- Rust
+- Assembly Language
 
-The following need to be installed in order to use it:
+### Targets
+- x86_64
+- Aarch64
 
-- Rustup
-- A Rust toolchain
-- xorriso
-- curl
-- make
-- qemu-system
+*Only devices with full UEFI and ACPI compliant firmware are to be supported as of now
 
-With all of those dependencies installed all of the make commands should just work. If not then open an issue.
+### Contributing
+
+Feel free to make a PR in this repo, participate in the discussion section, and open issues for any changes or features
+you think would enhance the project. Everyone who wants to participate is welcome to do so!

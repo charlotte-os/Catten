@@ -1,9 +1,0 @@
-name: Security check
-on:
-  schedule:
-    - cron: "0 6 * * 5,2"
-
-jobs:
-  security-audit:
-    uses: charlotte-os/devops/.github/workflows/security_audit.yml@main
-    secrets: inherit
