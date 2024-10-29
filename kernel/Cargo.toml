@@ -1,0 +1,14 @@
+[package]
+name = "kernel"
+version = "0.0.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "kernel"
+test = false
+bench = false
+
+[build-dependencies]
+
+[dependencies]
+limine = "*"

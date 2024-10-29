@@ -1,0 +1,20 @@
+name: Test code
+on: [push, pull_request]
+
+jobs:
+  unit-test:
+    uses: charlotte-os/devops/.github/workflows/unit_tests.yml@main
+    secrets: inherit
+    with:
+      toolchain: nightly
+  style-check:
+    uses: charlotte-os/devops/.github/workflows/style_check.yml@main
+    secrets: inherit
+    with:
+      toolchain: nightly
+  benchmark:
+    needs: [unit-test, style-check]
+    uses: charlotte-os/devops/.github/workflows/benchmark.yml@main
+    secrets: inherit
+    with:
+      toolchain: nightly
