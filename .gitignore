@@ -5,3 +5,4 @@ ovmf-x86_64
 kernel/target/**
 log.txt
 limine
+.vscode/**
