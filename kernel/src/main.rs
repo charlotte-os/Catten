@@ -11,9 +11,11 @@ mod hal;
 
 use core::panic::PanicInfo;
 
+use hal::isa::instructions::{interface::InstructionInterface, InstructionWrapper};
+
 #[no_mangle]
 unsafe extern "C" fn main() -> ! {
-    loop {}
+    InstructionWrapper::halt()
 }
 
 #[panic_handler]

@@ -1,8 +1,8 @@
 use core::arch::asm;
 
-struct Aarch64InstructionInterface;
+struct InstructionInterface;
 
-impl super::interface::InstructionInterface for X86_64InstructionInterface {
+impl super::interface::InstructionInterface for InstructionInterface {
     #[inline(always)]
     unsafe fn outb(port: u16, value: u8) {
         unsafe {
