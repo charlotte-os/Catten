@@ -1,2 +1,2 @@
-mod implementations;
-pub mod interfaces;
+pub mod instructions;
+pub mod memory;

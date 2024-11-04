@@ -1,18 +1,3 @@
-use super::instructions::{inb, outb};
-
-pub struct Memory;
-
-impl crate::hal::isa::interfaces::memory::Memory for Memory {
-    type VAddr = VAddr;
-    type PAddr = PAddr;
-    type IoAddr = IoAddr;
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-struct VAddr {
-    raw: usize
-}
-
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum IoAddr {
     IoPort(u16),

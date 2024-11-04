@@ -1,4 +1,4 @@
-pub trait Memory {
+pub trait AddrTypes {
     type VAddr: Clone 
         + Copy 
         + PartialEq 
@@ -38,7 +38,6 @@ pub trait IntoPtr {
     fn into_ptr<T>(self) -> *const T;
     fn into_mut<T>(self) -> *mut T;
 }
-
 pub unsafe trait LoadStore {
     unsafe fn load<T>(&self) -> T;
     unsafe fn store<T>(&self, value: T);
