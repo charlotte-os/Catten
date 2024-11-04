@@ -8,26 +8,16 @@ pub trait AddrTypes {
         + From<usize>
         + Into<usize>
         + FromPtr
-        + IntoPtr
-        + LoadStore;
+        + IntoPtr;
     type PAddr: Clone 
         + Copy 
         + PartialEq 
         + Eq 
         + PartialOrd 
         + Ord 
-        + From<usize> 
+        + From<usize>
         + Into<usize>
-        + FromPtr
-        + IntoPtr
-        + LoadStore;
-    type IoAddr: Clone
-        + Copy
-        + PartialEq
-        + Eq
-        + PartialOrd
-        + Ord
-        + LoadStore;
+        + IntoPtr;
 }
 
 pub trait FromPtr {
@@ -37,8 +27,4 @@ pub trait FromPtr {
 pub trait IntoPtr {
     fn into_ptr<T>(self) -> *const T;
     fn into_mut<T>(self) -> *mut T;
-}
-pub unsafe trait LoadStore {
-    unsafe fn load<T>(&self) -> T;
-    unsafe fn store<T>(&self, value: T);
 }
