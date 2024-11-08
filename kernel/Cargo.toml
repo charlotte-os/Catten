@@ -15,4 +15,3 @@ bench = false
 limine = ">=0.3.1"
 embedded-graphics = ">=0.8.1"
 spin = ">=0.9.8"
-allocator-api2 = "*"
