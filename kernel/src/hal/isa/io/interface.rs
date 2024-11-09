@@ -1,7 +1,7 @@
-pub trait IRegister8 {
+pub trait IReg8Ifce {
     fn read(&self) -> u8;
 }
 
-pub trait ORegister8 {
+pub trait OReg8Ifce {
     fn write(&self, value: u8);
 }

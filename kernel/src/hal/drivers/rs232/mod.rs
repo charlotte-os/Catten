@@ -2,12 +2,12 @@ use core::fmt::{self, Write};
 
 use spin::{Mutex, Lazy};
 
-use crate::hal::isa::io::{self, interface::IRegister8, interface::ORegister8, IoRegister8Impl};
+use crate::hal::isa::io::{self, interface::IReg8Ifce, interface::OReg8Ifce, IoReg8};
 
 pub static LOG_PORT: Lazy<Mutex<SerialPort>> = Lazy::new(
     || {
         Mutex::new(
-            SerialPort::try_new(io::IoRegister8Impl::IoPort(COM1)).unwrap()
+            SerialPort::try_new(io::IoReg8::IoPort(COM1)).unwrap()
         )
     }
 );
@@ -36,11 +36,11 @@ static scratch: u16 = 7; // Scratch register */
 
 #[derive(Copy, Clone, Debug)]
 pub struct SerialPort {
-    base: IoRegister8Impl,
+    base: IoReg8,
 }
 
 impl SerialPort {
-    pub fn try_new(base: IoRegister8Impl) -> Option<Self> {
+    pub fn try_new(base: IoReg8) -> Option<Self> {
         let port = SerialPort {
             base: base
         };

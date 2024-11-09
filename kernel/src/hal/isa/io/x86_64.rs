@@ -4,15 +4,15 @@ use core::ops::Add;
 use super::interface;
 
 #[derive(Copy, Clone, Debug)]
-pub enum IoRegister8 {
+pub enum IoReg8 {
     IoPort(u16),
     Mmio(*mut u8),
 }
 
-impl interface::IRegister8 for IoRegister8 {
+impl interface::IReg8Ifce for IoReg8 {
     fn read(&self) -> u8 {
         match self {
-            IoRegister8::IoPort(port) => {
+            IoReg8::IoPort(port) => {
                 let value: u8;
                 unsafe {
                     asm!(
@@ -23,15 +23,15 @@ impl interface::IRegister8 for IoRegister8 {
                 }
                 value
             }
-            IoRegister8::Mmio(address) => unsafe { core::ptr::read_volatile(*address) },
+            IoReg8::Mmio(address) => unsafe { core::ptr::read_volatile(*address) },
         }
     }
 }
 
-impl interface::ORegister8 for IoRegister8 {
+impl interface::OReg8Ifce for IoReg8 {
     fn write(&self, value: u8) {
         match self {
-            IoRegister8::IoPort(port) => {
+            IoReg8::IoPort(port) => {
                 unsafe {
                     asm!(
                         "out dx, al",
@@ -40,18 +40,18 @@ impl interface::ORegister8 for IoRegister8 {
                     );
                 }
             }
-            IoRegister8::Mmio(address) => unsafe { core::ptr::write_volatile(*address, value) },
+            IoReg8::Mmio(address) => unsafe { core::ptr::write_volatile(*address, value) },
         }
     }
 }
 
-impl Add<u16> for IoRegister8 {
-    type Output = IoRegister8;
+impl Add<u16> for IoReg8 {
+    type Output = IoReg8;
 
     fn add(self, rhs: u16) -> Self::Output {
         match self {
-            IoRegister8::IoPort(port) => IoRegister8::IoPort(port + rhs),
-            IoRegister8::Mmio(address) => IoRegister8::Mmio(unsafe {
+            IoReg8::IoPort(port) => IoReg8::IoPort(port + rhs),
+            IoReg8::Mmio(address) => IoReg8::Mmio(unsafe {
                 (address as *mut u8).add(rhs as usize) as *mut u8
             }),
         }
