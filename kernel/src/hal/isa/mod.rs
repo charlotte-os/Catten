@@ -1,13 +1,13 @@
-//! # ISA
-//! 
-//! This module provides a set of interfaces that commonize the ISA specific functionalities
-//! needed by the kernel. The interfaces are:
-//! - [`Init`](init): provides the initialization and deinitialization functions.
-//! - [`Memory`](memory): provides the memory related functions.
-//! - [`Io`](io): provides the IO related functions.
-//! - [`Instructions`](instructions): provides CPU instruction related functions.
+//! # Instruction Set Architecture (ISA) Interface
+//!
+//! This module provides a set of interfaces that commonize the ISA specific
+//! functionality needed by the kernel:
+//! - [`Initialization`](init): ISA specific system initialization and deinitialization
+//! - [`Input/Output`](io): wrappers over MMIO and Port IO
+//! - [`Logical Processor Control`](lp_control): logical processor operating state control
+//! - [`Memory`](memory): wrappers over ISA specific memory management structures
 
 pub mod init;
-pub mod instructions;
 pub mod io;
+pub mod lp_control;
 pub mod memory;

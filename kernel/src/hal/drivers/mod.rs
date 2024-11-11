@@ -1,1 +1,2 @@
-pub mod rs232;
+pub mod display;
+pub mod uart;
