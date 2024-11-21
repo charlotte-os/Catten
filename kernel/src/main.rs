@@ -19,8 +19,6 @@ mod memory;
 
 use core::panic::PanicInfo;
 
-use hal::isa::init::interface::InitInterface;
-use hal::isa::init::IsaInitializer;
 use hal::isa::lp_control::interface::LpCtlIfce;
 use hal::isa::lp_control::LpCtl;
 
@@ -31,13 +29,7 @@ use hal::isa::lp_control::LpCtl;
 #[no_mangle]
 unsafe extern "C" fn main() -> ! {
         logln!("Entering the Lavender Kernel...");
-        logln!("Performing ISA specific initialization...");
-        match IsaInitializer::init() {
-                Ok(_) => logln!("ISA specific initialization complete."),
-                Err(e) => {
-                        logln!("ISA specific initialization failed: {:?}", e)
-                }
-        }
+        init::kernel_init();
         LpCtl::halt()
 }
 
