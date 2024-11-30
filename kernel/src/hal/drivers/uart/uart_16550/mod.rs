@@ -11,7 +11,7 @@ use crate::hal::isa::io::{self, IoReg8};
 pub static LOG_PORT: Lazy<Mutex<Uart16550>> =
         Lazy::new(|| Mutex::new(Uart16550::try_new(io::IoReg8::IoPort(COM1)).unwrap()));
 
-// standard PC COM port base addresses
+// standard PC COM port base I/O ports
 static COM1: u16 = 0x3f8;
 static COM2: u16 = 0x2f8;
 static COM3: u16 = 0x3e8;
@@ -20,6 +20,7 @@ static COM5: u16 = 0x5f8;
 static COM6: u16 = 0x4f8;
 static COM7: u16 = 0x5e8;
 static COM8: u16 = 0x4e8;
+
 
 #[derive(Copy, Clone, Debug)]
 #[repr(transparent)]

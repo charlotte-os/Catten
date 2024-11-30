@@ -6,5 +6,6 @@
 //! operation and provides a common set of interfaces for the rest of the kernel
 //! to use.
 
+pub mod device_manager;
 pub mod drivers;
 pub mod isa;

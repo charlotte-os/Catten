@@ -7,11 +7,12 @@ use limine::request::{
         SmpRequest,
 };
 use limine::BaseRevision;
+use spin::Mutex;
 
 pub static BASE_REVISION: BaseRevision = BaseRevision::new();
 pub static MEMEORY_MAP_REQUEST: MemoryMapRequest = MemoryMapRequest::new();
 pub static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
 pub static KERNEL_ADDRESS_REQUEST: KernelAddressRequest = KernelAddressRequest::new();
-pub static FRAMBUFFER_REQUEST: FramebufferRequest = FramebufferRequest::new();
+pub static FRAMBUFFER_REQUEST: Mutex<FramebufferRequest> = Mutex::new(FramebufferRequest::new());
 pub static SMP_REQUEST: SmpRequest = SmpRequest::new();
 pub static RSDP_REQUEST: RsdpRequest = RsdpRequest::new();
