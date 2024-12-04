@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ASCII","ISO_8859_1","ISO_8859_10","ISO_8859_13","ISO_8859_14","ISO_8859_15","ISO_8859_16","ISO_8859_2","ISO_8859_3","ISO_8859_4","ISO_8859_5","ISO_8859_7","ISO_8859_9","JIS_X0201"],"enum":["Mapping"],"struct":["StrGlyphMapping"],"trait":["GlyphMapping"]};

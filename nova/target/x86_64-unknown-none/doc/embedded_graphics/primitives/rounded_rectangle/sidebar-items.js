@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["CornerRadii","CornerRadiiBuilder","Points","RoundedRectangle","StyledPixelsIterator"]};

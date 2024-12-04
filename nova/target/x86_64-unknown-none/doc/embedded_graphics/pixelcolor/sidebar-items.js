@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["BinaryColor"],"mod":["raw"],"struct":["Bgr555","Bgr565","Bgr666","Bgr888","Gray2","Gray4","Gray8","Rgb555","Rgb565","Rgb666","Rgb888"],"trait":["GrayColor","IntoStorage","PixelColor","RgbColor","WebColors"]};

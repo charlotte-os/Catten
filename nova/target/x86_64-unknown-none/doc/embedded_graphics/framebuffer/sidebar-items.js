@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["buffer_size","buffer_size_bpp"],"struct":["Framebuffer"]};

@@ -1,0 +1,851 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/mpatel/.cargo/registry/src/index.crates.io-6f17d22bba15001f/embedded-graphics-core-0.4.0/src/draw_target/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-6d8951b3ccd3cbca.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="embedded_graphics_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0-nightly (9096f4faf 2024-10-05)" data-channel="nightly" data-search-js="search-e056c65ede92db13.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">embedded_graphics_core/draw_target/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
+<a href="#2" id="2">2</a>
+<a href="#3" id="3">3</a>
+<a href="#4" id="4">4</a>
+<a href="#5" id="5">5</a>
+<a href="#6" id="6">6</a>
+<a href="#7" id="7">7</a>
+<a href="#8" id="8">8</a>
+<a href="#9" id="9">9</a>
+<a href="#10" id="10">10</a>
+<a href="#11" id="11">11</a>
+<a href="#12" id="12">12</a>
+<a href="#13" id="13">13</a>
+<a href="#14" id="14">14</a>
+<a href="#15" id="15">15</a>
+<a href="#16" id="16">16</a>
+<a href="#17" id="17">17</a>
+<a href="#18" id="18">18</a>
+<a href="#19" id="19">19</a>
+<a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
+<a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
+<a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a>
+<a href="#47" id="47">47</a>
+<a href="#48" id="48">48</a>
+<a href="#49" id="49">49</a>
+<a href="#50" id="50">50</a>
+<a href="#51" id="51">51</a>
+<a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
+<a href="#383" id="383">383</a>
+<a href="#384" id="384">384</a>
+<a href="#385" id="385">385</a>
+<a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a></pre></div><pre class="rust"><code><span class="doccomment">//! A target for embedded-graphics drawing operations.
+
+</span><span class="kw">use crate</span>::{
+    geometry::Dimensions,
+    pixelcolor::PixelColor,
+    primitives::{PointsIter, Rectangle},
+    Pixel,
+};
+
+<span class="doccomment">/// A target for embedded-graphics drawing operations.
+///
+/// The `DrawTarget` trait is used to add embedded-graphics support to a display
+/// driver or similar targets like framebuffers or image files.
+/// Targets are required to at least implement the [`draw_iter`] method and the [`Dimensions`]
+/// trait. All other methods provide default implementations which use these methods internally.
+///
+/// Because the default implementations cannot use features specific to the target hardware they
+/// can be overridden to improve performance. These target specific implementations might, for
+/// example, use hardware accelerated drawing operations provided by a display controller or
+/// specialized hardware modules in a microcontroller.
+///
+/// Note that some displays require a "flush" operation to write changes from a framebuffer to the
+/// display. See docs associated with the chosen display driver for details on how to update the
+/// display.
+///
+/// # Examples
+///
+/// ## Minimum implementation
+///
+/// In this example `DrawTarget` is implemented for an an imaginary 64px x 64px 8-bit grayscale display
+/// that is connected using a simplified SPI interface. Because the hardware doesn't support any
+/// acceleration only the [`draw_iter`] method and [`OriginDimensions`] trait need to be implemented.
+///
+/// To reduce the overhead caused by communicating with the display for each drawing operation
+/// the display driver uses and framebuffer to store the pixel data in memory. This way all drawing
+/// operations can be executed in local memory and the actual display is only updated on demand
+/// by calling the `flush` method.
+///
+/// Because all drawing operations are using a local framebuffer no communication error can occur
+/// while they are executed and the [`Error` type] can be set to `core::convert::Infallible`.
+///
+/// ```rust
+/// use core::convert::TryInto;
+/// use embedded_graphics::{
+///     pixelcolor::{Gray8, GrayColor},
+///     prelude::*,
+///     primitives::{Circle, PrimitiveStyle},
+/// };
+/// #
+/// # struct SPI1;
+/// #
+/// # impl SPI1 {
+/// #     pub fn send_bytes(&amp;self, buf: &amp;[u8]) -&gt; Result&lt;(), CommError&gt; {
+/// #         Ok(())
+/// #     }
+/// # }
+/// #
+///
+/// /// SPI communication error
+/// #[derive(Debug)]
+/// struct CommError;
+///
+/// /// A fake 64px x 64px display.
+/// struct ExampleDisplay {
+///     /// The framebuffer with one `u8` value per pixel.
+///     framebuffer: [u8; 64 * 64],
+///
+///     /// The interface to the display controller.
+///     iface: SPI1,
+/// }
+///
+/// impl ExampleDisplay {
+///     /// Updates the display from the framebuffer.
+///     pub fn flush(&amp;self) -&gt; Result&lt;(), CommError&gt; {
+///         self.iface.send_bytes(&amp;self.framebuffer)
+///     }
+/// }
+///
+/// impl DrawTarget for ExampleDisplay {
+///     type Color = Gray8;
+///     // `ExampleDisplay` uses a framebuffer and doesn't need to communicate with the display
+///     // controller to draw pixel, which means that drawing operations can never fail. To reflect
+///     // this the type `Infallible` was chosen as the `Error` type.
+///     type Error = core::convert::Infallible;
+///
+///     fn draw_iter&lt;I&gt;(&amp;mut self, pixels: I) -&gt; Result&lt;(), Self::Error&gt;
+///     where
+///         I: IntoIterator&lt;Item = Pixel&lt;Self::Color&gt;&gt;,
+///     {
+///         for Pixel(coord, color) in pixels.into_iter() {
+///             // Check if the pixel coordinates are out of bounds (negative or greater than
+///             // (63,63)). `DrawTarget` implementation are required to discard any out of bounds
+///             // pixels without returning an error or causing a panic.
+///             if let Ok((x @ 0..=63, y @ 0..=63)) = coord.try_into() {
+///                 // Calculate the index in the framebuffer.
+///                 let index: u32 = x + y * 64;
+///                 self.framebuffer[index as usize] = color.luma();
+///             }
+///         }
+///
+///         Ok(())
+///     }
+/// }
+///
+/// impl OriginDimensions for ExampleDisplay {
+///     fn size(&amp;self) -&gt; Size {
+///         Size::new(64, 64)
+///     }
+/// }
+///
+/// let mut display = ExampleDisplay {
+///     framebuffer: [0; 4096],
+///     iface: SPI1,
+/// };
+///
+/// // Draw a circle with top-left at `(22, 22)` with a diameter of `20` and a white stroke
+/// let circle = Circle::new(Point::new(22, 22), 20)
+///     .into_styled(PrimitiveStyle::with_stroke(Gray8::WHITE, 1));
+///
+/// circle.draw(&amp;mut display)?;
+///
+/// // Update the display
+/// display.flush().unwrap();
+/// # Ok::&lt;(), core::convert::Infallible&gt;(())
+/// ```
+///
+/// # Hardware acceleration - solid rectangular fill
+///
+/// This example uses an imaginary display with 16bpp RGB565 colors and hardware support for
+/// filling of rectangular areas with a solid color. A real display controller that supports this
+/// operation is the SSD1331 with it's "Draw Rectangle" (`22h`) command which this example
+/// is loosely based on.
+///
+/// To leverage this feature in a `DrawTarget`, the default implementation of [`fill_solid`] can be
+/// overridden by a custom implementation. Instead of drawing individual pixels, this target
+/// specific version will only send a single command to the display controller in one transaction.
+/// Because the command size is independent of the filled area, all [`fill_solid`] calls will only
+/// transmit 8 bytes to the display, which is far less then what is required to transmit each pixel
+/// color inside the filled area.
+/// ```rust
+/// use core::convert::TryInto;
+/// use embedded_graphics::{
+///     pixelcolor::{raw::RawU16, Rgb565, RgbColor},
+///     prelude::*,
+///     primitives::{Circle, Rectangle, PrimitiveStyle, PrimitiveStyleBuilder},
+/// };
+/// #
+/// # struct SPI1;
+/// #
+/// # impl SPI1 {
+/// #     pub fn send_bytes(&amp;self, buf: &amp;[u16]) -&gt; Result&lt;(), ()&gt; {
+/// #         Ok(())
+/// #     }
+/// # }
+/// #
+///
+/// /// SPI communication error
+/// #[derive(Debug)]
+/// struct CommError;
+///
+/// /// An example display connected over SPI.
+/// struct ExampleDisplay {
+///     iface: SPI1,
+/// }
+///
+/// impl ExampleDisplay {
+///     /// Send a single pixel to the display
+///     pub fn set_pixel(&amp;self, x: u32, y: u32, color: u16) -&gt; Result&lt;(), CommError&gt; {
+///         // ...
+///
+///         Ok(())
+///     }
+///
+///     /// Send commands to the display
+///     pub fn send_commands(&amp;self, commands: &amp;[u8]) -&gt; Result&lt;(), CommError&gt; {
+///         // Send data marked as commands to the display.
+///
+///         Ok(())
+///     }
+/// }
+///
+/// impl DrawTarget for ExampleDisplay {
+///     type Color = Rgb565;
+///     type Error = CommError;
+///
+///     fn draw_iter&lt;I&gt;(&amp;mut self, pixels: I) -&gt; Result&lt;(), Self::Error&gt;
+///     where
+///         I: IntoIterator&lt;Item = Pixel&lt;Self::Color&gt;&gt;,
+///     {
+///         for Pixel(coord, color) in pixels.into_iter() {
+///             // Check if the pixel coordinates are out of bounds (negative or greater than
+///             // (63,63)). `DrawTarget` implementation are required to discard any out of bounds
+///             // pixels without returning an error or causing a panic.
+///             if let Ok((x @ 0..=63, y @ 0..=63)) = coord.try_into() {
+///                 self.set_pixel(x, y, RawU16::from(color).into_inner())?;
+///             }
+///         }
+///
+///         Ok(())
+///     }
+///
+///     fn fill_solid(&amp;mut self, area: &amp;Rectangle, color: Self::Color) -&gt; Result&lt;(), Self::Error&gt; {
+///         // Clamp the rectangle coordinates to the valid range by determining
+///         // the intersection of the fill area and the visible display area
+///         // by using Rectangle::intersection.
+///         let area = area.intersection(&amp;self.bounding_box());
+///
+///         // Do not send a draw rectangle command if the intersection size if zero.
+///         // The size is checked by using `Rectangle::bottom_right`, which returns `None`
+///         // if the size is zero.
+///         let bottom_right = if let Some(bottom_right) = area.bottom_right() {
+///             bottom_right
+///         } else {
+///             return Ok(());
+///         };
+///
+///         self.send_commands(&amp;[
+///             // Draw rectangle command
+///             0x22,
+///             // Top left X coordinate
+///             area.top_left.x as u8,
+///             // Top left Y coordinate
+///             area.top_left.y as u8,
+///             // Bottom right X coordinate
+///             bottom_right.x as u8,
+///             // Bottom right Y coordinate
+///             bottom_right.y as u8,
+///             // Fill color red channel
+///             color.r(),
+///             // Fill color green channel
+///             color.g(),
+///             // Fill color blue channel
+///             color.b(),
+///         ])
+///     }
+/// }
+///
+/// impl OriginDimensions for ExampleDisplay {
+///     fn size(&amp;self) -&gt; Size {
+///         Size::new(64, 64)
+///     }
+/// }
+///
+/// let mut display = ExampleDisplay { iface: SPI1 };
+///
+/// // Draw a rectangle with 5px red stroke and green fill.
+/// // The stroke and fill can be broken down into multiple individual rectangles,
+/// // so this uses `fill_solid` internally.
+/// Rectangle::new(Point::new(20, 20), Size::new(50, 40))
+///     .into_styled(
+///         PrimitiveStyleBuilder::new()
+///             .stroke_color(Rgb565::RED)
+///             .stroke_width(5)
+///             .fill_color(Rgb565::GREEN)
+///             .build(),
+///     )
+///     .draw(&amp;mut display)?;
+///
+/// // Draw a circle with top-left at `(5, 5)` with a diameter of `10` and a magenta stroke with
+/// // cyan fill. This shape cannot be optimized by calls to `fill_solid` as it contains transparent
+/// // pixels as well as pixels of different colors. It will instead delegate to `draw_iter`
+/// // internally.
+/// Circle::new(Point::new(5, 5), 10)
+///     .into_styled(
+///         PrimitiveStyleBuilder::new()
+///             .stroke_color(Rgb565::MAGENTA)
+///             .stroke_width(1)
+///             .fill_color(Rgb565::CYAN)
+///             .build(),
+///     )
+///     .draw(&amp;mut display)?;
+///
+/// # Ok::&lt;(), CommError&gt;(())
+/// ```
+///
+/// [`fill_solid`]: DrawTarget::fill_solid()
+/// [`draw_iter`]: DrawTarget::draw_iter
+/// [`Dimensions`]: super::geometry::Dimensions
+/// [`OriginDimensions`]: super::geometry::OriginDimensions
+/// [`Error` type]: DrawTarget::Error
+</span><span class="kw">pub trait </span>DrawTarget: Dimensions {
+    <span class="doccomment">/// The pixel color type the targetted display supports.
+    </span><span class="kw">type </span>Color: PixelColor;
+
+    <span class="doccomment">/// Error type to return when a drawing operation fails.
+    ///
+    /// This error is returned if an error occurred during a drawing operation. This mainly applies
+    /// to drivers that need to communicate with the display for each drawing operation, where a
+    /// communication error can occur. For drivers that use an internal framebuffer where drawing
+    /// operations can never fail, [`core::convert::Infallible`] can instead be used as the `Error`
+    /// type.
+    ///
+    /// [`core::convert::Infallible`]: https://doc.rust-lang.org/stable/core/convert/enum.Infallible.html
+    </span><span class="kw">type </span>Error;
+
+    <span class="doccomment">/// Draw individual pixels to the display without a defined order.
+    ///
+    /// Due to the unordered nature of the pixel iterator, this method is likely to be the slowest
+    /// drawing method for a display that writes data to the hardware immediately. If possible, the
+    /// other methods in this trait should be implemented to improve performance when rendering
+    /// more contiguous pixel patterns.
+    </span><span class="kw">fn </span>draw_iter&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pixels: I) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>I: IntoIterator&lt;Item = Pixel&lt;<span class="self">Self</span>::Color&gt;&gt;;
+
+    <span class="doccomment">/// Fill a given area with an iterator providing a contiguous stream of pixel colors.
+    ///
+    /// Use this method to fill an area with contiguous, non-transparent pixel colors. Pixel
+    /// coordinates are iterated over from the top left to the bottom right corner of the area in
+    /// row-first order. The provided iterator must provide pixel color values based on this
+    /// ordering to produce correct output.
+    ///
+    /// As seen in the example below, the [`PointsIter::points`] method can be used to get an
+    /// iterator over all points in the provided area.
+    ///
+    /// The provided iterator is not required to provide `width * height` pixels to completely fill
+    /// the area. In this case, `fill_contiguous` should return without error.
+    ///
+    /// This method should not attempt to draw any pixels that fall outside the drawable area of the
+    /// target display. The `area` argument can be clipped to the drawable area using the
+    /// [`Rectangle::intersection`] method.
+    ///
+    /// The default implementation of this method delegates to [`draw_iter`](DrawTarget::draw_iter).
+    ///
+    /// # Examples
+    ///
+    /// This is an example implementation of `fill_contiguous` that delegates to [`draw_iter`]. This
+    /// delegation behaviour is undesirable in a real application as it will be as slow as the
+    /// default trait implementation, however is shown here for demonstration purposes.
+    ///
+    /// The example demonstrates the usage of [`Rectangle::intersection`] on the passed `area`
+    /// argument to only draw visible pixels. If there is no intersection between `area` and the
+    /// display area, no pixels will be drawn.
+    ///
+    /// ```rust
+    /// use embedded_graphics::{
+    ///     pixelcolor::{Gray8, GrayColor},
+    ///     prelude::*,
+    ///     primitives::{ContainsPoint, Rectangle},
+    /// };
+    ///
+    /// struct ExampleDisplay;
+    ///
+    /// impl DrawTarget for ExampleDisplay {
+    ///     type Color = Gray8;
+    ///     type Error = core::convert::Infallible;
+    ///
+    ///     fn draw_iter&lt;I&gt;(&amp;mut self, pixels: I) -&gt; Result&lt;(), Self::Error&gt;
+    ///     where
+    ///         I: IntoIterator&lt;Item = Pixel&lt;Self::Color&gt;&gt;,
+    ///     {
+    ///         // Draw pixels to the display
+    ///
+    ///         Ok(())
+    ///     }
+    ///
+    ///     fn fill_contiguous&lt;I&gt;(&amp;mut self, area: &amp;Rectangle, colors: I) -&gt; Result&lt;(), Self::Error&gt;
+    ///     where
+    ///         I: IntoIterator&lt;Item = Self::Color&gt;,
+    ///     {
+    ///         // Clamp area to drawable part of the display target
+    ///         let drawable_area = area.intersection(&amp;self.bounding_box());
+    ///
+    ///         // Check that there are visible pixels to be drawn
+    ///         if drawable_area.size != Size::zero() {
+    ///             self.draw_iter(
+    ///                 area.points()
+    ///                     .zip(colors)
+    ///                     .filter(|(pos, _color)| drawable_area.contains(*pos))
+    ///                     .map(|(pos, color)| Pixel(pos, color)),
+    ///             )
+    ///         } else {
+    ///             Ok(())
+    ///         }
+    ///     }
+    /// }
+    ///
+    /// impl OriginDimensions for ExampleDisplay {
+    ///     fn size(&amp;self) -&gt; Size {
+    ///         Size::new(64, 64)
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// [`draw_iter`]: DrawTarget::draw_iter
+    /// [`Rectangle::intersection`]: super::primitives::rectangle::Rectangle::intersection()
+    /// [`PointsIter::points`]: super::primitives::PointsIter::points
+    </span><span class="kw">fn </span>fill_contiguous&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, area: <span class="kw-2">&amp;</span>Rectangle, colors: I) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span>I: IntoIterator&lt;Item = <span class="self">Self</span>::Color&gt;,
+    {
+        <span class="self">self</span>.draw_iter(
+            area.points()
+                .zip(colors)
+                .map(|(pos, color)| Pixel(pos, color)),
+        )
+    }
+
+    <span class="doccomment">/// Fill a given area with a solid color.
+    ///
+    /// If the target display provides optimized hardware commands for filling a rectangular area of
+    /// the display with a solid color, this method should be overridden to use those commands to
+    /// improve performance.
+    ///
+    /// The default implementation of this method calls [`fill_contiguous`](DrawTarget::fill_contiguous())
+    /// with an iterator that repeats the given `color` for every point in `area`.
+    </span><span class="kw">fn </span>fill_solid(<span class="kw-2">&amp;mut </span><span class="self">self</span>, area: <span class="kw-2">&amp;</span>Rectangle, color: <span class="self">Self</span>::Color) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.fill_contiguous(area, core::iter::repeat(color))
+    }
+
+    <span class="doccomment">/// Fill the entire display with a solid color.
+    ///
+    /// If the target hardware supports a more optimized way of filling the entire display with a
+    /// solid color, this method should be overridden to use those commands.
+    ///
+    /// The default implementation of this method delegates to [`fill_solid`] to fill the
+    /// [`bounding_box`] returned by the [`Dimensions`] implementation.
+    ///
+    /// [`Dimensions`]: super::geometry::Dimensions
+    /// [`bounding_box`]: super::geometry::Dimensions::bounding_box
+    /// [`fill_solid`]: DrawTarget::fill_solid()
+    </span><span class="kw">fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>, color: <span class="self">Self</span>::Color) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.fill_solid(<span class="kw-2">&amp;</span><span class="self">self</span>.bounding_box(), color)
+    }
+}
+</code></pre></div></section></main></body></html>

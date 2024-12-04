@@ -1,0 +1,52 @@
+[package]
+name = "Nova"
+version = "0.0.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "Nova"
+test = false
+bench = false
+
+[features]
+default = ["pc-like"]
+#platform types
+pc-like = ["acpi", "smbios", "uefi-rt"]
+embedded = ["acpi", "fdt"]
+qemu = ["virt"]
+#firmware interfaces
+acpi = []
+uefi-rt = []
+fdt = []
+smbios = []
+sbi = []
+smc = []
+#driver sets
+virt = []
+
+[build-dependencies]
+
+[dependencies]
+bitflags = ">=2.6.0"
+lazy_static = {version = ">=1.5.0", features = ["spin_no_std"]}
+limine = ">=0.3.1"
+embedded-graphics = ">=0.8.1"
+gcd = "2.3.0"
+spin = ">=0.9.8"
+
+[profile.dev]
+debug = "full"
+debug-assertions = true
+targets = ["x86_64-unknown-none", "aarch64-unknown-none"]
+panic = "abort"
+lto = false
+opt-level = 0
+
+[profile.release]
+debug = "none"
+debug-assertions = false
+targets = ["x86_64-unknown-none", "aarch64-unknown-none"]
+panic = "abort"
+lto = true
+opt-level = 3

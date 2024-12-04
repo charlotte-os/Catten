@@ -1,0 +1,9 @@
+(function() {
+    var implementors = Object.fromEntries([["embedded_graphics",[["impl&lt;'a, T&gt; <a class=\"trait\" href=\"embedded_graphics/trait.Drawable.html\" title=\"trait embedded_graphics::Drawable\">Drawable</a> for <a class=\"struct\" href=\"embedded_graphics/image/struct.Image.html\" title=\"struct embedded_graphics::image::Image\">Image</a>&lt;'a, T&gt;<div class=\"where\">where\n    T: <a class=\"trait\" href=\"embedded_graphics/image/trait.ImageDrawable.html\" title=\"trait embedded_graphics::image::ImageDrawable\">ImageDrawable</a>,</div>"],["impl&lt;S: <a class=\"trait\" href=\"embedded_graphics/text/renderer/trait.TextRenderer.html\" title=\"trait embedded_graphics::text::renderer::TextRenderer\">TextRenderer</a>&gt; <a class=\"trait\" href=\"embedded_graphics/trait.Drawable.html\" title=\"trait embedded_graphics::Drawable\">Drawable</a> for <a class=\"struct\" href=\"embedded_graphics/text/struct.Text.html\" title=\"struct embedded_graphics::text::Text\">Text</a>&lt;'_, S&gt;"],["impl&lt;T: <a class=\"trait\" href=\"embedded_graphics/primitives/trait.StyledDrawable.html\" title=\"trait embedded_graphics::primitives::StyledDrawable\">StyledDrawable</a>&lt;S&gt;, S&gt; <a class=\"trait\" href=\"embedded_graphics/trait.Drawable.html\" title=\"trait embedded_graphics::Drawable\">Drawable</a> for <a class=\"struct\" href=\"embedded_graphics/primitives/struct.Styled.html\" title=\"struct embedded_graphics::primitives::Styled\">Styled</a>&lt;T, S&gt;"]]],["embedded_graphics_core",[]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[1433,30]}

@@ -1,0 +1,9 @@
+(function() {
+    var implementors = Object.fromEntries([["limine",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/iter/traits/collect/trait.FromIterator.html\" title=\"trait core::iter::traits::collect::FromIterator\">FromIterator</a>&lt;<a class=\"struct\" href=\"limine/modules/struct.ModuleFlags.html\" title=\"struct limine::modules::ModuleFlags\">ModuleFlags</a>&gt; for <a class=\"struct\" href=\"limine/modules/struct.ModuleFlags.html\" title=\"struct limine::modules::ModuleFlags\">ModuleFlags</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/iter/traits/collect/trait.FromIterator.html\" title=\"trait core::iter::traits::collect::FromIterator\">FromIterator</a>&lt;<a class=\"struct\" href=\"limine/smp/struct.RequestFlags.html\" title=\"struct limine::smp::RequestFlags\">RequestFlags</a>&gt; for <a class=\"struct\" href=\"limine/smp/struct.RequestFlags.html\" title=\"struct limine::smp::RequestFlags\">RequestFlags</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/iter/traits/collect/trait.FromIterator.html\" title=\"trait core::iter::traits::collect::FromIterator\">FromIterator</a>&lt;<a class=\"struct\" href=\"limine/smp/struct.ResponseFlags.html\" title=\"struct limine::smp::ResponseFlags\">ResponseFlags</a>&gt; for <a class=\"struct\" href=\"limine/smp/struct.ResponseFlags.html\" title=\"struct limine::smp::ResponseFlags\">ResponseFlags</a>"]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[1396]}

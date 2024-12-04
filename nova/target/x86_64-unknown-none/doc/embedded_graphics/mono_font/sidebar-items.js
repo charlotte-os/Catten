@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["ascii","iso_8859_1","iso_8859_10","iso_8859_13","iso_8859_14","iso_8859_15","iso_8859_16","iso_8859_2","iso_8859_3","iso_8859_4","iso_8859_5","iso_8859_7","iso_8859_9","jis_x0201","mapping"],"struct":["DecorationDimensions","MonoFont","MonoTextStyle","MonoTextStyleBuilder"]};

@@ -1,0 +1,3 @@
+cargo:rustc-link-arg=-Tlinker/x86_64.ld
+cargo:rerun-if-changed=linker/x86_64.ld
+cargo:rerun-if-changed=asm

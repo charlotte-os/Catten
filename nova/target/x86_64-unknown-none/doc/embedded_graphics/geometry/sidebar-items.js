@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["AnchorPoint","AnchorX","AnchorY"],"struct":["Angle","Point","Size"],"trait":["AngleUnit","Dimensions","OriginDimensions"]};

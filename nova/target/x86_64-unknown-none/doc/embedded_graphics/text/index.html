@@ -1,0 +1,113 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Text drawing."><title>embedded_graphics::text - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-6d8951b3ccd3cbca.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="embedded_graphics" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0-nightly (9096f4faf 2024-10-05)" data-channel="nightly" data-search-js="search-e056c65ede92db13.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button><a class="logo-container" href="../../embedded_graphics/index.html"><img src="https://raw.githubusercontent.com/embedded-graphics/embedded-graphics/191fe7f8a0fedc713f9722b9dc59208dacadee7e/assets/logo.svg?sanitize=true" alt=""></a></nav><nav class="sidebar"><div class="sidebar-crate"><a class="logo-container" href="../../embedded_graphics/index.html"><img src="https://raw.githubusercontent.com/embedded-graphics/embedded-graphics/191fe7f8a0fedc713f9722b9dc59208dacadee7e/assets/logo.svg?sanitize=true" alt="logo"></a><h2><a href="../../embedded_graphics/index.html">embedded_<wbr>graphics</a><span class="version">0.8.1</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module text</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#text-style" title="Text style">Text style</a></li><li><a href="#examples" title="Examples">Examples</a><ul><li><a href="#draw-basic-text" title="Draw basic text">Draw basic text</a></li><li><a href="#draw-centered-text" title="Draw centered text">Draw centered text</a></li><li><a href="#draw-text-with-textstyle" title="Draw text with `TextStyle`">Draw text with <code>TextStyle</code></a></li><li><a href="#combine-different-character-styles" title="Combine different character styles">Combine different character styles</a></li></ul></li></ul><h3><a href="#modules">Module Items</a></h3><ul class="block"><li><a href="#modules" title="Modules">Modules</a></li><li><a href="#structs" title="Structs">Structs</a></li><li><a href="#enums" title="Enums">Enums</a></li></ul></section><div id="rustdoc-modnav"><h2 class="in-crate"><a href="../index.html">In crate embedded_<wbr>graphics</a></h2></div></div></nav><div class="sidebar-resizer"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><span class="rustdoc-breadcrumbs"><a href="../index.html">embedded_graphics</a></span><h1>Module <span>text</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/embedded_graphics/text/mod.rs.html#1-307">source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Text drawing.</p>
+<p>The <a href="struct.Text.html" title="struct embedded_graphics::text::Text"><code>Text</code></a> drawable can be used to draw text on a draw target. To construct a <a href="struct.Text.html" title="struct embedded_graphics::text::Text"><code>Text</code></a> object
+at least a text string, position and character style are required. For advanced formatting
+options an additional <a href="struct.TextStyle.html" title="struct embedded_graphics::text::TextStyle"><code>TextStyle</code></a> object might be required.</p>
+<p>Text rendering in embedded-graphics is designed to be extendable by text renderers for different
+font formats. To use a text renderer in an embedded-graphics project each renderer provides a
+character style object. This object is used to set the appearance of characters, like the text
+color or the used font. The available settings vary between different text renderer and are
+documented in the text renderer documentation.</p>
+<p>See the <a href="renderer/index.html" title="mod embedded_graphics::text::renderer"><code>renderer</code> module</a> docs for more information about implementing custom text renderers.</p>
+<p>Embedded-graphics includes a text renderer for monospaced fonts in the <a href="../mono_font/index.html" title="mod embedded_graphics::mono_font"><code>mono_font</code></a> module.
+Most examples will use this renderer and the associated <a href="../mono_font/struct.MonoTextStyle.html" title="struct embedded_graphics::mono_font::MonoTextStyle"><code>MonoTextStyle</code></a> character style.
+But they should be easily adaptable to any external renderer listed in the
+<a href="../index.html#additional-functions-provided-by-external-crates" title="mod embedded_graphics">external crates list</a>.</p>
+<h2 id="text-style"><a class="doc-anchor" href="#text-style">§</a>Text style</h2>
+<p>In addition to styling the individual characters the <a href="struct.Text.html" title="struct embedded_graphics::text::Text"><code>Text</code></a> drawable also contains a
+<a href="struct.TextStyle.html" title="struct embedded_graphics::text::TextStyle"><code>TextStyle</code></a> setting. The text style is used to set the alignment and line spacing of text
+objects.</p>
+<p>The <a href="struct.TextStyle.html#structfield.alignment" title="field embedded_graphics::text::TextStyle::alignment"><code>alignment</code></a> setting sets the horizontal alignment of the text. With the default value
+<code>Left</code> the text will be rendered to the right of the given text position. Analogously <code>Right</code>
+aligned text will be rendered to the left of the given position. <code>Center</code>ed text will extend
+equally to the left and right of the text position.</p>
+<p>The <a href="struct.TextStyle.html#structfield.baseline" title="field embedded_graphics::text::TextStyle::baseline"><code>baseline</code></a> setting defines the vertical alignment of the first line of text. With the default
+setting of <code>Alphabetic</code> the glyphs will be drawn with their descenders below the given position.
+This means that the bottom of glyphs without descender (like ‘A’) will be on the same Y
+coordinate as the given position. The other baseline settings will position the glyphs relative
+to the EM box, without considering the baseline.</p>
+<p>If the text contains multiple lines only the first line will be vertically aligned based on the
+baseline setting. All following lines will be spaced relative to the first line, according to the <a href="struct.TextStyle.html#structfield.line_height" title="field embedded_graphics::text::TextStyle::line_height"><code>line_height</code></a> setting.</p>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2><h3 id="draw-basic-text"><a class="doc-anchor" href="#draw-basic-text">§</a>Draw basic text</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>embedded_graphics::{
+    mono_font::{ascii::FONT_6X10, MonoTextStyle},
+    pixelcolor::Rgb565,
+    prelude::<span class="kw-2">*</span>,
+    text::Text,
+};
+
+<span class="comment">// Create a new character style
+</span><span class="kw">let </span>style = MonoTextStyle::new(<span class="kw-2">&amp;</span>FONT_6X10, Rgb565::WHITE);
+
+<span class="comment">// Create a text at position (20, 30) and draw it using the previously defined style
+</span>Text::new(<span class="string">"Hello Rust!"</span>, Point::new(<span class="number">20</span>, <span class="number">30</span>), style).draw(<span class="kw-2">&amp;mut </span>display)<span class="question-mark">?</span>;</code></pre></div>
+<h3 id="draw-centered-text"><a class="doc-anchor" href="#draw-centered-text">§</a>Draw centered text</h3>
+<p><a href="struct.Text.html" title="struct embedded_graphics::text::Text"><code>Text</code></a> provides the <a href="struct.Text.html#method.with_alignment" title="associated function embedded_graphics::text::Text::with_alignment"><code>with_alignment</code></a> and <a href="struct.Text.html#method.with_baseline" title="associated function embedded_graphics::text::Text::with_baseline"><code>with_baseline</code></a> constructors to easily set
+these commonly used settings without having to build a <a href="struct.TextStyle.html" title="struct embedded_graphics::text::TextStyle"><code>TextStyle</code></a> object first.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>embedded_graphics::{
+    mono_font::{ascii::FONT_6X10, MonoTextStyle},
+    pixelcolor::Rgb565,
+    prelude::<span class="kw-2">*</span>,
+    text::{Text, Alignment},
+};
+
+<span class="comment">// Create a new character style
+</span><span class="kw">let </span>style = MonoTextStyle::new(<span class="kw-2">&amp;</span>FONT_6X10, Rgb565::WHITE);
+
+<span class="comment">// Create a text at position (20, 30) and draw it using the previously defined style
+</span>Text::with_alignment(
+    <span class="string">"First line\nSecond line"</span>,
+    Point::new(<span class="number">20</span>, <span class="number">30</span>),
+    style,
+    Alignment::Center,
+)
+.draw(<span class="kw-2">&amp;mut </span>display)<span class="question-mark">?</span>;</code></pre></div>
+<h3 id="draw-text-with-textstyle"><a class="doc-anchor" href="#draw-text-with-textstyle">§</a>Draw text with <code>TextStyle</code></h3>
+<p>For more advanced text styles a <a href="struct.TextStyle.html" title="struct embedded_graphics::text::TextStyle"><code>TextStyle</code></a> object can be build using the
+<a href="struct.TextStyleBuilder.html" title="struct embedded_graphics::text::TextStyleBuilder"><code>TextStyleBuilder</code></a> and then passed to the <a href="struct.Text.html#method.with_text_style" title="associated function embedded_graphics::text::Text::with_text_style"><code>with_text_style</code></a> constructor.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>embedded_graphics::{
+    mono_font::{ascii::FONT_6X10, MonoTextStyle},
+    pixelcolor::Rgb565,
+    prelude::<span class="kw-2">*</span>,
+    text::{Alignment, LineHeight, Text, TextStyleBuilder},
+};
+
+<span class="comment">// Create a new character style.
+</span><span class="kw">let </span>character_style = MonoTextStyle::new(<span class="kw-2">&amp;</span>FONT_6X10, Rgb565::WHITE);
+
+<span class="comment">// Create a new text style.
+</span><span class="kw">let </span>text_style = TextStyleBuilder::new()
+    .alignment(Alignment::Center)
+    .line_height(LineHeight::Percent(<span class="number">150</span>))
+    .build();
+
+<span class="comment">// Create a text at position (20, 30) and draw it using the previously defined style.
+</span>Text::with_text_style(
+    <span class="string">"First line\nSecond line"</span>,
+    Point::new(<span class="number">20</span>, <span class="number">30</span>),
+    character_style,
+    text_style,
+)
+.draw(<span class="kw-2">&amp;mut </span>display)<span class="question-mark">?</span>;</code></pre></div>
+<h3 id="combine-different-character-styles"><a class="doc-anchor" href="#combine-different-character-styles">§</a>Combine different character styles</h3>
+<p>The <code>draw</code> method for text drawables returns the position of the next character. This can be
+used to combine text with different character styles on a single line of text.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>embedded_graphics::{
+    mono_font::{ascii::{FONT_6X10, FONT_10X20}, MonoTextStyle},
+    pixelcolor::Rgb565,
+    prelude::<span class="kw-2">*</span>,
+    text::{Alignment, LineHeight, Text, TextStyleBuilder},
+};
+
+<span class="comment">// Create a small and a large character style.
+</span><span class="kw">let </span>small_style = MonoTextStyle::new(<span class="kw-2">&amp;</span>FONT_6X10, Rgb565::WHITE);
+<span class="kw">let </span>large_style = MonoTextStyle::new(<span class="kw-2">&amp;</span>FONT_10X20, Rgb565::WHITE);
+
+<span class="comment">// Draw the first text at (20, 30) using the small character style.
+</span><span class="kw">let </span>next = Text::new(<span class="string">"small "</span>, Point::new(<span class="number">20</span>, <span class="number">30</span>), small_style).draw(<span class="kw-2">&amp;mut </span>display)<span class="question-mark">?</span>;
+
+<span class="comment">// Draw the second text after the first text using the large character style.
+</span><span class="kw">let </span>next = Text::new(<span class="string">"large"</span>, next, large_style).draw(<span class="kw-2">&amp;mut </span>display)<span class="question-mark">?</span>;</code></pre></div>
+</div></details><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="renderer/index.html" title="mod embedded_graphics::text::renderer">renderer</a></div><div class="desc docblock-short">Text renderer.</div></li></ul><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.Text.html" title="struct embedded_graphics::text::Text">Text</a></div><div class="desc docblock-short">Text drawable.</div></li><li><div class="item-name"><a class="struct" href="struct.TextStyle.html" title="struct embedded_graphics::text::TextStyle">Text<wbr>Style</a></div><div class="desc docblock-short">Text style.</div></li><li><div class="item-name"><a class="struct" href="struct.TextStyleBuilder.html" title="struct embedded_graphics::text::TextStyleBuilder">Text<wbr>Style<wbr>Builder</a></div><div class="desc docblock-short">Builder for text styles.</div></li></ul><h2 id="enums" class="section-header">Enums<a href="#enums" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="enum" href="enum.Alignment.html" title="enum embedded_graphics::text::Alignment">Alignment</a></div><div class="desc docblock-short">Horizontal text alignment.</div></li><li><div class="item-name"><a class="enum" href="enum.Baseline.html" title="enum embedded_graphics::text::Baseline">Baseline</a></div><div class="desc docblock-short">Text baseline.</div></li><li><div class="item-name"><a class="enum" href="enum.DecorationColor.html" title="enum embedded_graphics::text::DecorationColor">Decoration<wbr>Color</a></div><div class="desc docblock-short">Text decoration color.</div></li><li><div class="item-name"><a class="enum" href="enum.LineHeight.html" title="enum embedded_graphics::text::LineHeight">Line<wbr>Height</a></div><div class="desc docblock-short">Text line height.</div></li></ul></section></div></main></body></html>
