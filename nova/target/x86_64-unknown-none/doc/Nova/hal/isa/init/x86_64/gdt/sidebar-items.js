@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["asm_load_gdt","asm_load_tss","asm_reload_segment_regs"],"struct":["Gdt","SegmentDescriptor","SystemSegmentDescriptor","Tss"]};

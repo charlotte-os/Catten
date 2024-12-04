@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["BSP_STACK_SIZE"],"enum":["Error"],"mod":["gdt"],"static":["BSP_STACK"],"struct":["BSP_GDT","BSP_TSS","IsaInitializer"]};

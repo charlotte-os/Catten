@@ -1,2 +1,0 @@
-window.ALL_CRATES = ["Nova","az","bitflags","byteorder","embedded_graphics","embedded_graphics_core","float_cmp","gcd","lazy_static","limine","lock_api","micromath","num_traits","scopeguard","spin"];
-//{"start":21,"fragment_lengths":[6,5,11,12,20,25,12,6,14,9,11,12,13,13,7]}

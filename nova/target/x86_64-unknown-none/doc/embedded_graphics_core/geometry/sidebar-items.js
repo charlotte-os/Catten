@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["AnchorPoint","AnchorX","AnchorY"],"struct":["Point","Size"],"trait":["Dimensions","OriginDimensions"]};

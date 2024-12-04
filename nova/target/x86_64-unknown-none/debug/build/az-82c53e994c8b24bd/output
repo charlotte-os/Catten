@@ -1,6 +1,0 @@
-$ mkdir -p "/home/mpatel/Programming/Nova/nova/target/x86_64-unknown-none/debug/build/az-82c53e994c8b24bd/out/try_track_caller"
-$ cd "/home/mpatel/Programming/Nova/nova/target/x86_64-unknown-none/debug/build/az-82c53e994c8b24bd/out/try_track_caller"
-$ printf '%s' "// try_tra"... > "/home/mpatel/Programming/Nova/nova/target/x86_64-unknown-none/debug/build/az-82c53e994c8b24bd/out/try_track_caller/try_track_caller.rs"
-$ cd "/home/mpatel/Programming/Nova/nova/target/x86_64-unknown-none/debug/build/az-82c53e994c8b24bd/out/try_track_caller" && "/home/mpatel/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/bin/rustc" "try_track_caller.rs" "--emit=dep-info,metadata" >& /dev/null
-cargo:rustc-cfg=track_caller
-$ rm -r "/home/mpatel/Programming/Nova/nova/target/x86_64-unknown-none/debug/build/az-82c53e994c8b24bd/out/try_track_caller"

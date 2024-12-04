@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["uart_16550"],"trait":["Uart"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["StrokeAlignment"],"mod":["arc","circle","ellipse","line","polyline","rectangle","rounded_rectangle","sector","triangle"],"struct":["PrimitiveStyle","PrimitiveStyleBuilder","Styled"],"trait":["ContainsPoint","OffsetOutline","PointsIter","Primitive","StyledDimensions","StyledDrawable"]};

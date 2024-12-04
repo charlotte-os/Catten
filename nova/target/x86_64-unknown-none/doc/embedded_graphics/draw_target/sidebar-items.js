@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["Clipped","ColorConverted","Cropped","Translated"],"trait":["DrawTarget","DrawTargetExt"]};

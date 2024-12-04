@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["Image","ImageRaw","SubImage"],"trait":["GetPixel","ImageDrawable","ImageDrawableExt"],"type":["ImageRawBE","ImageRawLE"]};

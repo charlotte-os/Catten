@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["init","io","lp_control","memory"]};

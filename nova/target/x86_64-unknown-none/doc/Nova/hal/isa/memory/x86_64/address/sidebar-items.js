@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["paddr","vaddr"],"struct":["PADDR_MASK","PADDR_SIG_BITS","VADDR_MASK","VADDR_SIG_BITS","x86_64_AddrTypes"]};

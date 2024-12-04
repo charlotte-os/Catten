@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"trait":["IReg8Ifce","OReg8Ifce"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["draw_target","geometry","image","pixelcolor","prelude","primitives"],"struct":["Pixel"],"trait":["Drawable"]};

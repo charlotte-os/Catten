@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["main","panic"],"macro":["log","logln"],"mod":["common","console","environment","hal","init","log","memory"]};
