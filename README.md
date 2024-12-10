@@ -9,7 +9,7 @@
 - x86_64
 - Aarch64
 
-*Only devices with full UEFI and ACPI compliant firmware are to be supported as of now
+*Only ARM devices that comply with either the SystemReady or SystemReady DeviceTree standards are supported
 
 ### Contributing
 

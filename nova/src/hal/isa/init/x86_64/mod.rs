@@ -52,7 +52,7 @@ impl interface::InitInterface for IsaInitializer {
     }
 
     fn deinit() -> Result<(), Self::Error> {
-        // Nothing to do here
+        // Nothing to do here yet
         Ok(())
     }
 }

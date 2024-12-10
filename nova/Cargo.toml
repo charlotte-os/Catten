@@ -10,14 +10,13 @@ test = false
 bench = false
 
 [features]
-default = ["pc-like"]
-#platform types
-pc-like = ["acpi", "smbios", "uefi-rt"]
-embedded = ["acpi", "fdt"]
-qemu = ["virt"]
+default = ["limine", "acpi", "uefi_rt", "smbios"]
+#boot protocols
+limine = []
+linux_boot = []
 #firmware interfaces
 acpi = []
-uefi-rt = []
+uefi_rt = []
 fdt = []
 smbios = []
 sbi = []
@@ -31,7 +30,9 @@ virt = []
 bitflags = ">=2.6.0"
 lazy_static = {version = ">=1.5.0", features = ["spin_no_std"]}
 limine = ">=0.3.1"
-embedded-graphics = ">=0.8.1"
+embedded-term = ">=0.1.0"
+embedded-graphics = "*"
+flat_device_tree = ">=3.1.1"
 gcd = "2.3.0"
 spin = ">=0.9.8"
 

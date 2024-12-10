@@ -22,12 +22,6 @@ pub mod memory;
 
 use core::panic::PanicInfo;
 
-use embedded_graphics::mono_font::ascii::FONT_9X18;
-use embedded_graphics::mono_font::MonoTextStyle;
-use embedded_graphics::pixelcolor::Rgb888;
-use embedded_graphics::prelude::*;
-use embedded_graphics::text::Text;
-use hal::drivers::display::limine_fb::FRAMEBUFFER;
 use hal::isa::lp_control::interface::LpCtlIfce;
 use hal::isa::lp_control::LpCtl;
 
@@ -38,15 +32,8 @@ use hal::isa::lp_control::LpCtl;
 #[no_mangle]
 pub unsafe extern "C" fn main() -> ! {
     logln!("Entering Nova.\nInitializing system...\n");
-    let style = MonoTextStyle::new(&FONT_9X18, Rgb888::WHITE);
-    Text::new("Entering Nova.\nInitializing system...\n", Point::new(0, 9), style)
-        .draw(&mut *FRAMEBUFFER.lock())
-        .unwrap();
     init::kernel_init();
     logln!("System initialized.\nHalting.\n");
-    Text::new("System initialized.\nHalting.\n", Point::new(0, 8 + 36), style)
-        .draw(&mut *FRAMEBUFFER.lock())
-        .unwrap();
     LpCtl::halt()
 }
 

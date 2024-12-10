@@ -19,10 +19,3 @@ lazy_static! {
     };
     static ref VADDR_MASK: usize = (1 << *VADDR_SIG_BITS as usize) - 1;
 }
-
-pub struct x86_64_AddrTypes;
-
-impl interface::AddrTypes for x86_64_AddrTypes {
-    type PAddr = paddr::PAddr;
-    type VAddr = vaddr::VAddr;
-}

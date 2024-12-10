@@ -1,8 +1,26 @@
-use crate::hal::isa::memory::interface::*;
+use crate::hal::isa::memory::interface::address::VirtualAddress;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct VAddr {
     raw: usize,
+}
+
+impl VirtualAddress for VAddr {
+    fn from_ptr<T>(ptr: *const T) -> Self {
+        VAddr { raw: ptr as usize }
+    }
+
+    fn from_mut<T>(ptr: *mut T) -> Self {
+        VAddr { raw: ptr as usize }
+    }
+
+    fn into_ptr<T>(self) -> *const T {
+        self.raw as *const T
+    }
+
+    fn into_mut<T>(self) -> *mut T {
+        self.raw as *mut T
+    }
 }
 
 impl From<usize> for VAddr {
@@ -22,25 +40,5 @@ impl From<usize> for VAddr {
 impl Into<usize> for VAddr {
     fn into(self) -> usize {
         self.raw
-    }
-}
-
-impl FromPtr for VAddr {
-    fn from_ptr<T>(ptr: *const T) -> Self {
-        VAddr { raw: ptr as usize }
-    }
-
-    fn from_mut<T>(ptr: *mut T) -> Self {
-        VAddr { raw: ptr as usize }
-    }
-}
-
-impl IntoPtr for VAddr {
-    fn into_ptr<T>(self) -> *const T {
-        self.raw as *const T
-    }
-
-    fn into_mut<T>(self) -> *mut T {
-        self.raw as *mut T
     }
 }

@@ -1,5 +1,5 @@
 use embedded_graphics::draw_target::DrawTarget;
-use embedded_graphics::prelude::{Dimensions, IntoStorage};
+use embedded_graphics::prelude::{Dimensions, IntoStorage, OriginDimensions};
 use embedded_graphics::Pixel;
 use lazy_static::lazy_static;
 use limine::framebuffer::Framebuffer as LimineFramebuffer;
@@ -7,21 +7,24 @@ use spin::Mutex;
 
 use crate::logln;
 
-lazy_static! {
-    pub static ref FRAMEBUFFER: Mutex<Framebuffer> = Mutex::new(Framebuffer::from(
-        &crate::environment::boot_protocol::limine::FRAMEBUFFER_REQUEST
-            .get_response()
-            .expect("Limine did not provide a response to the framebuffer request.")
-            .framebuffers()
-            .next()
-            .expect("The framebuffer request contains no usable framebuffers.")
-    ));
-}
-
 pub struct Framebuffer {
     base: *mut u8,
     width: u64,
     height: u64,
+}
+
+impl Framebuffer {
+    pub fn get() -> Option<Framebuffer> {
+        if let Some(limine_fb) = crate::environment::boot_protocol::limine::FRAMEBUFFER_REQUEST
+        .get_response()
+        .expect("Limine did not provide a response to the framebuffer request.")
+        .framebuffers()
+        .next() {
+            Some(Framebuffer::from(&limine_fb))
+        } else {
+            None
+        }
+    }
 }
 
 impl From<&LimineFramebuffer<'_>> for Framebuffer {
@@ -34,12 +37,9 @@ impl From<&LimineFramebuffer<'_>> for Framebuffer {
     }
 }
 
-impl Dimensions for Framebuffer {
-    fn bounding_box(&self) -> embedded_graphics::primitives::Rectangle {
-        embedded_graphics::primitives::Rectangle::new(
-            embedded_graphics::geometry::Point::new(0, 0),
-            embedded_graphics::geometry::Size::new(self.width as u32, self.height as u32),
-        )
+impl OriginDimensions for Framebuffer {
+    fn size(&self) -> embedded_graphics::geometry::Size {
+        embedded_graphics::geometry::Size::new(self.width as u32, self.height as u32)
     }
 }
 

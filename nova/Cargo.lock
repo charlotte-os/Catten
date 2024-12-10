@@ -3,6 +3,12 @@
 version = 4
 
 [[package]]
+name = "arrayvec"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
+
+[[package]]
 name = "autocfg"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -13,6 +19,12 @@ name = "az"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7b7e4c2464d97fe331d41de9d5db0def0a96f4d823b8b32a2efd503578988973"
+
+[[package]]
+name = "bitflags"
+version = "1.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "bitflags"
@@ -28,9 +40,9 @@ checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
 
 [[package]]
 name = "embedded-graphics"
-version = "0.8.1"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0649998afacf6d575d126d83e68b78c0ab0e00ca2ac7e9b3db11b4cbe8274ef0"
+checksum = "750082c65094fbcc4baf9ba31583ce9a8bb7f52cadfb96f6164b1bc7f922f32b"
 dependencies = [
  "az",
  "byteorder",
@@ -41,19 +53,38 @@ dependencies = [
 
 [[package]]
 name = "embedded-graphics-core"
-version = "0.4.0"
+version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba9ecd261f991856250d2207f6d8376946cd9f412a2165d3b75bc87a0bc7a044"
+checksum = "b8b1239db5f3eeb7e33e35bd10bd014e7b2537b17e071f726a09351431337cfa"
 dependencies = [
  "az",
  "byteorder",
 ]
 
 [[package]]
-name = "float-cmp"
-version = "0.9.0"
+name = "embedded-term"
+version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "98de4bbd547a563b716d8dfa9aad1cb19bfab00f4fa09a6a4ed21dbcf44ce9c4"
+checksum = "896e013a1933de8bc66a131b500bb594ca5dfe1d65db27c1609a18455328fc02"
+dependencies = [
+ "bitflags 1.3.2",
+ "embedded-graphics",
+ "lazy_static",
+ "log",
+ "vte",
+]
+
+[[package]]
+name = "flat_device_tree"
+version = "3.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4d29ba76ecf314f211601c5641d6fc4393d8f56a3b7764b3c8544639aad965a9"
+
+[[package]]
+name = "float-cmp"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e1267f4ac4f343772758f7b1bdcbe767c218bbab93bb432acbf5162bbf85a6c4"
 dependencies = [
  "num-traits",
 ]
@@ -79,7 +110,7 @@ version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ca87cab008b8efeebdbe037cd4d1438037d48c5cb6fed939ffa5aa06315a321"
 dependencies = [
- "bitflags",
+ "bitflags 2.6.0",
 ]
 
 [[package]]
@@ -93,17 +124,25 @@ dependencies = [
 ]
 
 [[package]]
-name = "micromath"
-version = "2.1.0"
+name = "log"
+version = "0.4.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3c8dda44ff03a2f238717214da50f65d5a53b45cd213a7370424ffdb6fae815"
+checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
+
+[[package]]
+name = "micromath"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc4010833aea396656c2f91ee704d51a6f1329ec2ab56ffd00bfd56f7481ea94"
 
 [[package]]
 name = "nova"
 version = "0.0.0"
 dependencies = [
- "bitflags",
+ "bitflags 2.6.0",
  "embedded-graphics",
+ "embedded-term",
+ "flat_device_tree",
  "gcd",
  "lazy_static",
  "limine",
@@ -120,6 +159,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "proc-macro2"
+version = "1.0.92"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37d3544b3f2748c54e147655edb5025752e2303145b5aefb3c3ea2c78b973bb0"
+dependencies = [
+ "unicode-ident",
+]
+
+[[package]]
+name = "quote"
+version = "1.0.37"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b5b9d34b8991d19d98081b46eacdd8eb58c6f2b201139f7c5f643cc155a633af"
+dependencies = [
+ "proc-macro2",
+]
+
+[[package]]
 name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -132,4 +189,37 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
 dependencies = [
  "lock_api",
+]
+
+[[package]]
+name = "unicode-ident"
+version = "1.0.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "adb9e6ca4f869e1180728b7950e35922a7fc6397f7b641499e8f3ef06e50dc83"
+
+[[package]]
+name = "utf8parse"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
+
+[[package]]
+name = "vte"
+version = "0.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6cbce692ab4ca2f1f3047fcf732430249c0e971bfdd2b234cf2c47ad93af5983"
+dependencies = [
+ "arrayvec",
+ "utf8parse",
+ "vte_generate_state_changes",
+]
+
+[[package]]
+name = "vte_generate_state_changes"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2e369bee1b05d510a7b4ed645f5faa90619e05437111783ea5848f28d97d3c2e"
+dependencies = [
+ "proc-macro2",
+ "quote",
 ]
