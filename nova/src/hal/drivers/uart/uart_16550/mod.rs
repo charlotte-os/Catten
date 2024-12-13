@@ -5,14 +5,13 @@ use lazy_static::lazy_static;
 use spin::Mutex;
 
 use crate::common::io::Read;
-use crate::console::terminal::*;
 use crate::hal::drivers::uart::Uart;
 use crate::hal::isa::io::interface::{IReg8Ifce, OReg8Ifce};
 use crate::hal::isa::io::{self, IoReg8};
 
 #[cfg(target_arch = "x86_64")]
 lazy_static! {
-        pub static ref LOG_PORT: Mutex<Uart16550> = Mutex::new(Uart16550::try_new(io::IoReg8::IoPort(COM1)).unwrap());
+    pub static ref LOG_PORT: Mutex<Uart16550> = Mutex::new(Uart16550::try_new(io::IoReg8::IoPort(COM1)).unwrap());
 }
 
 // standard PC COM port base addresses
@@ -114,7 +113,5 @@ impl Read for Uart16550 {
         buf.len()
     }
 }
-
-impl Terminal for Uart16550 {}
 
 unsafe impl Send for Uart16550 {}

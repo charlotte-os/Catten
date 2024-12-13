@@ -4,4 +4,5 @@
 //! like functionality for the Nova kernel. This  module should not duplicate functionality that is already provided
 //! by core or any other high quality no_std library unless there is a compelling reason to do so.
 
+pub mod cell;
 pub mod io;

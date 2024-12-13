@@ -18,7 +18,7 @@ impl PhysicalAddress for PAddr {
 
 impl<T> Into<*const T> for PAddr {
     fn into(self) -> *const T {
-        unsafe { (*HHDM_BASE).into_ptr::<T>()}
+        unsafe { (*HHDM_BASE).into_ptr::<T>() }
     }
 }
 

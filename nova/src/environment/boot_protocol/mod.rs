@@ -1,5 +1,5 @@
 //! # Boot Protocol
-//! 
+//!
 //! This module exists to abstract the boot protocol used to boot the kernel. As of now and for the foreseeable future
 //! this kernel will only support the Limine boot protocol on top of UEFI or the subset of UEFI required by the EBBR
 //! standard. This is in line with the system requirements for ARM64 systems including compliance with the requirements

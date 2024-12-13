@@ -13,8 +13,8 @@
 //! hardware and software component of the system on which it is used.
 
 pub mod common;
-pub mod console;
 pub mod environment;
+pub mod framebuffer;
 pub mod hal;
 pub mod init;
 pub mod log;

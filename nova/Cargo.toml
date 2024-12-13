@@ -30,11 +30,11 @@ virt = []
 bitflags = ">=2.6.0"
 lazy_static = {version = ">=1.5.0", features = ["spin_no_std"]}
 limine = ">=0.3.1"
-embedded-term = ">=0.1.0"
 embedded-graphics = "*"
+flanterm_bindings = ">=1.1.4"
 flat_device_tree = ">=3.1.1"
 gcd = "2.3.0"
-spin = ">=0.9.8"
+spin = {version = ">=0.9.8", features = ["ticket_mutex"]}
 
 [profile.dev]
 debug = "full"
@@ -51,3 +51,6 @@ targets = ["x86_64-unknown-none", "aarch64-unknown-none"]
 panic = "abort"
 lto = true
 opt-level = 3
+
+[build]
+rustflags = ["-C", "relocation-model=static"]
