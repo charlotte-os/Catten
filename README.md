@@ -1,4 +1,4 @@
-# Lavender
+# CharlotteOS
 ## An Experimental Modern Operating System Project
 
 ### Implementation Languages
