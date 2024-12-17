@@ -1,5 +1,5 @@
-# CharlotteOS
-## An Experimental Modern Operating System Project
+# Nova
+## CharlotteOS, An Experimental Modern Operating System Project
 
 ### Implementation Languages
 - Rust
