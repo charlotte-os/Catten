@@ -13,7 +13,6 @@
 //! hardware and software component of the system on which it is used.
 
 pub mod common;
-pub mod environment;
 pub mod framebuffer;
 pub mod hal;
 pub mod init;

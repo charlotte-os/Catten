@@ -1,6 +1,6 @@
 use lazy_static::lazy_static;
 
-use crate::environment::boot_protocol::limine::HHDM_REQUEST;
+use crate::hal::environment::boot_protocol::limine::HHDM_REQUEST;
 #[cfg(target_arch = "x86_64")]
 use crate::hal::isa::memory::{interface::MemoryInterface, MemoryInterfaceImpl};
 

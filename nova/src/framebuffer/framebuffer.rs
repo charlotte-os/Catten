@@ -1,6 +1,6 @@
 use core::sync::atomic::{AtomicPtr, Ordering};
 
-use crate::environment::boot_protocol::limine::FRAMEBUFFER_REQUEST;
+use crate::hal::environment::boot_protocol::limine::FRAMEBUFFER_REQUEST;
 use crate::framebuffer::chars::{FONT, FONT_HEIGHT, FONT_WIDTH};
 // External crate for bootloader-specific functions and types.
 extern crate limine;

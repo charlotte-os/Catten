@@ -7,4 +7,5 @@
 //! to use.
 
 pub mod drivers;
+pub mod environment;
 pub mod isa;
