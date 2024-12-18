@@ -7,8 +7,8 @@
 - Assembly Language
 
 ### Targets
-- x86_64
-- Aarch64*
+- x86_64 (Primary)
+- Aarch64* (Secondary)
 
 *Only devices that meet the requirements specified by ARM for either of the two bands of the SystemReady program are being targeted at this point.
 
