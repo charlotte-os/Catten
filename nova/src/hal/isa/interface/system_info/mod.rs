@@ -1,24 +1,16 @@
 pub enum Error {
     UnsupportedByIsa,
-}
-
-pub struct SimdExtensions {
-    
-    // x86_64
-    avx2: bool,
-    avx_512: bool,
-    // aarch64
-    neon: bool,
-    sve: bool,
-    sve2: bool,
-    sme: bool,
+    UnableToDetermine,
 }
 
 trait CpuInfoIfce {
-    fn get_vendor_string(&self) -> [u8; 12];
-    fn get_brand_string(&self) -> [u8; 48];
+    type IsaExtension;
+    type Vendor;
+    type Model;
+
+    fn get_vendor(&self) -> Self::Vendor;
+    fn get_brand(&self) -> Self::Model;
     fn get_vaddr_sig_bits(&self) -> u8;
     fn get_paddr_sig_bits(&self) -> u8;
-    fn get_simd_extensions(&self) -> SimdExtensions;
-    fn supports_five_level_paging(&self) -> bool;
+    fn is_extension_supported(&self, extension: Self::IsaExtension) -> bool;
 }
