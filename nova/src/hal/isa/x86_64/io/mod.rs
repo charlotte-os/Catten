@@ -1,7 +1,7 @@
 use core::arch::asm;
 use core::ops::Add;
 
-use super::interface;
+use crate::hal::isa::interface::io::{IReg8Ifce, OReg8Ifce};
 
 #[derive(Copy, Clone, Debug)]
 pub enum IoReg8 {
@@ -9,7 +9,7 @@ pub enum IoReg8 {
     Mmio(*mut u8),
 }
 
-impl interface::IReg8Ifce for IoReg8 {
+impl IReg8Ifce for IoReg8 {
     fn read(&self) -> u8 {
         match self {
             IoReg8::IoPort(port) => {
@@ -28,7 +28,7 @@ impl interface::IReg8Ifce for IoReg8 {
     }
 }
 
-impl interface::OReg8Ifce for IoReg8 {
+impl OReg8Ifce for IoReg8 {
     fn write(&self, value: u8) {
         match self {
             IoReg8::IoPort(port) => unsafe {

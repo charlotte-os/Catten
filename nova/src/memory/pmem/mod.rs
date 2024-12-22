@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 
 use crate::hal::environment::boot_protocol::limine::HHDM_REQUEST;
 #[cfg(target_arch = "x86_64")]
-use crate::hal::isa::memory::{interface::MemoryInterface, MemoryInterfaceImpl};
+use crate::hal::isa::interface::{memory::MemoryInterface, MemoryInterfaceImpl};
 
 type VAddr = <MemoryInterfaceImpl as MemoryInterface>::VAddr;
 

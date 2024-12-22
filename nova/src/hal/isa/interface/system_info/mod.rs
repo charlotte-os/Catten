@@ -3,7 +3,7 @@ pub enum Error {
     UnableToDetermine,
 }
 
-trait CpuInfoIfce {
+pub trait CpuInfoIfce {
     type IsaExtension;
     type Vendor;
     type Model;

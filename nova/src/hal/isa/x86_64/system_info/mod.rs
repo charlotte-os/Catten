@@ -1,6 +1,6 @@
 use core::{arch::x86_64::__cpuid_count, mem::transmute_copy};
 
-use super::CpuInfoIfce;
+use crate::hal::isa::interface::system_info::CpuInfoIfce;
 
 pub enum IsaExtension {
     avx2,

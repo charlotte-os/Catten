@@ -3,8 +3,6 @@ pub mod vaddr;
 
 use lazy_static::lazy_static;
 
-use crate::hal::isa::memory::interface;
-
 lazy_static! {
     static ref PADDR_SIG_BITS: u8 = {
         let cpuid_val = unsafe { core::arch::x86_64::__cpuid(0x80000008) };

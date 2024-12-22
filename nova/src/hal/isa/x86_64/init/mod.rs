@@ -9,7 +9,7 @@ use gdt::{Gdt, Tss};
 use lazy_static::lazy_static;
 use spin::Mutex;
 
-use super::interface;
+use crate::hal::isa::interface::init::InitInterface;
 
 /// The BSP stack size is 4 pages by default.
 const BSP_STACK_SIZE: usize = 4096 * 4;
@@ -43,7 +43,7 @@ pub enum Error {
     InvalidTss,
 }
 
-impl interface::InitInterface for IsaInitializer {
+impl InitInterface for IsaInitializer {
     type Error = Error;
 
     fn init() -> Result<(), Self::Error> {

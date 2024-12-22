@@ -1,4 +1,4 @@
-use crate::hal::isa::memory::interface::address::{PhysicalAddress, VirtualAddress};
+use crate::hal::isa::interface::memory::address::{PhysicalAddress, VirtualAddress};
 use crate::memory::pmem::HHDM_BASE;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
