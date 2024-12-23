@@ -21,8 +21,10 @@ pub mod memory;
 
 use core::panic::PanicInfo;
 
-use hal::isa::lp_control::interface::LpCtlIfce;
-use hal::isa::lp_control::LpCtl;
+use hal::isa::interface::lp_control::LpCtlIfce;
+use hal::isa::current_isa::lp_control::LpCtl;
+use hal::isa::current_isa::system_info::*;
+use hal::isa::interface::system_info::CpuInfoIfce;
 
 /// This is the entry point for the kernel. The `main` function is called by the
 /// bootloader after setting up the environment. It is made C ABI compatible so
@@ -32,7 +34,9 @@ use hal::isa::lp_control::LpCtl;
 pub unsafe extern "C" fn main() -> ! {
     logln!("Entering Nova.\nInitializing system...\n");
     init::kernel_init();
-    logln!("System initialized.\nHalting.\n");
+    logln!("System initialized.");
+    logln!("System Information:");
+    logln!("CPU Vendor: {:?}", (CpuInfo::get_vendor()));
     LpCtl::halt()
 }
 

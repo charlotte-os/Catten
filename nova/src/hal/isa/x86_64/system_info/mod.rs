@@ -15,13 +15,13 @@ impl CpuInfoIfce for CpuInfo {
     type Vendor = [u8; 12];
     type Model = [u8; 48];
 
-    fn get_vendor(&self) -> Self::Vendor {
+    fn get_vendor() -> Self::Vendor {
         unsafe { 
             let vendor_string_raw = __cpuid_count(0,0);
             core::mem::transmute::<[u32; 3], [u8; 12]>([vendor_string_raw.ebx, vendor_string_raw.edx, vendor_string_raw.ecx]) 
         }
     }
-    fn get_brand(&self) -> Self::Model {
+    fn get_brand() -> Self::Model {
         unsafe {
             let mut brand_string: [u8; 48] = [0; 48];
 
@@ -46,19 +46,19 @@ impl CpuInfoIfce for CpuInfo {
             brand_string
         }
     }
-    fn get_vaddr_sig_bits(&self) -> u8 {
+    fn get_vaddr_sig_bits() -> u8 {
         unsafe {
             let cpuid_result = __cpuid_count(0x80000008, 0);
             cpuid_result.eax as u8
         }
     }
-    fn get_paddr_sig_bits(&self) -> u8 {
+    fn get_paddr_sig_bits() -> u8 {
         unsafe {
             let cpuid_result = __cpuid_count(0x80000008, 0);
             (cpuid_result.eax >> 8) as u8
         }
     }
-    fn is_extension_supported(&self, extension: Self::IsaExtension) -> bool {
+    fn is_extension_supported(extension: Self::IsaExtension) -> bool {
         match extension {
             IsaExtension::avx2 => {
                 unsafe {

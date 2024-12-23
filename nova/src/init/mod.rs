@@ -1,5 +1,5 @@
 use crate::hal::isa::interface::init::InitInterface;
-use crate::hal::isa::IsaInitializer;
+use crate::hal::isa::current_isa::init::IsaInitializer;
 use crate::logln;
 
 pub fn kernel_init() {
