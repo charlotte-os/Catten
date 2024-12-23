@@ -36,7 +36,11 @@ pub unsafe extern "C" fn main() -> ! {
     init::kernel_init();
     logln!("System initialized.");
     logln!("System Information:");
-    logln!("CPU Vendor: {:?}", (CpuInfo::get_vendor()));
+    logln!("CPU Vendor: {}", (CpuInfo::get_vendor()));
+    logln!("CPU Model: {}", (CpuInfo::get_brand()));
+    logln!("Physical Address bits implmented: {}", (CpuInfo::get_paddr_sig_bits()));
+    logln!("Virtual Address bits implmented: {}", (CpuInfo::get_vaddr_sig_bits()));
+    logln!("Nothing to do. Halting.");
     LpCtl::halt()
 }
 

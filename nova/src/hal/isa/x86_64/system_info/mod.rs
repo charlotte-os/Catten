@@ -1,4 +1,4 @@
-use core::{arch::x86_64::__cpuid_count, mem::transmute_copy};
+use core::{arch::x86_64::__cpuid_count, fmt::{self, Display, Formatter}, mem::transmute_copy};
 
 use crate::hal::isa::interface::system_info::CpuInfoIfce;
 
@@ -8,40 +8,58 @@ pub enum IsaExtension {
     pml5,
 }
 
+#[repr(transparent)]
+pub struct VendorString([u8; 12]);
+
+impl Display for VendorString {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", core::str::from_utf8(&self.0).unwrap_or("<Invalid Vendor String>"))
+    }
+}
+
+#[repr(transparent)]
+pub struct ModelString([u8; 48]);
+
+impl Display for ModelString {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", core::str::from_utf8(&self.0).expect("<Invalid Model String>"))
+    }
+}
+
 pub struct CpuInfo;
 
 impl CpuInfoIfce for CpuInfo {
     type IsaExtension = IsaExtension;
-    type Vendor = [u8; 12];
-    type Model = [u8; 48];
+    type Vendor = VendorString;
+    type Model = ModelString;
 
     fn get_vendor() -> Self::Vendor {
         unsafe { 
             let vendor_string_raw = __cpuid_count(0,0);
-            core::mem::transmute::<[u32; 3], [u8; 12]>([vendor_string_raw.ebx, vendor_string_raw.edx, vendor_string_raw.ecx]) 
+            core::mem::transmute::<[u32; 3], VendorString>([vendor_string_raw.ebx, vendor_string_raw.edx, vendor_string_raw.ecx]) 
         }
     }
     fn get_brand() -> Self::Model {
         unsafe {
-            let mut brand_string: [u8; 48] = [0; 48];
+            let mut brand_string = ModelString{0: [0u8; 48]};
 
             let mut cpuid_result = __cpuid_count(0x80000002, 0);
-            brand_string[0..4].copy_from_slice(transmute_copy(&cpuid_result.eax));
-            brand_string[4..8].copy_from_slice(transmute_copy(&cpuid_result.ebx));
-            brand_string[8..12].copy_from_slice(transmute_copy(&cpuid_result.ecx));
-            brand_string[12..16].copy_from_slice(transmute_copy(&cpuid_result.edx));
+            brand_string.0[0..4].copy_from_slice(transmute_copy(&cpuid_result.eax));
+            brand_string.0[4..8].copy_from_slice(transmute_copy(&cpuid_result.ebx));
+            brand_string.0[8..12].copy_from_slice(transmute_copy(&cpuid_result.ecx));
+            brand_string.0[12..16].copy_from_slice(transmute_copy(&cpuid_result.edx));
 
             cpuid_result = __cpuid_count(0x80000003, 0);
-            brand_string[16..20].copy_from_slice(transmute_copy(&cpuid_result.eax));
-            brand_string[20..24].copy_from_slice(transmute_copy(&cpuid_result.ebx));
-            brand_string[24..28].copy_from_slice(transmute_copy(&cpuid_result.ecx));
-            brand_string[28..32].copy_from_slice(transmute_copy(&cpuid_result.edx));
+            brand_string.0[16..20].copy_from_slice(transmute_copy(&cpuid_result.eax));
+            brand_string.0[20..24].copy_from_slice(transmute_copy(&cpuid_result.ebx));
+            brand_string.0[24..28].copy_from_slice(transmute_copy(&cpuid_result.ecx));
+            brand_string.0[28..32].copy_from_slice(transmute_copy(&cpuid_result.edx));
 
             cpuid_result = __cpuid_count(0x80000004, 0);
-            brand_string[32..36].copy_from_slice(transmute_copy(&cpuid_result.eax));
-            brand_string[36..40].copy_from_slice(transmute_copy(&cpuid_result.ebx));
-            brand_string[40..44].copy_from_slice(transmute_copy(&cpuid_result.ecx));
-            brand_string[44..48].copy_from_slice(transmute_copy(&cpuid_result.edx));
+            brand_string.0[32..36].copy_from_slice(transmute_copy(&cpuid_result.eax));
+            brand_string.0[36..40].copy_from_slice(transmute_copy(&cpuid_result.ebx));
+            brand_string.0[40..44].copy_from_slice(transmute_copy(&cpuid_result.ecx));
+            brand_string.0[44..48].copy_from_slice(transmute_copy(&cpuid_result.edx));
 
             brand_string
         }
