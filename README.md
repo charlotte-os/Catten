@@ -8,9 +8,9 @@
 
 ### Targets
 - x86_64 (Primary)
-- Aarch64* (Secondary)
+- Aarch64 (Secondary)
 
-*Only devices that meet the requirements specified by ARM for either of the two bands of the SystemReady program are being targeted at this point.
+*UEFI and ACPI are required on all targets. If your system does not currently support them then please contact your hardware vendor.
 
 ### Contributing
 
