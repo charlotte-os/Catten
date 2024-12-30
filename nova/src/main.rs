@@ -21,9 +21,9 @@ pub mod memory;
 
 use core::panic::PanicInfo;
 
-use hal::isa::interface::lp_control::LpCtlIfce;
 use hal::isa::current_isa::lp_control::LpCtl;
 use hal::isa::current_isa::system_info::*;
+use hal::isa::interface::lp_control::LpCtlIfce;
 use hal::isa::interface::system_info::CpuInfoIfce;
 
 /// This is the entry point for the kernel. The `main` function is called by the
@@ -32,20 +32,23 @@ use hal::isa::interface::system_info::CpuInfoIfce;
 /// bootloader.
 #[no_mangle]
 pub unsafe extern "C" fn main() -> ! {
-    logln!("Entering Nova.\nInitializing system...\n");
+    logln!("Nova Kernel Version 0.0.1");
+    logln!("=========================");
+    logln!("Started Nova.\nInitializing system...");
     init::kernel_init();
     logln!("System initialized.");
     logln!("System Information:");
     logln!("CPU Vendor: {}", (CpuInfo::get_vendor()));
-    logln!("CPU Model: {}", (CpuInfo::get_brand()));
+    // TODO: Root cause the reason the following line halts execution without output or a panic.
+    //logln!("CPU Model: {}", (CpuInfo::get_brand()));
     logln!("Physical Address bits implmented: {}", (CpuInfo::get_paddr_sig_bits()));
     logln!("Virtual Address bits implmented: {}", (CpuInfo::get_vaddr_sig_bits()));
-    logln!("Nothing to do. Halting.");
+    logln!("Nothing left to do. Halting the BSP pending an interrupt.");
     LpCtl::halt()
 }
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     logln!("{}", _info);
-    loop {}
+    LpCtl::halt()
 }
