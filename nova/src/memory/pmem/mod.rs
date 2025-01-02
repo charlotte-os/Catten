@@ -1,18 +1,18 @@
 //! # Physical Memory Management
-//! 
-//! This module is responsible for managing physical memory. It provides an interface for allocating and freeing physical memory frames.
+//!
+//! This module is responsible for managing physical memory. It provides an interface for allocating and freeing
+//! physical memory frames.
 
-use core::ptr::NonNull;
+use core::mem::MaybeUninit;
 
 use lazy_static::lazy_static;
 use limine::response::MemoryMapResponse;
+use spin::Mutex;
 
-use crate::hal::environment::boot_protocol::limine::HHDM_REQUEST;
+use crate::hal::environment::boot_protocol::limine::{HHDM_REQUEST, MEMEORY_MAP_REQUEST};
+use crate::hal::isa::current_isa::memory::address::paddr::PAddr;
 use crate::hal::isa::current_isa::memory::MemoryInterfaceImpl;
-use crate::hal::isa::interface::memory::address::PhysicalAddress;
-#[cfg(target_arch = "x86_64")]
 use crate::hal::isa::interface::memory::MemoryInterface;
-use crate::hal::isa::x86_64::memory::address::paddr::PAddr;
 use crate::logln;
 
 pub type VAddr = <MemoryInterfaceImpl as MemoryInterface>::VAddr;
@@ -23,41 +23,50 @@ lazy_static! {
     } else {
         panic!("Limine failed to provide a higher half direct mapping region.");
     };
+    pub static ref PHYSICAL_FRAME_ALLOCATOR: Mutex<PhysicalFrameAllocator> = Mutex::new(PhysicalFrameAllocator::from(MEMEORY_MAP_REQUEST.get_response().unwrap()));
 }
+
 #[derive(Debug)]
 pub enum Error {
     UnableToAllocateTrackingStructure,
     MisalignedPhysicalAddress,
 }
 
-
-
+#[derive(Debug)]
 pub struct PhysicalFrameAllocator {
-    bitmap: &'static mut [u8],
+    bitmap_ptr: *mut u8,
+    bitmap_len: usize,
 }
 
-impl PhysicalFrameAllocator {}
+unsafe impl Send for PhysicalFrameAllocator {}
+
+impl PhysicalFrameAllocator {
+
+}
 
 // There should be a From implementation for each type of memory map we support.
 
 impl From<&MemoryMapResponse> for PhysicalFrameAllocator {
     fn from(response: &MemoryMapResponse) -> Self {
+        logln!("Computing PhysicalFrameAllocator bitmap size...");
         let bitmap_size = compute_bitmap_size(response);
         logln!("PhysicalFrameAllocator bitmap size: {:?}", bitmap_size);
-
+        logln!("Finding best fit memory location for the PhysicalFrameAllocator bitmap...");
         let bitmap_addr: PAddr = find_mmap_best_fit(response, bitmap_size).unwrap();
-        logln!("PhysicalFrameAllocator bitmap addr: {:?}", bitmap_addr);
+        logln!("PhysicalFrameAllocator bitmap addr (physical): {:?}", bitmap_addr);
         let pfa = PhysicalFrameAllocator {
-            bitmap: unsafe {
-                core::slice::from_raw_parts_mut(
-                    <PAddr as Into<*mut u8>>::into(bitmap_addr),
-                    bitmap_size,
-                )
-            },
+            bitmap_ptr: bitmap_addr.into(),
+            bitmap_len: bitmap_size
         };
         // Initially mark all frames as unavailable.
-        pfa.bitmap.fill(1u8);
-        init_bitmap_from_mmap(pfa.bitmap, response);
+        for i in 0..bitmap_size {
+            unsafe {
+                *pfa.bitmap_ptr.add(i) = 0xFF;
+            }
+        }
+        logln!("Initializing PhysicalFrameAllocator bitmap...");
+        init_bitmap_from_mmap(pfa.bitmap_ptr, pfa.bitmap_len, response);
+        logln!("PhysicalFrameAllocator bitmap initialized.");
 
         pfa
     }
@@ -106,7 +115,7 @@ fn addr_to_bitmap_index(addr: PAddr) -> Result<(usize, usize), Error> {
     Ok((byte_index, bit_offset))
 }
 
-fn init_bitmap_from_mmap(bitmap: &mut [u8], mmap: &MemoryMapResponse) {
+fn init_bitmap_from_mmap(bitmap_ptr: *mut u8, bitmap_len: usize, mmap: &MemoryMapResponse) {
     for entry in mmap.entries().iter() {
         let start = entry.base;
         let end = entry.base + entry.length;
@@ -114,7 +123,9 @@ fn init_bitmap_from_mmap(bitmap: &mut [u8], mmap: &MemoryMapResponse) {
         let end_index = end / 4096;
         for i in (start_index..end_index).step_by(4096) {
             let (byte_index, bit_offset) = addr_to_bitmap_index(PAddr::from(i as usize)).unwrap();
-            bitmap[byte_index] &= 0 << bit_offset;
+            unsafe {
+                *(bitmap_ptr.offset(byte_index as isize)) &= 0 << bit_offset;
+            }
         }
     }
 }

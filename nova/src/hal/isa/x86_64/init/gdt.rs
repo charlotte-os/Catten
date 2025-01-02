@@ -3,7 +3,7 @@ use core::mem::size_of;
 use core::ptr;
 
 #[repr(C, packed(1))]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 struct SegmentDescriptor {
     limit0: u16,
     base0: u16,
@@ -26,6 +26,7 @@ impl SegmentDescriptor {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
 #[repr(C, packed(1))]
 struct SystemSegmentDescriptor {
     lower: SegmentDescriptor,
@@ -43,6 +44,7 @@ impl SystemSegmentDescriptor {
     }
 }
 
+#[derive(Debug)]
 #[repr(C, packed(1))]
 pub struct Gdt {
     segment_descs: [SegmentDescriptor; 5],
@@ -118,6 +120,7 @@ impl Gdt {
     }
 }
 
+#[derive(Debug)]
 #[repr(C, packed(1))]
 pub struct Tss {
     res: u32,

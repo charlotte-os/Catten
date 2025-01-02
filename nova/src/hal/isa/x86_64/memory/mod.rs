@@ -2,7 +2,6 @@ pub mod address;
 
 use crate::hal::isa::interface::memory::MemoryInterface;
 
-
 pub struct MemoryInterfaceImpl;
 
 impl MemoryInterface for MemoryInterfaceImpl {

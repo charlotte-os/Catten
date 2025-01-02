@@ -8,9 +8,9 @@
 //! - [`Memory`](memory): wrappers over ISA specific memory management structures
 //! - [`System Information`](system_info): ISA specific system information
 
-pub mod interface;
 #[cfg(target_arch = "aarch64")]
 pub mod aarch64;
+pub mod interface;
 #[cfg(target_arch = "aarch64")]
 pub use aarch64 as current_isa;
 #[cfg(target_arch = "x86_64")]

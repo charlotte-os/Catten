@@ -32,7 +32,7 @@ use hal::isa::interface::system_info::CpuInfoIfce;
 /// bootloader.
 #[no_mangle]
 pub unsafe extern "C" fn main() -> ! {
-    logln!("Nova Kernel Version 0.0.1");
+    logln!("Nova Kernel Version 0.0.5");
     logln!("=========================");
     logln!("Started Nova.\nInitializing system...");
     init::kernel_init();
@@ -43,7 +43,7 @@ pub unsafe extern "C" fn main() -> ! {
     //logln!("CPU Model: {}", (CpuInfo::get_brand()));
     logln!("Physical Address bits implmented: {}", (CpuInfo::get_paddr_sig_bits()));
     logln!("Virtual Address bits implmented: {}", (CpuInfo::get_vaddr_sig_bits()));
-    logln!("Nothing left to do. Halting the BSP pending an interrupt.");
+    logln!("Nothing left to do. Waiting for interrupts...");
     LpCtl::halt()
 }
 

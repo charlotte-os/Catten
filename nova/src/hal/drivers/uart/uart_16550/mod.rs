@@ -6,8 +6,8 @@ use spin::Mutex;
 
 use crate::common::io::Read;
 use crate::hal::drivers::uart::Uart;
-use crate::hal::isa::interface::io::{IReg8Ifce, OReg8Ifce};
 use crate::hal::isa::current_isa::io::{self, IoReg8};
+use crate::hal::isa::interface::io::{IReg8Ifce, OReg8Ifce};
 
 #[cfg(target_arch = "x86_64")]
 lazy_static! {

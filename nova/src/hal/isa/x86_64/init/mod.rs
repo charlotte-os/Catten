@@ -1,15 +1,21 @@
 mod gdt;
 
+use core::borrow::BorrowMut;
+use core::ops::Deref;
 // core
 use core::ptr;
 
+use exceptions::load_exceptions;
 // crate local
 use gdt::{Gdt, Tss};
+use idt::Idt;
 // external crates
 use lazy_static::lazy_static;
 use spin::Mutex;
 
 use crate::hal::isa::interface::init::InitInterface;
+use crate::hal::isa::x86_64::interrupts::*;
+use crate::{log, logln};
 
 /// The BSP stack size is 4 pages by default.
 const BSP_STACK_SIZE: usize = 4096 * 4;
@@ -48,6 +54,11 @@ impl InitInterface for IsaInitializer {
 
     fn init() -> Result<(), Self::Error> {
         BSP_GDT.lock().load();
+        logln!("Loaded GDT");
+        //logln!("GDT: {:?}", (BSP_GDT.lock().deref()));
+        load_exceptions(IDT.lock().borrow_mut());
+        //logln!("IDT: {:?}", (IDT.lock().deref()));
+        IDT.lock().load();
         Ok(())
     }
 

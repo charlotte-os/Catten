@@ -1,4 +1,6 @@
-use core::{arch::x86_64::__cpuid_count, fmt::{self, Display, Formatter}, mem::transmute_copy};
+use core::arch::x86_64::__cpuid_count;
+use core::fmt::{self, Display, Formatter};
+use core::mem::transmute_copy;
 
 use crate::hal::isa::interface::system_info::CpuInfoIfce;
 
@@ -13,7 +15,11 @@ pub struct VendorString([u8; 12]);
 
 impl Display for VendorString {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", core::str::from_utf8(&self.0).unwrap_or("<Invalid Vendor String>"))
+        write!(
+            f,
+            "{}",
+            core::str::from_utf8(&self.0).unwrap_or("<Invalid Vendor String>")
+        )
     }
 }
 
@@ -30,18 +36,23 @@ pub struct CpuInfo;
 
 impl CpuInfoIfce for CpuInfo {
     type IsaExtension = IsaExtension;
-    type Vendor = VendorString;
     type Model = ModelString;
+    type Vendor = VendorString;
 
     fn get_vendor() -> Self::Vendor {
-        unsafe { 
-            let vendor_string_raw = __cpuid_count(0,0);
-            core::mem::transmute::<[u32; 3], VendorString>([vendor_string_raw.ebx, vendor_string_raw.edx, vendor_string_raw.ecx]) 
+        unsafe {
+            let vendor_string_raw = __cpuid_count(0, 0);
+            core::mem::transmute::<[u32; 3], VendorString>([
+                vendor_string_raw.ebx,
+                vendor_string_raw.edx,
+                vendor_string_raw.ecx,
+            ])
         }
     }
+
     fn get_brand() -> Self::Model {
         unsafe {
-            let mut brand_string = ModelString{0: [0u8; 48]};
+            let mut brand_string = ModelString { 0: [0u8; 48] };
 
             let mut cpuid_result = __cpuid_count(0x80000002, 0);
             brand_string.0[0..4].copy_from_slice(transmute_copy(&cpuid_result.eax));
@@ -64,38 +75,35 @@ impl CpuInfoIfce for CpuInfo {
             brand_string
         }
     }
+
     fn get_vaddr_sig_bits() -> u8 {
         unsafe {
             let cpuid_result = __cpuid_count(0x80000008, 0);
             cpuid_result.eax as u8
         }
     }
+
     fn get_paddr_sig_bits() -> u8 {
         unsafe {
             let cpuid_result = __cpuid_count(0x80000008, 0);
             (cpuid_result.eax >> 8) as u8
         }
     }
+
     fn is_extension_supported(extension: Self::IsaExtension) -> bool {
         match extension {
-            IsaExtension::avx2 => {
-                unsafe {
-                    let cpuid_result = __cpuid_count(7, 0);
-                    (cpuid_result.ebx & 0x20) != 0
-                }
-            }
-            IsaExtension::avx512 => {
-                unsafe {
-                    let cpuid_result = __cpuid_count(7, 0);
-                    (cpuid_result.ebx & 0x40000000) != 0
-                }
-            }
-            IsaExtension::pml5 => {
-                unsafe {
-                    let cpuid_result = __cpuid_count(0x80000008, 0);
-                    (cpuid_result.ecx & 0x100) != 0
-                }
-            }
+            IsaExtension::avx2 => unsafe {
+                let cpuid_result = __cpuid_count(7, 0);
+                (cpuid_result.ebx & 0x20) != 0
+            },
+            IsaExtension::avx512 => unsafe {
+                let cpuid_result = __cpuid_count(7, 0);
+                (cpuid_result.ebx & 0x40000000) != 0
+            },
+            IsaExtension::pml5 => unsafe {
+                let cpuid_result = __cpuid_count(0x80000008, 0);
+                (cpuid_result.ecx & 0x100) != 0
+            },
         }
     }
 }

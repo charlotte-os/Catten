@@ -1,4 +1,5 @@
 use core::arch::asm;
+
 use crate::hal::isa::interface::lp_control::LpCtlIfce;
 
 pub struct LpCtl;

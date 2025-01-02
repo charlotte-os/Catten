@@ -26,7 +26,7 @@ impl VirtualAddress for VAddr {
 impl From<usize> for VAddr {
     fn from(value: usize) -> Self {
         let corrected = {
-            let is_negative = (value & (1 << (*super::VADDR_SIG_BITS - 1))) != 0;
+            let is_negative = (value & ((1 << *super::VADDR_SIG_BITS) - 1)) != 0;
             if is_negative {
                 value | !(*super::VADDR_MASK)
             } else {
