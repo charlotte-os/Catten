@@ -23,7 +23,7 @@ lazy_static! {
     } else {
         panic!("Limine failed to provide a higher half direct mapping region.");
     };
-    pub static ref PHYSICAL_FRAME_ALLOCATOR: Mutex<PhysicalFrameAllocator> = Mutex::new(PhysicalFrameAllocator::from(MEMEORY_MAP_REQUEST.get_response().unwrap()));
+    pub static ref PHYSICAL_FRAME_ALLOCATOR: Mutex<PhysicalFrameAllocator> = Mutex::new(PhysicalFrameAllocator::from(MEMEORY_MAP_REQUEST.get_response().expect("Limine failed to provide a memory map.")));
 }
 
 #[derive(Debug)]
@@ -59,9 +59,10 @@ impl From<&MemoryMapResponse> for PhysicalFrameAllocator {
             bitmap_len: bitmap_size
         };
         // Initially mark all frames as unavailable.
+        logln!("Clearing PhysicalFrameAllocator bitmap...");
         for i in 0..bitmap_size {
             unsafe {
-                *pfa.bitmap_ptr.add(i) = 0xFF;
+                *(pfa.bitmap_ptr.offset(i as isize)) = 0xFFu8;
             }
         }
         logln!("Initializing PhysicalFrameAllocator bitmap...");
@@ -119,9 +120,8 @@ fn init_bitmap_from_mmap(bitmap_ptr: *mut u8, bitmap_len: usize, mmap: &MemoryMa
     for entry in mmap.entries().iter() {
         let start = entry.base;
         let end = entry.base + entry.length;
-        let start_index = start / 4096;
-        let end_index = end / 4096;
-        for i in (start_index..end_index).step_by(4096) {
+        for i in (start..end).step_by(4096) {
+            //logln!("Marking frame at physical address {:?} as available...", i);
             let (byte_index, bit_offset) = addr_to_bitmap_index(PAddr::from(i as usize)).unwrap();
             unsafe {
                 *(bitmap_ptr.offset(byte_index as isize)) &= 0 << bit_offset;

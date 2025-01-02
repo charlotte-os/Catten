@@ -8,23 +8,23 @@ pub struct PAddr {
 
 impl PhysicalAddress for PAddr {
     unsafe fn into_hhdm_ptr<T>(self) -> *const T {
-        (*HHDM_BASE).into_ptr::<T>()
+        (*HHDM_BASE).into_ptr::<T>().byte_offset(self.addr as isize)
     }
 
     unsafe fn into_hhdm_mut<T>(self) -> *mut T {
-        (*HHDM_BASE).into_mut::<T>()
+        (*HHDM_BASE).into_mut::<T>().byte_offset(self.addr as isize)
     }
 }
 
 impl<T> Into<*const T> for PAddr {
     fn into(self) -> *const T {
-        unsafe { (*HHDM_BASE).into_ptr::<T>() }
+        unsafe { (*HHDM_BASE).into_ptr::<T>().byte_offset(self.addr as isize) }
     }
 }
 
 impl<T> Into<*mut T> for PAddr {
     fn into(self) -> *mut T {
-        unsafe { (*HHDM_BASE).into_mut::<T>() }
+        unsafe { (*HHDM_BASE).into_mut::<T>().byte_offset(self.addr as isize) }
     }
 }
 
