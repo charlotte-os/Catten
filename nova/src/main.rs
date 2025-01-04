@@ -18,6 +18,7 @@ pub mod hal;
 pub mod init;
 pub mod log;
 pub mod memory;
+pub mod self_test;
 
 use core::panic::PanicInfo;
 
@@ -34,7 +35,7 @@ use hal::isa::interface::system_info::CpuInfoIfce;
 pub unsafe extern "C" fn main() -> ! {
     logln!("Nova Kernel Version 0.0.5");
     logln!("=========================");
-    logln!("Started Nova.\nInitializing system...");
+    logln!("Entering Nova.\nInitializing system...");
     init::kernel_init();
     logln!("System initialized.");
     logln!("System Information:");
@@ -43,6 +44,9 @@ pub unsafe extern "C" fn main() -> ! {
     //logln!("CPU Model: {}", (CpuInfo::get_brand()));
     logln!("Physical Address bits implmented: {}", (CpuInfo::get_paddr_sig_bits()));
     logln!("Virtual Address bits implmented: {}", (CpuInfo::get_vaddr_sig_bits()));
+
+    self_test::run_self_tests();
+
     logln!("Nothing left to do. Waiting for interrupts...");
     LpCtl::halt()
 }

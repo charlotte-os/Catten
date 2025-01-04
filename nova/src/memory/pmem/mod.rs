@@ -3,8 +3,6 @@
 //! This module is responsible for managing physical memory. It provides an interface for allocating and freeing
 //! physical memory frames.
 
-use core::mem::MaybeUninit;
-
 use lazy_static::lazy_static;
 use limine::response::MemoryMapResponse;
 use spin::Mutex;
@@ -126,6 +124,8 @@ fn compute_bitmap_size(mmap: &MemoryMapResponse) -> usize {
 
     (<PAddr as Into<usize>>::into(highest_address) / 4096 + 1) / 8 + 1
 }
+
+// Helper functions
 
 fn find_mmap_best_fit(mmap: &MemoryMapResponse, size: usize) -> Result<PAddr, Error> {
     let mut best_fit = PAddr::from(0);
