@@ -30,6 +30,9 @@ lazy_static! {
 pub enum Error {
     UnableToAllocateTrackingStructure,
     MisalignedPhysicalAddress,
+    OutOfFrames,
+    InvalidPAddr,
+    CannotDeallocateUnallocatedFrame
 }
 
 #[derive(Debug)]
@@ -41,7 +44,43 @@ pub struct PhysicalFrameAllocator {
 unsafe impl Send for PhysicalFrameAllocator {}
 
 impl PhysicalFrameAllocator {
-
+    pub fn allocate_frame(&mut self) -> Result<PAddr, Error> {
+        let mut curr_byte: u8;
+        for byte_idx in 0..self.bitmap_len {
+            unsafe {
+                curr_byte = *self.bitmap_ptr.offset(byte_idx as isize);
+                if curr_byte != 0xFF {
+                    for bit_idx in 0..8 {
+                        if curr_byte & 1 << bit_idx == 0u8 {
+                            return Ok(PAddr::from(byte_idx * 8 + bit_idx));
+                        }
+                    }
+                }
+            }
+        }
+        Err(Error::OutOfFrames)
+    }
+    pub fn deallocate_frame(&mut self, frame_addr: PAddr) -> Result<(), Error> {
+        if <PAddr as Into<usize>>::into(frame_addr.clone()) % 4096 != 0 {
+            return Err(Error::MisalignedPhysicalAddress)
+        }
+        if let Ok(idx) = addr_to_bitmap_index(frame_addr) {
+            let byte_idx = idx.0;
+            let bit_idx = idx.1;
+            unsafe {
+                let target_byte_ptr = self.bitmap_ptr.offset(byte_idx as isize);
+                if target_byte_ptr.read() & 1 << bit_idx == 0 {
+                    Err(Error::CannotDeallocateUnallocatedFrame)
+                } else {
+                    // clear the bit corresponding to the frame
+                    *target_byte_ptr &= !(1 << bit_idx);
+                    return Ok(())
+                }
+            }
+        } else {
+            Err(Error::InvalidPAddr)
+        }
+    }
 }
 
 // There should be a From implementation for each type of memory map we support.
