@@ -45,13 +45,15 @@ unsafe impl Send for PhysicalFrameAllocator {}
 
 impl PhysicalFrameAllocator {
     pub fn allocate_frame(&mut self) -> Result<PAddr, Error> {
-        let mut curr_byte: u8;
+        let mut curr_byte_ptr: *mut u8;
         for byte_idx in 0..self.bitmap_len {
             unsafe {
-                curr_byte = *self.bitmap_ptr.offset(byte_idx as isize);
-                if curr_byte != 0xFF {
+                curr_byte_ptr = self.bitmap_ptr.offset(byte_idx as isize);
+                if curr_byte_ptr.read() != 0xFF {
                     for bit_idx in 0..8 {
-                        if curr_byte & 1 << bit_idx == 0u8 {
+                        if curr_byte_ptr.read() & 1 << bit_idx == 0u8 {
+                            //set the bit corresponding to the allocated frame
+                            *curr_byte_ptr |= 1 << bit_idx;
                             return Ok(PAddr::from(byte_idx * 8 + bit_idx));
                         }
                     }
@@ -72,7 +74,7 @@ impl PhysicalFrameAllocator {
                 if target_byte_ptr.read() & 1 << bit_idx == 0 {
                     Err(Error::CannotDeallocateUnallocatedFrame)
                 } else {
-                    // clear the bit corresponding to the frame
+                    // clear the bit corresponding to the frame being deallocated
                     *target_byte_ptr &= !(1 << bit_idx);
                     return Ok(())
                 }
