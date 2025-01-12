@@ -1,5 +1,10 @@
 use core::arch::asm;
+use core::mem::MaybeUninit;
 use core::ptr::addr_of;
+
+use spin::lazy;
+
+static mut IDTR: MaybeUninit<Idtr> = MaybeUninit::uninit();
 
 #[derive(Debug)]
 #[repr(C, align(16))]
@@ -28,7 +33,7 @@ impl Idt {
         gate.segment_selector = segment_selector;
         gate.reserved_ist_index = 0u8; // the IST is not used
         gate.flags = if is_trap { 0b1111u8 } else { 0b1110u8 }; //gate type
-                                                                //reserved bit
+        //reserved bit
         gate.flags &= !(0b1u8 << 4);
         //privilege ring required to use gate
         gate.flags &= !(0b11u8 << 5);
@@ -55,9 +60,9 @@ impl Idt {
         }
     }
     pub fn load(&self) {
-        let idtr = Idtr::new(128u16 * 256u16 - 1u16, addr_of!(*self) as u64);
         unsafe {
-            asm_load_idt(&idtr);
+            IDTR.write(Idtr::new(16u16 * 256u16 - 1u16, addr_of!(*self) as u64));
+            asm_load_idt(IDTR.as_ptr());
         }
     }
 }
@@ -99,8 +104,6 @@ impl Idtr {
     }
 }
 
-unsafe fn asm_load_idt(idtr: &Idtr) {
-    asm!("\
-        lidt [{}]
-    ", in(reg) idtr);
+unsafe fn asm_load_idt(idtr: *const Idtr) {
+    asm!("lidt [rdi]", in("rdi") idtr);
 }

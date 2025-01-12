@@ -28,34 +28,32 @@ impl SegmentDescriptor {
 
 #[derive(Debug, Clone, Copy)]
 #[repr(C, packed(1))]
-struct SystemSegmentDescriptor {
-    lower: SegmentDescriptor,
-    base3: u32,
-    reserved: u32,
+struct TssDescriptor {
+    low: u64,  // Low 64 bits of the descriptor
+    high: u64, // High 64 bits of the descriptor
 }
 
-impl SystemSegmentDescriptor {
+impl TssDescriptor {
     fn new() -> Self {
-        SystemSegmentDescriptor {
-            lower: SegmentDescriptor::new(),
-            base3: 0,
-            reserved: 0,
-        }
+        TssDescriptor { low: 0, high: 0 }
     }
 }
+
 
 #[derive(Debug)]
 #[repr(C, packed(1))]
 pub struct Gdt {
     segment_descs: [SegmentDescriptor; 5],
-    tss_desc: SystemSegmentDescriptor,
+    tss_desc: TssDescriptor,
 }
 
 impl Gdt {
     pub fn new(tss: &Tss) -> Self {
+        unsafe { core::arch::asm!("cli"); }
+
         let mut gdt = Gdt {
             segment_descs: [SegmentDescriptor::new(); 5],
-            tss_desc: SystemSegmentDescriptor::new(),
+            tss_desc: TssDescriptor::new(),
         };
 
         //Null descriptor
@@ -71,21 +69,26 @@ impl Gdt {
         //Task State Segment
         gdt.set_tss_desc(ptr::addr_of!(*tss) as u64, size_of::<Tss>() as u32);
 
+        unsafe { core::arch::asm!("sti"); }
+
         gdt
     }
 
     fn set_tss_desc(&mut self, base: u64, limit: u32) {
-        self.set_segment_desc(5, (base & 0xffffffff) as u32, limit, 0x89, 0x0);
-        self.tss_desc.base3 = ((base & 0xffffffff00000000) >> 32) as u32;
-        self.tss_desc.reserved = 0;
+        let low = ((limit as u64) & 0xFFFF)
+            | ((base & 0xFFFFFF) << 16)
+            | ((0x89u64) << 40) // Type for TSS
+            | ((limit as u64 & 0xF0000) << 32)
+            | ((base & 0xFF000000) << 32);
+        let high = (base >> 32) & 0xFFFFFFFF;
+    
+        self.tss_desc.low = low;
+        self.tss_desc.high = high;
     }
+    
 
     fn set_segment_desc(&mut self, index: usize, base: u32, limit: u32, access_byte: u8, flags: u8) {
-        let dest_sd = if index == 5 {
-            &mut (self.tss_desc.lower)
-        } else {
-            &mut (self.segment_descs[index])
-        };
+        let dest_sd = &mut (self.segment_descs[index]);
 
         dest_sd.limit0 = (limit & 0xffff) as u16;
         dest_sd.limit1_flags = ((limit & 0xff0000) >> 16) as u8; // Only the lower 4 bits of this field encodes limit bits
@@ -142,7 +145,7 @@ impl Tss {
 
 global_asm! { include_str!("gdt.asm") }
 extern "C" {
-    fn asm_load_gdt(gdt: &Gdt);
+    fn asm_load_gdt(gdt: *const Gdt);
     fn asm_reload_segment_regs();
     fn asm_load_tss();
 }

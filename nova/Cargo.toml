@@ -27,7 +27,6 @@ virt = []
 [build-dependencies]
 
 [dependencies]
-bitflags = ">=2.6.0"
 lazy_static = {version = ">=1.5.0", features = ["spin_no_std"]}
 limine = ">=0.3.1"
 embedded-graphics = "*"
@@ -39,7 +38,6 @@ spin = {version = ">=0.9.8", features = ["ticket_mutex"]}
 [profile.dev]
 debug = "full"
 debug-assertions = true
-targets = ["x86_64-unknown-none", "aarch64-unknown-none"]
 panic = "abort"
 lto = false
 opt-level = 0
@@ -51,6 +49,3 @@ targets = ["x86_64-unknown-none", "aarch64-unknown-none"]
 panic = "abort"
 lto = true
 opt-level = 3
-
-[build]
-rustflags = ["-C", "relocation-model=static"]

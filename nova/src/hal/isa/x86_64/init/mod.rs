@@ -1,7 +1,8 @@
 mod gdt;
 
-use core::borrow::BorrowMut;
+use core::borrow::{Borrow, BorrowMut};
 use core::ops::Deref;
+use core::ptr::addr_of;
 // core
 use core::ptr;
 
@@ -21,7 +22,7 @@ use crate::{log, logln};
 const BSP_STACK_SIZE: usize = 4096 * 4;
 
 /// The BSP stack for the kernel.
-/// DO NOT TOUCH THIS, IT IS USED BY THE CPU AS THE KERNEL STACK.
+/// DO NOT TOUCH THIS, IT IS USED BY THE CPU AS THE KERNEL STACK
 /// UNTIL THE DYNAMIC ALLOCATOR IS INITIALIZED
 #[used]
 static BSP_STACK: [u8; BSP_STACK_SIZE] = [0u8; BSP_STACK_SIZE];
@@ -31,7 +32,8 @@ lazy_static! {
         /// for each privilege level and for interrupts. It also contains the I/O
         /// permission bitmap which is used to expose or block I/O ports to user-space
         /// applications.
-        static ref BSP_TSS: Mutex<Tss> = Mutex::new(Tss::new(ptr::addr_of!(BSP_STACK[BSP_STACK_SIZE - 1]) as u64));
+        
+        static ref BSP_TSS: Mutex<Tss> = Mutex::new(Tss::new(ptr::addr_of!(BSP_STACK) as u64));
         /// The Global Descriptor Table for the BSP.
         /// The GDT is used to store the segment descriptors for the kernel and
         /// user-space applications. In long mode, the GDT is used to store the segment
@@ -55,6 +57,8 @@ impl InitInterface for IsaInitializer {
     fn init() -> Result<(), Self::Error> {
         BSP_GDT.lock().load();
         logln!("Loaded GDT");
+        Gdt::reload_segment_regs();
+        Gdt::load_tss();
         //logln!("GDT: {:?}", (BSP_GDT.lock().deref()));
         load_exceptions(IDT.lock().borrow_mut());
         //logln!("IDT: {:?}", (IDT.lock().deref()));

@@ -4,7 +4,7 @@ use limine::request::{
     KernelAddressRequest,
     MemoryMapRequest,
     RsdpRequest,
-    SmpRequest,
+    SmpRequest, StackSizeRequest,
 };
 use limine::BaseRevision;
 
@@ -15,3 +15,4 @@ pub static KERNEL_ADDRESS_REQUEST: KernelAddressRequest = KernelAddressRequest::
 pub static FRAMEBUFFER_REQUEST: FramebufferRequest = FramebufferRequest::new();
 pub static SMP_REQUEST: SmpRequest = SmpRequest::new();
 pub static RSDP_REQUEST: RsdpRequest = RsdpRequest::new();
+pub static STACK_SIZE: StackSizeRequest = StackSizeRequest::new().with_size(4096 * 4);

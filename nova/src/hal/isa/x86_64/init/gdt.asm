@@ -2,7 +2,7 @@
 
 .data
 gdtr: 
-	.2byte 447 // Place 447 = (64 * 7) - 1 in the gdtr label
+	.2byte 55 // Place 55 = (8 * 7) - 1 in the gdtr label
 	.8byte 0
 
 .text

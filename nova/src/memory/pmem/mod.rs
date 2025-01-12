@@ -106,6 +106,8 @@ impl From<&MemoryMapResponse> for PhysicalFrameAllocator {
         }
         logln!("Initializing PhysicalFrameAllocator bitmap...");
         init_bitmap_from_mmap(pfa.bitmap_ptr, pfa.bitmap_len, response);
+        //address zero is not accessible
+        unsafe { *pfa.bitmap_ptr |= 1; }
         logln!("PhysicalFrameAllocator bitmap initialized.");
 
         pfa

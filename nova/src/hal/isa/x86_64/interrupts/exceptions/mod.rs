@@ -1,5 +1,3 @@
-mod exceptions;
-
 use crate::hal::isa::x86_64::interrupts::idt::Idt;
 use crate::logln;
 
@@ -21,7 +19,7 @@ pub fn load_exceptions(idt: &mut Idt) {
     idt.set_gate(15, isr_reserved, 1 << 3, true, false);
     idt.set_gate(16, isr_x87_floating_point, 1 << 3, true, false);
     idt.set_gate(17, isr_alignment_check, 1 << 3, true, false);
-    idt.set_gate(18, isr_machine_check, 1 << 3, true, false);
+    idt.set_gate(18, isr_machine_check, 1 << 3, true, true);
     idt.set_gate(19, isr_simd_floating_point, 1 << 3, true, false);
     idt.set_gate(20, isr_virtualization, 1 << 3, true, false);
     idt.set_gate(21, isr_control_protection, 1 << 3, true, false);
@@ -30,6 +28,9 @@ pub fn load_exceptions(idt: &mut Idt) {
     idt.set_gate(30, isr_security_exception, 1 << 3, true, false);
 }
 
+core::arch::global_asm! {
+    include_str!("exceptions.asm"),
+}
 extern "C" {
     fn isr_divide_by_zero();
     fn isr_debug();
@@ -130,14 +131,14 @@ extern "C" fn ih_stack_segment_fault() {
 }
 
 #[no_mangle]
-extern "C" fn ih_general_protection_fault() {
+extern "C" fn ih_general_protection_fault(_error_code: u64) {
     logln!("General protection fault occurred!");
     panic!("General protection fault");
 }
 
 #[no_mangle]
-extern "C" fn ih_page_fault() {
-    logln!("Page fault occurred!");
+extern "C" fn ih_page_fault(error_code: u64) {
+    logln!("Page fault occurred with error code {:X}!", error_code);
     panic!("Page fault");
 }
 

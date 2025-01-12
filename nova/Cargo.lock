@@ -247,7 +247,6 @@ dependencies = [
 name = "nova"
 version = "0.0.0"
 dependencies = [
- "bitflags",
  "embedded-graphics",
  "flanterm_bindings",
  "flat_device_tree",
