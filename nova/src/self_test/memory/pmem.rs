@@ -8,7 +8,7 @@ pub fn test_pmem() {
     if let Ok(frame) = PHYSICAL_FRAME_ALLOCATOR.lock().allocate_frame() {
         logln!("Allocated a frame at {:?}.", frame);
         let magic_number = 0xCAFEBABEu32;
-        logln!("Writing magic number {:X} to the beginning of the frame.", magic_number);
+        logln!("Writing magic number 0x{:X} to the beginning of the frame.", magic_number);
         let frame_ptr = <PAddr as Into<*mut u32>>::into(frame.clone());
         unsafe {
             frame_ptr.write(magic_number);

@@ -49,10 +49,10 @@ impl PhysicalFrameAllocator {
                 curr_byte_ptr = self.bitmap_ptr.offset(byte_idx as isize);
                 if curr_byte_ptr.read() != 0xFF {
                     for bit_idx in 0..8 {
-                        if curr_byte_ptr.read() & 1 << bit_idx == 0u8 {
+                        if curr_byte_ptr.read() & (1 << bit_idx) == 0u8 {
                             //set the bit corresponding to the allocated frame
                             *curr_byte_ptr |= 1 << bit_idx;
-                            return Ok(PAddr::from(byte_idx * 8 + bit_idx));
+                            return Ok(PAddr::from((byte_idx * 8 + bit_idx) * 4096));
                         }
                     }
                 }
@@ -105,7 +105,7 @@ impl From<&MemoryMapResponse> for PhysicalFrameAllocator {
             }
         }
         logln!("Initializing PhysicalFrameAllocator bitmap...");
-        init_bitmap_from_mmap(pfa.bitmap_ptr, pfa.bitmap_len, response);
+        init_bitmap_from_mmap(pfa.bitmap_ptr, response);
         //address zero is not accessible
         unsafe { *pfa.bitmap_ptr |= 1; }
         logln!("PhysicalFrameAllocator bitmap initialized.");
@@ -159,15 +159,17 @@ fn addr_to_bitmap_index(addr: PAddr) -> Result<(usize, usize), Error> {
     Ok((byte_index, bit_offset))
 }
 
-fn init_bitmap_from_mmap(bitmap_ptr: *mut u8, bitmap_len: usize, mmap: &MemoryMapResponse) {
+fn init_bitmap_from_mmap(bitmap_ptr: *mut u8, mmap: &MemoryMapResponse) {
     for entry in mmap.entries().iter() {
-        let start = entry.base;
-        let end = entry.base + entry.length;
-        for i in (start..end).step_by(4096) {
-            //logln!("Marking frame at physical address {:?} as available...", i);
-            let (byte_index, bit_offset) = addr_to_bitmap_index(PAddr::from(i as usize)).unwrap();
-            unsafe {
-                *(bitmap_ptr.offset(byte_index as isize)) &= 0 << bit_offset;
+        if entry.entry_type == limine::memory_map::EntryType::USABLE {
+            let start = entry.base;
+            let end = entry.base + entry.length;
+            for i in (start..end).step_by(4096) {
+                //logln!("Marking frame at physical address {:?} as available...", i);
+                let (byte_index, bit_offset) = addr_to_bitmap_index(PAddr::from(i as usize)).unwrap();
+                unsafe {
+                    *(bitmap_ptr.offset(byte_index as isize)) &= !(1 << bit_offset);
+                }
             }
         }
     }
