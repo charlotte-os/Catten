@@ -58,11 +58,13 @@ impl InitInterface for IsaInitializer {
         BSP_GDT.lock().load();
         logln!("Loaded GDT");
         Gdt::reload_segment_regs();
+        logln!("Segment registers reloaded");
         Gdt::load_tss();
-        //logln!("GDT: {:?}", (BSP_GDT.lock().deref()));
+        logln!("Loaded TSS");
         load_exceptions(IDT.lock().borrow_mut());
-        //logln!("IDT: {:?}", (IDT.lock().deref()));
+        logln!("Registered exceptions ISRs");
         IDT.lock().load();
+        logln!("Loaded IDT");
         Ok(())
     }
 

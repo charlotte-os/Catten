@@ -108,6 +108,8 @@ impl From<&MemoryMapResponse> for PhysicalFrameAllocator {
         init_bitmap_from_mmap(pfa.bitmap_ptr, response);
         //address zero is not accessible
         unsafe { *pfa.bitmap_ptr |= 1; }
+        // Mark the bitmap region as unusable.
+        mark_pfa_bitmap_unusable(pfa.bitmap_ptr, bitmap_addr, bitmap_size);
         logln!("PhysicalFrameAllocator bitmap initialized.");
 
         pfa
@@ -173,4 +175,20 @@ fn init_bitmap_from_mmap(bitmap_ptr: *mut u8, mmap: &MemoryMapResponse) {
             }
         }
     }
+}
+
+fn mark_pfa_bitmap_unusable(bitmap_ptr: *mut u8, base: PAddr, length: usize) {
+    let n_pages = if length % 4096 > 0 {
+        length / 4096 + 1  
+    } else {
+        length / 4096
+    };
+
+    for i in 0..n_pages {
+        let pfa_index = addr_to_bitmap_index(base + (i * 4096) as isize).expect("Failed to convert PAddr to bitmap index.");
+        unsafe {
+            *(bitmap_ptr.offset(pfa_index.0 as isize)) |= 1 << pfa_index.1;
+        }
+    }
+
 }

@@ -1,3 +1,5 @@
+use core::ops::Add;
+
 use crate::hal::isa::interface::memory::address::{PhysicalAddress, VirtualAddress};
 use crate::memory::pmem::HHDM_BASE;
 
@@ -39,5 +41,12 @@ impl From<usize> for PAddr {
 impl Into<usize> for PAddr {
     fn into(self) -> usize {
         self.addr
+    }
+}
+
+impl Add<isize> for PAddr {
+    type Output = PAddr;
+    fn add(self, rhs: isize) -> Self::Output {
+        PAddr::from(self.addr.wrapping_add(rhs as usize))
     }
 }
