@@ -33,7 +33,7 @@ use hal::isa::interface::system_info::CpuInfoIfce;
 /// bootloader.
 #[no_mangle]
 pub unsafe extern "C" fn main() -> ! {
-    logln!("Nova Kernel Version 0.0.5");
+    logln!("Nova Kernel Version 0.0.7");
     logln!("=========================");
     logln!("Entering Nova.\nInitializing system...");
     init::kernel_init();
