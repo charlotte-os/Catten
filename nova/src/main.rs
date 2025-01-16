@@ -23,7 +23,7 @@ pub mod self_test;
 use core::panic::PanicInfo;
 
 use hal::isa::current_isa::lp_control::LpCtl;
-use hal::isa::current_isa::system_info::*;
+use hal::isa::current_isa::system_info::CpuInfo;
 use hal::isa::interface::lp_control::LpCtlIfce;
 use hal::isa::interface::system_info::CpuInfoIfce;
 
@@ -39,7 +39,7 @@ pub unsafe extern "C" fn main() -> ! {
     init::kernel_init();
     logln!("System initialized.");
     logln!("System Information:");
-    logln!("CPU Vendor: {}", (CpuInfo::get_vendor()));
+    logln!("CPU Vendor: {:?}", (CpuInfo::get_vendor()));
     // TODO: Root cause the reason the following line halts execution without output or a panic.
     //logln!("CPU Model: {}", (CpuInfo::get_brand()));
     logln!("Physical Address bits implmented: {}", (CpuInfo::get_paddr_sig_bits()));

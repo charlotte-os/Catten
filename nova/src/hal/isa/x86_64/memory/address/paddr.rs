@@ -7,7 +7,6 @@ use crate::memory::pmem::HHDM_BASE;
 pub struct PAddr {
     addr: usize,
 }
-
 impl PhysicalAddress for PAddr {
     unsafe fn into_hhdm_ptr<T>(self) -> *const T {
         (*HHDM_BASE).into_ptr::<T>().byte_offset(self.addr as isize)

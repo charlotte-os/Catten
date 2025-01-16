@@ -1,4 +1,4 @@
-use super::interface;
+use crate::hal::isa::interface::init::InitInterface;
 
 pub struct IsaInitializer;
 
@@ -7,7 +7,7 @@ pub enum Error {
     // Error type for the aarch64 architecture
 }
 
-impl interface::InitInterface for IsaInitializer {
+impl InitInterface for IsaInitializer {
     type Error = Error;
 
     fn init() -> Result<(), Self::Error> {

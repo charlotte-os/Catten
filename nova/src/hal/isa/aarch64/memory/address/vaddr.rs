@@ -1,6 +1,6 @@
-use crate::hal::isa::memory::interface::address::VirtualAddress;
+use crate::hal::isa::interface::memory::address::VirtualAddress;
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct VAddr(usize);
 
 impl VirtualAddress for VAddr {
@@ -21,13 +21,13 @@ impl VirtualAddress for VAddr {
     }
 }
 
-pub impl From<usize> for VAddr {
+impl From<usize> for VAddr {
     fn from(val: usize) -> Self {
         VAddr(val)
     }
 }
 
-pub impl Into<usize> for VAddr {
+impl Into<usize> for VAddr {
     fn into(self) -> usize {
         self.0
     }

@@ -10,6 +10,7 @@ use spin::Mutex;
 use crate::hal::environment::boot_protocol::limine::{HHDM_REQUEST, MEMEORY_MAP_REQUEST};
 use crate::hal::isa::current_isa::memory::address::paddr::PAddr;
 use crate::hal::isa::current_isa::memory::MemoryInterfaceImpl;
+use crate::hal::isa::interface::memory::address::PhysicalAddress;
 use crate::hal::isa::interface::memory::MemoryInterface;
 use crate::logln;
 
@@ -94,7 +95,7 @@ impl From<&MemoryMapResponse> for PhysicalFrameAllocator {
         let bitmap_addr: PAddr = find_mmap_best_fit(response, bitmap_size).unwrap();
         logln!("PhysicalFrameAllocator bitmap addr (physical): {:?}", bitmap_addr);
         let pfa = PhysicalFrameAllocator {
-            bitmap_ptr: bitmap_addr.into(),
+            bitmap_ptr: unsafe { bitmap_addr.into_hhdm_mut::<u8>() },
             bitmap_len: bitmap_size
         };
         // Initially mark all frames as unavailable.

@@ -1,5 +1,5 @@
 use core::arch::x86_64::__cpuid_count;
-use core::fmt::{self, Display, Formatter};
+use core::fmt::{self, Display, Formatter, Debug};
 use core::mem::transmute_copy;
 
 use crate::hal::isa::interface::system_info::CpuInfoIfce;
@@ -14,6 +14,16 @@ pub enum IsaExtension {
 pub struct VendorString([u8; 12]);
 
 impl Display for VendorString {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            core::str::from_utf8(&self.0).unwrap_or("<Invalid Vendor String>")
+        )
+    }
+}
+
+impl Debug for VendorString {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(
             f,
@@ -50,7 +60,7 @@ impl CpuInfoIfce for CpuInfo {
         }
     }
 
-    fn get_brand() -> Self::Model {
+    fn get_model() -> Self::Model {
         unsafe {
             let mut brand_string = ModelString { 0: [0u8; 48] };
 

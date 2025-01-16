@@ -1,3 +1,4 @@
+use crate::hal::isa::interface::memory::address::PhysicalAddress;
 use crate::logln;
 use crate::hal::isa::current_isa::memory::address::paddr::PAddr;
 use crate::memory::pmem::PHYSICAL_FRAME_ALLOCATOR;
@@ -13,8 +14,8 @@ pub fn test_pmem() {
             logln!("Allocated a frame at {:?}.", frame);
             let magic_number = 0xCAFEBABEu32;
             logln!("Writing magic number 0x{:X} to the beginning of the frame.", magic_number);
-            let frame_ptr = <PAddr as Into<*mut u32>>::into(*frame);
             unsafe {
+                let frame_ptr = frame.into_hhdm_mut::<u32>();
                 frame_ptr.write(magic_number);
                 logln!("Reading back magic number from the frame: {:X}", (frame_ptr.read()));
             }
@@ -33,5 +34,5 @@ pub fn test_pmem() {
             panic!("Self-test failure: Failed to allocate a frame from the physical frame allocator. Error: {:?}", e);
         }
     }
-    logln!("All physical memory subsystem tests passed.")
+    logln!("All physical memory subsystem tests passed.");
 }
