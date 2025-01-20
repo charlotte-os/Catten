@@ -1,6 +1,6 @@
 ### CharlotteOS
 
-# Nova
+# Purrnel
 
 ### Implementation Languages
 - Rust

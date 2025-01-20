@@ -2,9 +2,9 @@
 #![no_main]
 #![feature(sync_unsafe_cell)]
 
-//! # Nova
+//! # Purrnel
 //!
-//! The Nova kernel is a component of CharlotteOS, an experimental
+//! The Purrnel kernel is a component of CharlotteOS, an experimental
 //! modern operating system. The kernel is responsible for initializing the
 //! hardware, providing commonizing abstractions for all hardware resources, and
 //! managing the execution of user-space applications and the environment in
@@ -33,9 +33,9 @@ use hal::isa::interface::system_info::CpuInfoIfce;
 /// bootloader.
 #[no_mangle]
 pub unsafe extern "C" fn main() -> ! {
-    logln!("Nova Kernel Version 0.0.7");
+    logln!("Purrnel Kernel Version 0.0.7");
     logln!("=========================");
-    logln!("Entering Nova.\nInitializing system...");
+    logln!("Entering Purrnel.\nInitializing system...");
     init::kernel_init();
     logln!("System initialized.");
     logln!("System Information:");
