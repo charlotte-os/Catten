@@ -45,7 +45,6 @@ pub unsafe extern "C" fn main() -> ! {
     logln!("Physical Address bits implmented: {}", (CpuInfo::get_paddr_sig_bits()));
     logln!("Virtual Address bits implmented: {}", (CpuInfo::get_vaddr_sig_bits()));
 
-    //core::arch::asm!("int 0");
     self_test::run_self_tests();
 
     logln!("Nothing left to do. Waiting for interrupts...");

@@ -1,4 +1,6 @@
 use crate::hal::isa::interface::init::InitInterface;
+use super::interrupts::load_ivt;
+use crate::logln;
 
 pub struct IsaInitializer;
 
@@ -12,6 +14,13 @@ impl InitInterface for IsaInitializer {
 
     fn init() -> Result<(), Self::Error> {
         // Initialization code for the aarch64 architecture
+        logln!("Performing Aarch64 ISA specific initialization...");
+        // Setup the interrupt vector table
+        logln!("Loading the interrupt vector table on the BSP");
+        load_ivt();
+        logln!("Interrupt vector table loaded on the BSP");
+
+        logln!("Aarch64 ISA specific initialization complete!");
         Ok(())
     }
 
