@@ -11,6 +11,7 @@ impl MemoryInterface for MemoryInterfaceImpl {
     type Error = Error;
     type PAddr = address::paddr::PAddr;
     type VAddr = address::vaddr::VAddr;
+    type Error = Error;
 }
 
 pub enum Error {}
