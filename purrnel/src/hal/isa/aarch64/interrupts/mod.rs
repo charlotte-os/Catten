@@ -8,10 +8,7 @@ pub fn load_ivt() {
     // Load the interrupt vector table
     unsafe {
         // Load the interrupt vector table
-        asm!(
-            "ldr x0, =ivt",
-            "msr vbar_el1, x0"
-        );
+        asm!("ldr x0, =ivt", "msr vbar_el1, x0");
     }
 }
 #[no_mangle]

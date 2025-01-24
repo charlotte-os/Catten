@@ -22,7 +22,11 @@ lazy_static! {
     } else {
         panic!("Limine failed to provide a higher half direct mapping region.");
     };
-    pub static ref PHYSICAL_FRAME_ALLOCATOR: Mutex<PhysicalFrameAllocator> = Mutex::new(PhysicalFrameAllocator::from(MEMEORY_MAP_REQUEST.get_response().expect("Limine failed to provide a memory map.")));
+    pub static ref PHYSICAL_FRAME_ALLOCATOR: Mutex<PhysicalFrameAllocator> = Mutex::new(PhysicalFrameAllocator::from(
+        MEMEORY_MAP_REQUEST
+            .get_response()
+            .expect("Limine failed to provide a memory map.")
+    ));
 }
 
 #[derive(Debug)]
@@ -31,7 +35,7 @@ pub enum Error {
     MisalignedPhysicalAddress,
     OutOfFrames,
     InvalidPAddr,
-    CannotDeallocateUnallocatedFrame
+    CannotDeallocateUnallocatedFrame,
 }
 
 #[derive(Debug)]
@@ -48,7 +52,7 @@ impl PhysicalFrameAllocator {
         for byte_idx in 0..self.bitmap_len {
             unsafe {
                 curr_byte_ptr = self.bitmap_ptr.offset(byte_idx as isize);
-                if curr_byte_ptr.read() != 0xFF {
+                if curr_byte_ptr.read() != 0xff {
                     for bit_idx in 0..8 {
                         if curr_byte_ptr.read() & (1 << bit_idx) == 0u8 {
                             //set the bit corresponding to the allocated frame
@@ -61,9 +65,10 @@ impl PhysicalFrameAllocator {
         }
         Err(Error::OutOfFrames)
     }
+
     pub fn deallocate_frame(&mut self, frame_addr: PAddr) -> Result<(), Error> {
         if <PAddr as Into<usize>>::into(frame_addr.clone()) % 4096 != 0 {
-            return Err(Error::MisalignedPhysicalAddress)
+            return Err(Error::MisalignedPhysicalAddress);
         }
         if let Ok(idx) = addr_to_bitmap_index(frame_addr) {
             let byte_idx = idx.0;
@@ -75,7 +80,7 @@ impl PhysicalFrameAllocator {
                 } else {
                     // clear the bit corresponding to the frame being deallocated
                     *target_byte_ptr &= !(1 << bit_idx);
-                    return Ok(())
+                    return Ok(());
                 }
             }
         } else {
@@ -96,19 +101,21 @@ impl From<&MemoryMapResponse> for PhysicalFrameAllocator {
         logln!("PhysicalFrameAllocator bitmap addr (physical): {:?}", bitmap_addr);
         let pfa = PhysicalFrameAllocator {
             bitmap_ptr: unsafe { bitmap_addr.into_hhdm_mut::<u8>() },
-            bitmap_len: bitmap_size
+            bitmap_len: bitmap_size,
         };
         // Initially mark all frames as unavailable.
         logln!("Clearing PhysicalFrameAllocator bitmap...");
         for i in 0..bitmap_size {
             unsafe {
-                *(pfa.bitmap_ptr.offset(i as isize)) = 0xFFu8;
+                *(pfa.bitmap_ptr.offset(i as isize)) = 0xffu8;
             }
         }
         logln!("Initializing PhysicalFrameAllocator bitmap...");
         init_bitmap_from_mmap(pfa.bitmap_ptr, response);
         //address zero is not accessible
-        unsafe { *pfa.bitmap_ptr |= 1; }
+        unsafe {
+            *pfa.bitmap_ptr |= 1;
+        }
         // Mark the bitmap region as unusable.
         mark_pfa_bitmap_unusable(pfa.bitmap_ptr, bitmap_addr, bitmap_size);
         logln!("PhysicalFrameAllocator bitmap initialized.");
@@ -180,16 +187,16 @@ fn init_bitmap_from_mmap(bitmap_ptr: *mut u8, mmap: &MemoryMapResponse) {
 
 fn mark_pfa_bitmap_unusable(bitmap_ptr: *mut u8, base: PAddr, length: usize) {
     let n_pages = if length % 4096 > 0 {
-        length / 4096 + 1  
+        length / 4096 + 1
     } else {
         length / 4096
     };
 
     for i in 0..n_pages {
-        let pfa_index = addr_to_bitmap_index(base + (i * 4096) as isize).expect("Failed to convert PAddr to bitmap index.");
+        let pfa_index =
+            addr_to_bitmap_index(base + (i * 4096) as isize).expect("Failed to convert PAddr to bitmap index.");
         unsafe {
             *(bitmap_ptr.offset(pfa_index.0 as isize)) |= 1 << pfa_index.1;
         }
     }
-
 }

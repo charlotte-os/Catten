@@ -27,6 +27,7 @@ impl PhysicalAddress for PAddr {
 
 impl core::ops::Add<isize> for PAddr {
     type Output = PAddr;
+
     fn add(self, rhs: isize) -> Self::Output {
         PAddr::from(self.0.wrapping_add(rhs as usize))
     }

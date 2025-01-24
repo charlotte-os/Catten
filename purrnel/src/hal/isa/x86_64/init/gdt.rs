@@ -29,7 +29,7 @@ impl SegmentDescriptor {
 #[derive(Debug, Clone, Copy)]
 #[repr(C, packed(1))]
 struct TssDescriptor {
-    low: u64,  // Low 64 bits of the descriptor
+    low:  u64, // Low 64 bits of the descriptor
     high: u64, // High 64 bits of the descriptor
 }
 
@@ -38,7 +38,6 @@ impl TssDescriptor {
         TssDescriptor { low: 0, high: 0 }
     }
 }
-
 
 #[derive(Debug)]
 #[repr(C, packed(1))]
@@ -49,7 +48,9 @@ pub struct Gdt {
 
 impl Gdt {
     pub fn new(tss: &Tss) -> Self {
-        unsafe { core::arch::asm!("cli"); }
+        unsafe {
+            core::arch::asm!("cli");
+        }
 
         let mut gdt = Gdt {
             segment_descs: [SegmentDescriptor::new(); 5],
@@ -69,7 +70,9 @@ impl Gdt {
         //Task State Segment
         gdt.set_tss_desc(ptr::addr_of!(*tss) as u64, size_of::<Tss>() as u32);
 
-        unsafe { core::arch::asm!("sti"); }
+        unsafe {
+            core::arch::asm!("sti");
+        }
 
         gdt
     }
@@ -80,12 +83,11 @@ impl Gdt {
             | ((0x89u64) << 40) // Type for TSS
             | ((limit as u64 & 0xF0000) << 32)
             | ((base & 0xFF000000) << 32);
-        let high = (base >> 32) & 0xFFFFFFFF;
-    
+        let high = (base >> 32) & 0xffffffff;
+
         self.tss_desc.low = low;
         self.tss_desc.high = high;
     }
-    
 
     fn set_segment_desc(&mut self, index: usize, base: u32, limit: u32, access_byte: u8, flags: u8) {
         let dest_sd = &mut (self.segment_descs[index]);

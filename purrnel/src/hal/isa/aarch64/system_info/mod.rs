@@ -16,7 +16,7 @@ pub enum Vendor {
     Qualcomm = 0x51,
     Marvell = 0x56,
     Intel = 0x69,
-    Ampere = 0xC0
+    Ampere = 0xc0,
 }
 
 impl From<u8> for Vendor {
@@ -35,8 +35,8 @@ impl From<u8> for Vendor {
             0x51 => Vendor::Qualcomm,
             0x56 => Vendor::Marvell,
             0x69 => Vendor::Intel,
-            0xC0 => Vendor::Ampere,
-            _ => panic!("aarch64 systeminfo: Unrecognized vendor ID!")
+            0xc0 => Vendor::Ampere,
+            _ => panic!("aarch64 systeminfo: Unrecognized vendor ID!"),
         }
     }
 }
@@ -46,7 +46,7 @@ pub struct Model {
     part_num: u16,
     revision: u8,
     variant: u8,
-    architecture: u8
+    architecture: u8,
 }
 
 #[derive(Debug)]
@@ -54,12 +54,14 @@ pub struct CpuInfo;
 
 impl CpuInfoIfce for CpuInfo {
     type IsaExtension = IsaExtension;
-    type Vendor = Vendor;
     type Model = Model;
+    type Vendor = Vendor;
 
     fn get_vendor() -> Self::Vendor {
         let mut midr: u64;
-        unsafe { core::arch::asm!("mrs {}, midr_el1", out(reg) midr); }
+        unsafe {
+            core::arch::asm!("mrs {}, midr_el1", out(reg) midr);
+        }
         let vendor_id = (midr >> 24) as u8;
 
         vendor_id.into()
@@ -67,48 +69,54 @@ impl CpuInfoIfce for CpuInfo {
 
     fn get_model() -> Self::Model {
         let mut midr: u64;
-        unsafe { core::arch::asm!("mrs {}, midr_el1", out(reg) midr); }
-        let part_num = (midr & 0xFFF) as u16;
-        let revision = ((midr >> 16) & 0xF) as u8;
-        let variant = ((midr >> 20) & 0xF) as u8;
-        let architecture = ((midr >> 4) & 0xF) as u8;
+        unsafe {
+            core::arch::asm!("mrs {}, midr_el1", out(reg) midr);
+        }
+        let part_num = (midr & 0xfff) as u16;
+        let revision = ((midr >> 16) & 0xf) as u8;
+        let variant = ((midr >> 20) & 0xf) as u8;
+        let architecture = ((midr >> 4) & 0xf) as u8;
 
         Model {
             part_num,
             revision,
             variant,
-            architecture
+            architecture,
         }
     }
 
     fn get_vaddr_sig_bits() -> u8 {
         let mut id_aa64mmfr2_el1: u64;
-        unsafe { core::arch::asm!("mrs {}, id_aa64mmfr2_el1", out(reg) id_aa64mmfr2_el1); }
-        let vaddr_range = ((id_aa64mmfr2_el1 >> 16) & 0xF) as u8;
+        unsafe {
+            core::arch::asm!("mrs {}, id_aa64mmfr2_el1", out(reg) id_aa64mmfr2_el1);
+        }
+        let vaddr_range = ((id_aa64mmfr2_el1 >> 16) & 0xf) as u8;
 
         match vaddr_range {
-        0b0000 => 48, // 48-bit VA
-        0b0001 => 52, // 52-bit VA when using the 64KB granule
-        0b0010 => 56, // 52-bit VA only when FEAT_D128 is implemented
-        _ => panic!("aarch64 systeminfo: Unrecognized virtual address range value!")
+            0b0000 => 48, // 48-bit VA
+            0b0001 => 52, // 52-bit VA when using the 64KB granule
+            0b0010 => 56, // 52-bit VA only when FEAT_D128 is implemented
+            _ => panic!("aarch64 systeminfo: Unrecognized virtual address range value!"),
         }
     }
 
     fn get_paddr_sig_bits() -> u8 {
         let mut id_aa64mmfr0_el1: u64;
-        unsafe { core::arch::asm!("mrs {}, id_aa64mmfr0_el1", out(reg) id_aa64mmfr0_el1); }
-        let paddr_range = (id_aa64mmfr0_el1 & 0xF) as u8;
+        unsafe {
+            core::arch::asm!("mrs {}, id_aa64mmfr0_el1", out(reg) id_aa64mmfr0_el1);
+        }
+        let paddr_range = (id_aa64mmfr0_el1 & 0xf) as u8;
 
         match paddr_range {
-        0b0000 => 32, // 32-bit PA, 4GB
-        0b0001 => 36, // 36-bit PA, 64GB
-        0b0010 => 40, // 40-bit PA, 1TB
-        0b0011 => 42, // 42-bit PA, 4TB
-        0b0100 => 44, // 44-bit PA, 16TB
-        0b0101 => 48, // 48-bit PA, 256TB
-        0b0110 => 52, // 52-bit PA, 4PB when FEAT_LPA is implemented
-        0b0111 => 56, // 56-bit PA, 64PB when FEAT_D128 is implemented
-        _ => panic!("aarch64 systeminfo: Unrecognized physical address range value!")
+            0b0000 => 32, // 32-bit PA, 4GB
+            0b0001 => 36, // 36-bit PA, 64GB
+            0b0010 => 40, // 40-bit PA, 1TB
+            0b0011 => 42, // 42-bit PA, 4TB
+            0b0100 => 44, // 44-bit PA, 16TB
+            0b0101 => 48, // 48-bit PA, 256TB
+            0b0110 => 52, // 52-bit PA, 4PB when FEAT_LPA is implemented
+            0b0111 => 56, // 56-bit PA, 64PB when FEAT_D128 is implemented
+            _ => panic!("aarch64 systeminfo: Unrecognized physical address range value!"),
         }
     }
 

@@ -1,17 +1,23 @@
 pub mod address;
 
-use crate::{hal::isa::current_isa::memory::address::paddr::PAddr, memory::vmem::{MemoryMapping, PageType}};
+use crate::hal::isa::current_isa::memory::address::paddr::PAddr;
+use crate::hal::isa::current_isa::memory::address::vaddr::VAddr;
+use crate::hal::isa::current_isa::memory::MemoryInterfaceImpl;
+pub use crate::memory::vmem::{MemoryMapping, PageType};
 
 pub trait MemoryInterface {
     type VAddr: address::VirtualAddress;
     type PAddr: address::PhysicalAddress;
     type Error;
-
-    fn find_free_region(addr_space: usize, n_pages: usize) -> Result<Self::VAddr, Self::Error>;
-    fn map_page(addr_space: usize, mapping: MemoryMapping) -> Result<(), Self::Error>;
-    fn unmap_page(addr_space: usize, vaddr: Self::VAddr) -> Result<MemoryMapping, Self::Error>;
-    fn is_mapped(addr_space: usize, vaddr: Self::VAddr) -> Result<bool, Self::Error>;
-    fn get_mapping(addr_space: usize, vaddr: Self::VAddr) -> Result<MemoryMapping, Self::Error>;
+    type AddressSpace: AddressSpaceInterface;
 }
 
-
+pub trait AddressSpaceInterface {
+    fn get_current() -> Self;
+    fn load(&self) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error>;
+    fn find_free_region(&self, n_pages: usize) -> Result<VAddr, <MemoryInterfaceImpl as MemoryInterface>::Error>;
+    fn map_page(&mut self, mapping: MemoryMapping) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error>;
+    fn unmap_page(&mut self, vaddr: VAddr) -> Result<MemoryMapping, <MemoryInterfaceImpl as MemoryInterface>::Error>;
+    fn is_mapped(&self, vaddr: VAddr) -> Result<bool, <MemoryInterfaceImpl as MemoryInterface>::Error>;
+    fn get_mapping(&self, vaddr: VAddr) -> Result<MemoryMapping, <MemoryInterfaceImpl as MemoryInterface>::Error>;
+}

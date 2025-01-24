@@ -4,7 +4,8 @@ use limine::request::{
     KernelAddressRequest,
     MemoryMapRequest,
     RsdpRequest,
-    SmpRequest, StackSizeRequest,
+    SmpRequest,
+    StackSizeRequest,
 };
 use limine::BaseRevision;
 

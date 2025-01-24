@@ -2,9 +2,9 @@ mod gdt;
 
 use core::borrow::{Borrow, BorrowMut};
 use core::ops::Deref;
-use core::ptr::addr_of;
 // core
 use core::ptr;
+use core::ptr::addr_of;
 
 use exceptions::load_exceptions;
 // crate local
@@ -32,7 +32,7 @@ lazy_static! {
         /// for each privilege level and for interrupts. It also contains the I/O
         /// permission bitmap which is used to expose or block I/O ports to user-space
         /// applications.
-        
+
         static ref BSP_TSS: Mutex<Tss> = Mutex::new(Tss::new(ptr::addr_of!(BSP_STACK) as u64));
         /// The Global Descriptor Table for the BSP.
         /// The GDT is used to store the segment descriptors for the kernel and

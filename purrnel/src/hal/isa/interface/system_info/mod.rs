@@ -1,6 +1,6 @@
 pub enum Error {
     UnsupportedByIsa,
-    UnableToDetermine
+    UnableToDetermine,
 }
 
 pub trait CpuInfoIfce {

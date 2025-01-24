@@ -45,6 +45,7 @@ impl Into<usize> for PAddr {
 
 impl Add<isize> for PAddr {
     type Output = PAddr;
+
     fn add(self, rhs: isize) -> Self::Output {
         PAddr::from(self.addr.wrapping_add(rhs as usize))
     }

@@ -18,6 +18,7 @@ impl Idt {
             gates: [InterruptGate::new(); 256],
         }
     }
+
     pub fn set_gate(
         &mut self,
         index: usize,
@@ -29,11 +30,11 @@ impl Idt {
         let gate = &mut self.gates[index];
         let isr_addr = isr_ptr as u64;
 
-        gate.addr0 = u16::try_from(isr_addr & 0xFFFF).unwrap();
+        gate.addr0 = u16::try_from(isr_addr & 0xffff).unwrap();
         gate.segment_selector = segment_selector;
         gate.reserved_ist_index = 0u8; // the IST is not used
         gate.flags = if is_trap { 0b1111u8 } else { 0b1110u8 }; //gate type
-        //reserved bit
+                                                                //reserved bit
         gate.flags &= !(0b1u8 << 4);
         //privilege ring required to use gate
         gate.flags &= !(0b11u8 << 5);
@@ -43,22 +44,25 @@ impl Idt {
         } else {
             gate.flags &= !(0b1u8 << 7);
         }
-        gate.addr1 = ((isr_addr & (0xFFFF << 16)) >> 16) as u16;
-        gate.addr2 = ((isr_addr & (0xFFFFFFFF << 32)) >> 32) as u32;
+        gate.addr1 = ((isr_addr & (0xffff << 16)) >> 16) as u16;
+        gate.addr2 = ((isr_addr & (0xffffffff << 32)) >> 32) as u32;
         gate.reserved = 0u32;
     }
+
     #[allow(unused)]
     pub fn set_present(&mut self, index: usize) {
         if index < 256 {
             self.gates[index].flags |= 0b1u8 << 7;
         }
     }
+
     #[allow(unused)]
     pub fn clear_present(&mut self, index: usize) {
         if index < 256 {
             self.gates[index].flags &= !(0b1u8 << 7);
         }
     }
+
     pub fn load(&self) {
         unsafe {
             IDTR.write(Idtr::new(16u16 * 256u16 - 1u16, addr_of!(*self) as u64));
