@@ -2,7 +2,7 @@ pub mod address;
 
 use core::arch::asm;
 
-use crate::hal::isa::interface::memory::{AddressSpaceInterface, MemoryInterface, MemoryMapping};
+use crate::llk::isa::interface::memory::{AddressSpaceInterface, MemoryInterface, MemoryMapping};
 
 pub struct MemoryInterfaceImpl;
 
@@ -11,7 +11,6 @@ impl MemoryInterface for MemoryInterfaceImpl {
     type Error = Error;
     type PAddr = address::paddr::PAddr;
     type VAddr = address::vaddr::VAddr;
-    type Error = Error;
 }
 
 pub enum Error {}
