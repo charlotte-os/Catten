@@ -1,4 +1,4 @@
-use crate::hal::isa::interface::lp_control::LpCtlIfce;
+use crate::llk::isa::interface::lp_control::LpCtlIfce;
 
 pub struct LpCtl;
 

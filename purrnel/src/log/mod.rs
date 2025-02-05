@@ -11,7 +11,7 @@ macro_rules! log {
     ($text:expr $(, $arg:tt)*) => ({
 /*         if cfg! (target_arch = "x86_64") {
             use core::fmt::Write;
-            use crate::hal::drivers::uart::uart_16550::LOG_PORT;
+            use crate::llk::drivers::uart::uart_16550::LOG_PORT;
             let _ = write!(LOG_PORT.lock(), $text $(, $arg)*);
         } */
         use crate::print;
@@ -23,7 +23,7 @@ macro_rules! logln {
     ($text:expr $(, $arg:tt)*) => ({
 /*         if cfg! (target_arch = "x86_64") {
             use core::fmt::Write;
-            use crate::hal::drivers::uart::uart_16550::LOG_PORT;
+            use crate::llk::drivers::uart::uart_16550::LOG_PORT;
             let _ = writeln!(LOG_PORT.lock(), $text $(, $arg)*);
         } */
         use crate::println;

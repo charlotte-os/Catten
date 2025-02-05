@@ -1,4 +1,4 @@
-use crate::hal::isa::interface::memory::address::{PhysicalAddress, VirtualAddress};
+use crate::llk::isa::interface::memory::address::{PhysicalAddress, VirtualAddress};
 use crate::memory::pmem::HHDM_BASE;
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct PAddr(usize);

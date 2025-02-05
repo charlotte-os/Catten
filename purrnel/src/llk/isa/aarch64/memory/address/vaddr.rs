@@ -1,4 +1,4 @@
-use crate::hal::isa::interface::memory::address::VirtualAddress;
+use crate::llk::isa::interface::memory::address::VirtualAddress;
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct VAddr(usize);

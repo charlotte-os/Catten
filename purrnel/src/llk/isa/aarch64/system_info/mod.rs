@@ -1,4 +1,4 @@
-use crate::hal::isa::interface::system_info::CpuInfoIfce;
+use crate::llk::isa::interface::system_info::CpuInfoIfce;
 #[derive(Debug)]
 pub enum IsaExtension {}
 #[derive(Debug)]
