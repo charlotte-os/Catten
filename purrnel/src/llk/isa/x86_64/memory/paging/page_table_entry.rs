@@ -1,99 +1,142 @@
+use crate::llk::isa::{interface::memory::address::PhysicalAddress, x86_64::memory::address::paddr::PAddr};
+
+const PRESENT_BIT_INDEX: u64 = 0;
+const WRITABLE_BIT_INDEX: u64 = 1;
+const USER_ACCESSIBLE_BIT_INDEX: u64 = 2;
+const PAT_INDEX_BITS_START: u64 = 3;
+const PAT_INDEX_MASK: u64 = 0b11 << PAT_INDEX_BITS_START;
+const ACCESSED_BIT_INDEX: u64 = 5;
+const DIRTY_BIT_INDEX: u64 = 6;
+const PAGE_SIZE_BIT_INDEX: u64 = 7;
+const GLOBAL_BIT_INDEX: u64 = 8;
+const FRAME_ADDR_START: u64 = 12;
+const FRAME_ADDR_MASK: u64 = 0xFFFFFFFFFFFFF000;
+const EXECUTE_DISABLE_BIT_INDEX: u64 = 63;
+
 #[repr(transparent)]
 pub struct PageTableEntry(u64);
 
 impl PageTableEntry {
-    pub fn new() -> Self {
-        Self(0)
+    pub fn new(present: bool, writeable: bool, user_accessible: bool, pat_index_bits: u64, global: bool, frame_addr: PAddr) -> Self {
+        let mut pte = Self(0);
+        pte
+            .set_present(present)
+            .set_writable(writeable)
+            .set_user_accessible(user_accessible)
+            .set_pat_index_bits(pat_index_bits)
+            .set_global(global)
+            .set_frame(frame_addr);
+        pte
     }
 
-    pub fn present(&self) -> bool {
-        self.0 & 1 != 0
+    pub fn is_present(&self) -> bool {
+        self.0 & 1 << PRESENT_BIT_INDEX != 0
     }
 
-    pub fn set_present(&mut self, present: bool) {
+    pub fn set_present(&mut self, present: bool)-> &mut Self {
         if present {
-            self.0 |= 1;
+            self.0 |= 1 << PRESENT_BIT_INDEX;
         } else {
-            self.0 &= !1;
+            self.0 &= 0 << PRESENT_BIT_INDEX;
         }
+        self
     }
 
-    pub fn writable(&self) -> bool {
-        self.0 & (1 << 1) != 0
+    pub fn is_writable(&self) -> bool {
+        self.0 & (1 << WRITABLE_BIT_INDEX) != 0
     }
 
-    pub fn set_writable(&mut self, writable: bool) {
+    pub fn set_writable(&mut self, writable: bool)-> &mut Self {
         if writable {
-            self.0 |= 1 << 1;
+            self.0 |= 1 << WRITABLE_BIT_INDEX;
         } else {
-            self.0 &= !(1 << 1);
+            self.0 &= !(1 << WRITABLE_BIT_INDEX);
         }
+        self
     }
 
-    pub fn user_accessible(&self) -> bool {
-        self.0 & (1 << 2) != 0
+    pub fn is_user_accessible(&self) -> bool {
+        self.0 & (1 << USER_ACCESSIBLE_BIT_INDEX) != 0
     }
 
-    pub fn set_user_accessible(&mut self, user_accessible: bool) {
+    pub fn set_user_accessible(&mut self, user_accessible: bool)-> &mut Self {
         if user_accessible {
-            self.0 |= 1 << 2;
+            self.0 |= 1 << USER_ACCESSIBLE_BIT_INDEX;
         } else {
-            self.0 &= !(1 << 2);
+            self.0 &= !(1 << USER_ACCESSIBLE_BIT_INDEX);
         }
+        self
     }
 
-    pub fn pat_index_bits(&self) -> u64 {
-        (self.0 >> 3) & 0b11
+    pub fn get_pat_index_bits(&self) -> u64 {
+        (self.0 & PAT_INDEX_MASK) >> PAT_INDEX_BITS_START
     }
 
-    pub fn set_pat_index_bits(&mut self, pat_index_bits: u64) {
-        self.0 = (self.0 & !(0b11 << 3)) | ((pat_index_bits & 0b11) << 3);
+    pub fn set_pat_index_bits(&mut self, pat_index_bits: u64)-> &mut Self {
+        self.0 |= (pat_index_bits << PAT_INDEX_BITS_START) & PAT_INDEX_MASK;
+        self
     }
 
-    pub fn accessed(&self) -> bool {
-        self.0 & (1 << 5) != 0
+    pub fn is_accessed(&self) -> bool {
+        self.0 & (1 << ACCESSED_BIT_INDEX) != 0
     }
-    pub fn set_accessed(&mut self, accessed: bool) {
+    pub fn set_accessed(&mut self, accessed: bool)-> &mut Self {
         if accessed {
-            self.0 |= 1 << 5;
+            self.0 |= 1 << ACCESSED_BIT_INDEX;
         } else {
-            self.0 &= !(1 << 5);
+            self.0 &= !(1 << ACCESSED_BIT_INDEX);
         }
+        self
     }
-    pub fn dirty(&self) -> bool {
-        self.0 & (1 << 6) != 0
+    pub fn is_dirty(&self) -> bool {
+        self.0 & (1 << DIRTY_BIT_INDEX) != 0
     }
-    pub fn set_dirty(&mut self, dirty: bool) {
+    pub fn set_dirty(&mut self, dirty: bool)-> &mut Self {
         if dirty {
-            self.0 |= 1 << 6;
+            self.0 |= 1 << DIRTY_BIT_INDEX;
         } else {
-            self.0 &= !(1 << 6);
+            self.0 &= !(1 << DIRTY_BIT_INDEX);
         }
+        self
     }
-    pub fn page_size(&self) -> bool {
-        self.0 & (1 << 7) != 0
+    pub fn get_page_size(&self) -> bool {
+        self.0 & (1 << PAGE_SIZE_BIT_INDEX) != 0
     }
-    pub fn set_page_size(&mut self, page_size: bool) {
+    pub fn set_page_size(&mut self, page_size: bool)-> &mut Self {
         if page_size {
-            self.0 |= 1 << 7;
+            self.0 |= 1 << PAGE_SIZE_BIT_INDEX;
         } else {
-            self.0 &= !(1 << 7);
+            self.0 &= !(1 << PAGE_SIZE_BIT_INDEX);
         }
+        self
     }
-    pub fn global(&self) -> bool {
-        self.0 & (1 << 8) != 0
+    pub fn is_global(&self) -> bool {
+        self.0 & (1 << GLOBAL_BIT_INDEX) != 0
     }
-    pub fn set_global(&mut self, global: bool) {
+    pub fn set_global(&mut self, global: bool)-> &mut Self {
         if global {
-            self.0 |= 1 << 8;
+            self.0 |= 1 << GLOBAL_BIT_INDEX;
         } else {
-            self.0 &= !(1 << 8);
+            self.0 &= !(1 << GLOBAL_BIT_INDEX);
         }
+        self
     }
-    pub fn frame(&self) -> u64 {
-        self.0 >> 12
+    pub fn get_frame(&self) -> u64 {
+        self.0 & FRAME_ADDR_MASK >> FRAME_ADDR_START
     }
-    pub fn set_frame(&mut self, frame: u64) {
-        self.0 = (self.0 & 0xFFF) | (frame << 12);
+    pub fn set_frame(&mut self, frame: PAddr)-> &mut Self {
+        self.0 |= ((<PAddr as Into<usize>>::into(frame) as u64) << FRAME_ADDR_START) & FRAME_ADDR_MASK;
+        self
+    }
+    pub fn is_execute_disabled(&self) -> bool {
+        self.0 & (1 << EXECUTE_DISABLE_BIT_INDEX) != 0
+    }
+    pub fn set_execute_disabled(&mut self, execute_disabled: bool)-> &mut Self {
+        if execute_disabled {
+            self.0 |= 1 << EXECUTE_DISABLE_BIT_INDEX;
+        } else {
+            self.0 &= !(1 << EXECUTE_DISABLE_BIT_INDEX);
+        }
+        self
     }
 }
