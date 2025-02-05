@@ -1,3 +1,5 @@
+pub mod page_table_entry;
+
 use core::arch::asm;
 
 use super::MemoryInterfaceImpl;
