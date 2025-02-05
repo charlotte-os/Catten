@@ -1,6 +1,8 @@
 pub mod address;
 pub mod paging;
 
+use crate::llk::isa::interface::memory::MemoryInterface;
+
 pub struct MemoryInterfaceImpl;
 
 impl MemoryInterface for MemoryInterfaceImpl {
