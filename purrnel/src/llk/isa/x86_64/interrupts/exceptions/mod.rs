@@ -1,4 +1,4 @@
-use crate::hal::isa::x86_64::interrupts::idt::Idt;
+use crate::llk::isa::x86_64::interrupts::idt::Idt;
 use crate::logln;
 
 pub fn load_exceptions(idt: &mut Idt) {

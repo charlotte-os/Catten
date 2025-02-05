@@ -2,7 +2,7 @@ use core::arch::x86_64::__cpuid_count;
 use core::fmt::{self, Debug, Display, Formatter};
 use core::mem::transmute_copy;
 
-use crate::hal::isa::interface::system_info::CpuInfoIfce;
+use crate::llk::isa::interface::system_info::CpuInfoIfce;
 
 pub enum IsaExtension {
     avx2,

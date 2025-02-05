@@ -14,7 +14,7 @@
 
 pub mod common;
 pub mod framebuffer;
-pub mod hal;
+pub mod llk;
 pub mod init;
 pub mod log;
 pub mod memory;
@@ -22,10 +22,10 @@ pub mod self_test;
 
 use core::panic::PanicInfo;
 
-use hal::isa::current_isa::lp_control::LpCtl;
-use hal::isa::current_isa::system_info::CpuInfo;
-use hal::isa::interface::lp_control::LpCtlIfce;
-use hal::isa::interface::system_info::CpuInfoIfce;
+use llk::isa::current_isa::lp_control::LpCtl;
+use llk::isa::current_isa::system_info::CpuInfo;
+use llk::isa::interface::lp_control::LpCtlIfce;
+use llk::isa::interface::system_info::CpuInfoIfce;
 
 /// This is the entry point for the kernel. The `main` function is called by the
 /// bootloader after setting up the environment. It is made C ABI compatible so

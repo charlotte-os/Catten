@@ -8,7 +8,7 @@ pub mod uart_16550;
 
 use core::fmt::Write;
 
-use crate::hal::isa::current_isa::io::IoReg8;
+use crate::llk::isa::current_isa::io::IoReg8;
 
 pub trait Uart: Write + Sized {
     type Error: Sized;

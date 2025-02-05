@@ -1,6 +1,6 @@
 use core::ops::Add;
 
-use crate::hal::isa::interface::memory::address::{PhysicalAddress, VirtualAddress};
+use crate::llk::isa::interface::memory::address::{PhysicalAddress, VirtualAddress};
 use crate::memory::pmem::HHDM_BASE;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

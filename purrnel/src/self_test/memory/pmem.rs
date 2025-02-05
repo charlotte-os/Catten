@@ -1,6 +1,6 @@
-use crate::hal::isa::current_isa::memory::address::paddr::PAddr;
-use crate::hal::isa::interface::memory::address::PhysicalAddress;
+use crate::llk::isa::interface::memory::address::PhysicalAddress;
 use crate::logln;
+use crate::llk::isa::current_isa::memory::address::paddr::PAddr;
 use crate::memory::pmem::PHYSICAL_FRAME_ALLOCATOR;
 
 pub fn test_pmem() {

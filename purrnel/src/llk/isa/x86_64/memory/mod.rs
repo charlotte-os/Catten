@@ -1,8 +1,6 @@
 pub mod address;
 
-use core::arch::asm;
-
-use crate::hal::isa::interface::memory::{AddressSpaceInterface, MemoryInterface, MemoryMapping};
+use crate::llk::isa::interface::memory::MemoryInterface;
 
 pub struct MemoryInterfaceImpl;
 

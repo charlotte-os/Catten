@@ -1,4 +1,4 @@
-use crate::hal::isa::interface::memory::MemoryInterface;
+use crate::llk::isa::interface::memory::MemoryInterface;
 
 pub enum PageType {
     Memory,

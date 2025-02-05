@@ -2,9 +2,9 @@ use core::mem::MaybeUninit;
 
 use limine::response::MemoryMapResponse;
 
-use crate::hal::environment::boot_protocol::limine::MEMEORY_MAP_REQUEST;
-use crate::hal::isa::current_isa::init::IsaInitializer;
-use crate::hal::isa::interface::init::InitInterface;
+use crate::llk::environment::boot_protocol::limine::MEMEORY_MAP_REQUEST;
+use crate::llk::isa::current_isa::init::IsaInitializer;
+use crate::llk::isa::interface::init::InitInterface;
 use crate::logln;
 use crate::memory::pmem::*;
 

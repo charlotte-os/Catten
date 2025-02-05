@@ -14,8 +14,8 @@ use idt::Idt;
 use lazy_static::lazy_static;
 use spin::Mutex;
 
-use crate::hal::isa::interface::init::InitInterface;
-use crate::hal::isa::x86_64::interrupts::*;
+use crate::llk::isa::interface::init::InitInterface;
+use crate::llk::isa::x86_64::interrupts::*;
 use crate::{log, logln};
 
 /// The BSP stack size is 4 pages by default.
