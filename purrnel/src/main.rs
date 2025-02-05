@@ -14,8 +14,8 @@
 
 pub mod common;
 pub mod framebuffer;
-pub mod llk;
 pub mod init;
+pub mod llk;
 pub mod log;
 pub mod memory;
 pub mod self_test;

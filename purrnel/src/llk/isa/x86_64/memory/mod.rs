@@ -3,9 +3,8 @@ pub mod paging;
 
 use crate::llk::isa::interface::memory::MemoryInterface;
 
-
 pub enum Error {
-    Unmapped, 
+    Unmapped,
     AlreadyMapped,
 }
 pub struct MemoryInterfaceImpl;

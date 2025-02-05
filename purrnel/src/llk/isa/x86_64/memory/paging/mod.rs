@@ -1,7 +1,7 @@
 use core::arch::asm;
 
-use crate::llk::isa::interface::memory::{AddressSpaceInterface, MemoryInterface, MemoryMapping};
 use super::MemoryInterfaceImpl;
+use crate::llk::isa::interface::memory::{AddressSpaceInterface, MemoryInterface, MemoryMapping};
 
 pub struct AddressSpace {
     // control register 3 i.e. page table base register
