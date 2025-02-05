@@ -1,5 +1,5 @@
 use super::interrupts::load_ivt;
-use crate::hal::isa::interface::init::InitInterface;
+use crate::llk::isa::interface::init::InitInterface;
 use crate::logln;
 
 pub struct IsaInitializer;
