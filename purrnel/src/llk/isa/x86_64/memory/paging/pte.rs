@@ -1,5 +1,8 @@
+//! # Page Table Entry
+
 use crate::llk::isa::x86_64::memory::address::paddr::PAddr;
 
+/// PTE component indexes and masks
 const PRESENT_BIT_INDEX: u64 = 0;
 const WRITABLE_BIT_INDEX: u64 = 1;
 const USER_ACCESSIBLE_BIT_INDEX: u64 = 2;
@@ -13,6 +16,7 @@ const FRAME_ADDR_START: u64 = 12;
 const FRAME_ADDR_MASK: u64 = 0xfffffffffffff000;
 const EXECUTE_DISABLE_BIT_INDEX: u64 = 63;
 
+/// the page table entry structure
 #[repr(transparent)]
 pub struct PageTableEntry(u64);
 
@@ -135,8 +139,8 @@ impl PageTableEntry {
         self
     }
 
-    pub fn get_frame(&self) -> u64 {
-        self.0 & FRAME_ADDR_MASK >> FRAME_ADDR_START
+    pub fn get_frame(&self) -> PAddr {
+        PAddr::from((self.0 & FRAME_ADDR_MASK) as usize)
     }
 
     pub fn set_frame(&mut self, frame: PAddr) -> &mut Self {

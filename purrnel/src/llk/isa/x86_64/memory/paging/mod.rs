@@ -1,9 +1,25 @@
-pub mod page_table_entry;
+pub mod pte;
+pub mod pth_walker;
 
 use core::arch::asm;
 
 use super::MemoryInterfaceImpl;
 use crate::llk::isa::interface::memory::{AddressSpaceInterface, MemoryInterface, MemoryMapping};
+
+pub const PAGE_SIZE: usize = 4096;
+pub const N_PAGE_TABLE_ENTRIES: usize = 512;
+pub type PageTable = [pte::PageTableEntry; N_PAGE_TABLE_ENTRIES];
+
+pub fn is_pagetable_unused(table_ptr: *const PageTable) -> bool {
+    unsafe {
+        for i in 0..N_PAGE_TABLE_ENTRIES {
+            if (*table_ptr)[i].is_present() {
+                return false;
+            }
+        }
+    }
+    true
+}
 
 pub struct AddressSpace {
     // control register 3 i.e. page table base register
