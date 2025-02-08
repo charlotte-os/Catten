@@ -130,7 +130,6 @@ impl<'vas> PthWalker<'vas> {
                     self.pt_ptr = new_pt.into();
                 }
                 // Map the page frame
-                let frame = PHYSICAL_FRAME_ALLOCATOR.lock().allocate_frame()?;
                 unsafe {
                     (*self.pt_ptr)[self.vaddr.pt_index()]
                         .set_frame(frame)
