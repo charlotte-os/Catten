@@ -82,7 +82,12 @@ impl AddressSpaceInterface for AddressSpace {
         &self,
         vaddr: <MemoryInterfaceImpl as MemoryInterface>::VAddr,
     ) -> Result<bool, <MemoryInterfaceImpl as MemoryInterface>::Error> {
-        todo!()
+        let mut walker = pth_walker::PthWalker::new(self, vaddr);
+        match walker.walk() {
+            Ok(_) => Ok(true),
+            Err(<MemoryInterfaceImpl as MemoryInterface>::Error::Unmapped) => Ok(false),
+            Err(e) => Err(e),
+        }
     }
 
     fn translate_address(

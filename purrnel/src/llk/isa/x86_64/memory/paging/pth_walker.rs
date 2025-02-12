@@ -7,7 +7,6 @@
 use core::ptr::addr_of_mut;
 
 use super::is_pagetable_unused;
-use crate::llk::isa::interface::memory::address::{PhysicalAddress, VirtualAddress};
 use crate::llk::isa::interface::memory::MemoryInterface;
 use crate::llk::isa::x86_64::memory::address::paddr::PAddr;
 use crate::llk::isa::x86_64::memory::address::vaddr::VAddr;
