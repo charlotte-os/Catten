@@ -16,13 +16,13 @@ use crate::memory::pmem::PHYSICAL_FRAME_ALLOCATOR;
 const CR3_ADDRESS_MASK: u64 = 0x000ffffffffff000;
 
 pub struct PthWalker<'vas> {
-    address_space: &'vas super::AddressSpace,
-    vaddr: VAddr,
-    pml4_ptr: *mut super::PageTable,
-    pdpt_ptr: *mut super::PageTable,
-    pd_ptr: *mut super::PageTable,
-    pt_ptr: *mut super::PageTable,
-    page_frame_ptr: *mut [u8; super::PAGE_SIZE],
+    pub address_space: &'vas super::AddressSpace,
+    pub vaddr: VAddr,
+    pub pml4_ptr: *mut super::PageTable,
+    pub pdpt_ptr: *mut super::PageTable,
+    pub pd_ptr: *mut super::PageTable,
+    pub pt_ptr: *mut super::PageTable,
+    pub page_frame_ptr: *mut [u8; super::PAGE_SIZE],
 }
 
 impl<'vas> PthWalker<'vas> {

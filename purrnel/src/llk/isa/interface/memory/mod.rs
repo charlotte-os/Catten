@@ -15,9 +15,13 @@ pub trait MemoryInterface {
 pub trait AddressSpaceInterface {
     fn get_current() -> Self;
     fn load(&self) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error>;
-    fn find_free_region(&self, n_pages: usize) -> Result<VAddr, <MemoryInterfaceImpl as MemoryInterface>::Error>;
+    fn find_free_region(
+        &self,
+        n_pages: usize,
+        range: (VAddr, VAddr),
+    ) -> Result<VAddr, <MemoryInterfaceImpl as MemoryInterface>::Error>;
     fn map_page(&mut self, mapping: MemoryMapping) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error>;
-    fn unmap_page(&mut self, vaddr: VAddr) -> Result<MemoryMapping, <MemoryInterfaceImpl as MemoryInterface>::Error>;
+    fn unmap_page(&mut self, vaddr: VAddr) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error>;
     fn is_mapped(&self, vaddr: VAddr) -> Result<bool, <MemoryInterfaceImpl as MemoryInterface>::Error>;
-    fn get_mapping(&self, vaddr: VAddr) -> Result<MemoryMapping, <MemoryInterfaceImpl as MemoryInterface>::Error>;
+    fn translate_address(&self, vaddr: VAddr) -> Result<PAddr, <MemoryInterfaceImpl as MemoryInterface>::Error>;
 }

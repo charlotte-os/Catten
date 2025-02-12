@@ -8,6 +8,8 @@ pub enum Error {
     Unmapped,
     AlreadyMapped,
     UnmappedTopLevelPageTable,
+    NullVAddrNotAllowed,
+    VAddrNotPageAligned,
     PMemError(PMemError),
 }
 
