@@ -16,20 +16,17 @@
 //! use of ACPI AML code. As such we do not provide a separate module for SMM calls.
 
 // Advanced Configuration and Power Interface (ACPI)
-#[cfg(feature = "acpi")]
 pub mod acpi;
 // Flattened Device Tree (FDT) aka Device Tree Blob (DTB)
-#[cfg(feature = "fdt")]
+#[cfg(not(target_arch = "x86_64"))]
 pub mod fdt;
 // RISC-V Supervisor Binary Interface (SBI)
 #[cfg(target_arch = "riscv64")]
 pub mod sbi;
 // System Management BIOS (SMBIOS)
-#[cfg(feature = "smbios")]
 pub mod smbios;
 // ARM Secure Monitor Calls (SMC)
 #[cfg(target_arch = "aarch64")]
 pub mod smc;
 // Unified Extensible Firmware Interface (UEFI) Runtime Services
-#[cfg(feature = "uefi-rt")]
 pub mod uefi_rt;

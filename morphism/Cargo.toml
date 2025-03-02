@@ -30,7 +30,6 @@ opt-level = 0
 [profile.release]
 debug = "none"
 debug-assertions = false
-targets = ["x86_64-unknown-none", "aarch64-unknown-none"]
 panic = "abort"
 lto = true
 opt-level = 3
