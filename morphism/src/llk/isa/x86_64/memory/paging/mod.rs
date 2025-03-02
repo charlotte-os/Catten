@@ -3,6 +3,7 @@ pub mod pth_walker;
 
 use core::arch::asm;
 
+use super::address::vaddr::VAddr;
 use super::MemoryInterfaceImpl;
 use crate::llk::isa::interface::memory::{AddressSpaceInterface, MemoryInterface, MemoryMapping};
 use crate::memory::pmem::VAddr;
@@ -23,7 +24,7 @@ pub fn is_pagetable_unused(table_ptr: *const PageTable) -> bool {
 }
 
 pub struct AddressSpace {
-    // control register 3 i.e. page table base register
+    // control register 3 i.e. top level page table base register
     cr3: u64,
 }
 
@@ -48,7 +49,21 @@ impl AddressSpaceInterface for AddressSpace {
         n_pages: usize,
         range: (VAddr, VAddr),
     ) -> Result<<MemoryInterfaceImpl as MemoryInterface>::VAddr, <MemoryInterfaceImpl as MemoryInterface>::Error> {
-        todo!()
+        let mut free_region_base = VAddr::from(range.0);
+        let mut free_region_size = 0isize;
+        for vaddr in (range.0..range.1).step_by(PAGE_SIZE) {
+            if range.1 - vaddr < n_pages * PAGE_SIZE {
+                return Err(<MemoryInterfaceImpl as MemoryInterface>::Error::NoRequestedVAddrRegionAvailable);
+            } else if &self.is_mapped(vaddr)? == false {
+                free_region_base = vaddr + PAGE_SIZE;
+                free_region_size = 0;
+            } else {
+                free_region_size += PAGE_SIZE as isize;
+                if free_region_size == n_pages as isize * PAGE_SIZE as isize {
+                    return Ok(free_region_base);
+                }
+            }
+        }
     }
 
     fn map_page(&mut self, mapping: MemoryMapping) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error> {
