@@ -10,6 +10,7 @@ pub enum Error {
     UnmappedTopLevelPageTable,
     NullVAddrNotAllowed,
     VAddrNotPageAligned,
+    NoRequestedVAddrRegionAvailable,
     PMemError(PMemError),
 }
 
