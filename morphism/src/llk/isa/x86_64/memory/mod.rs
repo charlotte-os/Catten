@@ -4,6 +4,7 @@ pub mod paging;
 use crate::llk::isa::interface::memory::MemoryInterface;
 use crate::memory::pmem::Error as PMemError;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Error {
     Unmapped,
     AlreadyMapped,

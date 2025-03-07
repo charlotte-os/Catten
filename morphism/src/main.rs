@@ -1,6 +1,7 @@
 #![no_std]
 #![no_main]
 #![feature(sync_unsafe_cell)]
+#![feature(step_trait)]
 
 //! # Purrnel
 //!

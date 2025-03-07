@@ -2,11 +2,11 @@ pub mod pte;
 pub mod pth_walker;
 
 use core::arch::asm;
+use core::iter::Iterator;
 
 use super::address::vaddr::VAddr;
 use super::MemoryInterfaceImpl;
 use crate::llk::isa::interface::memory::{AddressSpaceInterface, MemoryInterface, MemoryMapping};
-use crate::memory::pmem::VAddr;
 
 pub const PAGE_SIZE: usize = 4096;
 pub const N_PAGE_TABLE_ENTRIES: usize = 512;
@@ -52,9 +52,9 @@ impl AddressSpaceInterface for AddressSpace {
         let mut free_region_base = VAddr::from(range.0);
         let mut free_region_size = 0isize;
         for vaddr in (range.0..range.1).step_by(PAGE_SIZE) {
-            if range.1 - vaddr < n_pages * PAGE_SIZE {
+            if <VAddr as Into<usize>>::into(range.1 - vaddr) < n_pages * PAGE_SIZE {
                 return Err(<MemoryInterfaceImpl as MemoryInterface>::Error::NoRequestedVAddrRegionAvailable);
-            } else if &self.is_mapped(vaddr)? == false {
+            } else if *&self.is_mapped(vaddr)? == false {
                 free_region_base = vaddr + PAGE_SIZE;
                 free_region_size = 0;
             } else {
@@ -64,6 +64,7 @@ impl AddressSpaceInterface for AddressSpace {
                 }
             }
         }
+        Err(<MemoryInterfaceImpl as MemoryInterface>::Error::NoRequestedVAddrRegionAvailable)
     }
 
     fn map_page(&mut self, mapping: MemoryMapping) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error> {

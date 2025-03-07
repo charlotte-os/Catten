@@ -2,7 +2,7 @@
 ovmf-aarch64
 ovmf-riscv64
 ovmf-x86_64
-purrnel/target/**
+morphism/target/**
 log.txt
 limine
 .vscode/**

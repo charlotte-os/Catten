@@ -1,4 +1,5 @@
 pub mod address;
+pub mod paging;
 
 use core::arch::asm;
 

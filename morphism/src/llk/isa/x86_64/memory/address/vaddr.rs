@@ -1,3 +1,6 @@
+use core::iter::Step;
+use core::ops::{Add, Sub};
+
 use crate::llk::isa::interface::memory::address::VirtualAddress;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -76,5 +79,49 @@ impl From<usize> for VAddr {
 impl Into<usize> for VAddr {
     fn into(self) -> usize {
         self.raw
+    }
+}
+
+impl Sub for VAddr {
+    type Output = VAddr;
+
+    fn sub(self, other: Self) -> Self::Output {
+        VAddr {
+            raw: self.raw - other.raw,
+        }
+    }
+}
+
+impl Add<usize> for VAddr {
+    type Output = VAddr;
+
+    fn add(self, other: usize) -> Self::Output {
+        VAddr { raw: self.raw + other }
+    }
+}
+
+impl Step for VAddr {
+    fn steps_between(start: &Self, end: &Self) -> (usize, Option<usize>) {
+        if start > end {
+            (0, None)
+        } else {
+            (end.raw - start.raw, Some(end.raw - start.raw))
+        }
+    }
+
+    fn forward_checked(start: Self, count: usize) -> Option<Self> {
+        if start.raw.saturating_add(count) < usize::MAX {
+            Some(VAddr { raw: start.raw + count })
+        } else {
+            None
+        }
+    }
+
+    fn backward_checked(start: Self, count: usize) -> Option<Self> {
+        if start.raw.saturating_sub(count) > usize::MIN {
+            Some(VAddr { raw: start.raw - count })
+        } else {
+            None
+        }
     }
 }

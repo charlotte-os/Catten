@@ -29,7 +29,7 @@ lazy_static! {
     ));
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Error {
     UnableToAllocateTrackingStructure,
     MisalignedPhysicalAddress,
