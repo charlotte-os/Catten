@@ -36,9 +36,10 @@ Morphism is still in early development, and core subsystems are actively being b
 - **RISC-V64GC**
 
 > **Note:**
-> At present UEFI and ACPI are to be required on all targets On some ARM and RISC-V machines,
+> At present UEFI and ACPI are to be required on all targets. On some ARM and RISC-V machines,
 Das U-Boot may be able to provide these interfaces if properly compiled and configured to do so.
 If you are unsure if your device supports these interfaces please consult your hardware vendor.
+
 > If you are interested in porting Morphism to a new target or developing support for a target that is under consideration,
 please reach out to us on Discord or open an issue on our GitHub repository.
 
