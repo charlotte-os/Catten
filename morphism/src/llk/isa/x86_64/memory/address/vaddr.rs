@@ -3,9 +3,15 @@ use core::ops::{Add, Sub};
 
 use crate::llk::isa::interface::memory::address::VirtualAddress;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct VAddr {
     raw: usize,
+}
+
+impl core::fmt::Debug for VAddr {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "VAddr({:#x})", self.raw)
+    }
 }
 
 /// VAddr component indexes and masks
@@ -64,15 +70,14 @@ impl VirtualAddress for VAddr {
 
 impl From<usize> for VAddr {
     fn from(value: usize) -> Self {
-        let corrected = {
-            let is_negative = (value & ((1 << *super::VADDR_SIG_BITS) - 1)) != 0;
-            if is_negative {
-                value | !(*super::VADDR_MASK)
-            } else {
-                value & *super::VADDR_MASK
-            }
+        crate::logln!("VADDR_SIG_BITS = {}", (*super::VADDR_SIG_BITS));
+        let mask = (1 << *super::VADDR_SIG_BITS) - 1;
+        let sign_extended = if value & (1 << (*super::VADDR_SIG_BITS - 1)) != 0 {
+            value | (!mask)
+        } else {
+            value & mask
         };
-        VAddr { raw: corrected }
+        VAddr { raw: sign_extended }
     }
 }
 

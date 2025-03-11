@@ -43,6 +43,20 @@ impl Into<usize> for PAddr {
     }
 }
 
+impl From<u64> for PAddr {
+    fn from(value: u64) -> Self {
+        PAddr {
+            addr: value as usize & *super::PADDR_MASK,
+        }
+    }
+}
+
+impl Into<u64> for PAddr {
+    fn into(self) -> u64 {
+        self.addr as u64
+    }
+}
+
 impl Add<isize> for PAddr {
     type Output = PAddr;
 

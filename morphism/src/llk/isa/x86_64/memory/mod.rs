@@ -8,7 +8,6 @@ use crate::memory::pmem::Error as PMemError;
 pub enum Error {
     Unmapped,
     AlreadyMapped,
-    UnmappedTopLevelPageTable,
     NullVAddrNotAllowed,
     VAddrNotPageAligned,
     NoRequestedVAddrRegionAvailable,

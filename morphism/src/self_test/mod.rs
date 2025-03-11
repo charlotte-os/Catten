@@ -12,5 +12,6 @@ use crate::logln;
 pub fn run_self_tests() {
     logln!("Running self tests...");
     memory::pmem::test_pmem();
+    memory::vmem::test_vmem();
     logln!("Testing Complete. All Tests Passed!");
 }

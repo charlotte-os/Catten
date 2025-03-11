@@ -125,7 +125,7 @@ impl From<&MemoryMapResponse> for PhysicalFrameAllocator {
 }
 
 fn compute_bitmap_size(mmap: &MemoryMapResponse) -> usize {
-    let mut highest_address: PAddr = PAddr::from(0);
+    let mut highest_address: PAddr = PAddr::from(0usize);
     // Find the highest address in the memory map.
     for entry in mmap.entries().iter() {
         let entry_end = entry.base + entry.length;
@@ -140,7 +140,7 @@ fn compute_bitmap_size(mmap: &MemoryMapResponse) -> usize {
 // Helper functions
 
 fn find_mmap_best_fit(mmap: &MemoryMapResponse, size: usize) -> Result<PAddr, Error> {
-    let mut best_fit = PAddr::from(0);
+    let mut best_fit = PAddr::from(0usize);
     let mut best_fit_size = 0;
     for entry in mmap.entries().iter() {
         let entry_size = entry.length;
@@ -149,7 +149,7 @@ fn find_mmap_best_fit(mmap: &MemoryMapResponse, size: usize) -> Result<PAddr, Er
             best_fit_size = entry_size;
         }
     }
-    if best_fit == PAddr::from(0) {
+    if best_fit == PAddr::from(0usize) {
         Err(Error::UnableToAllocateTrackingStructure)
     } else {
         Ok(best_fit)

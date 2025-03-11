@@ -1,6 +1,7 @@
-use crate::llk::isa::current_isa::memory::address::paddr::PAddr;
-use crate::llk::isa::current_isa::memory::address::vaddr::VAddr;
+pub use crate::llk::isa::current_isa::memory::address::paddr::PAddr;
+pub use crate::llk::isa::current_isa::memory::address::vaddr::VAddr;
 use crate::llk::isa::interface::memory::MemoryInterface;
+
 pub enum PageType {
     KernelCode,   //read, execute
     KernelData,   //read, write
@@ -22,7 +23,7 @@ impl PageType {
 
     pub fn is_writable(&self) -> bool {
         match self {
-            PageType::KernelData | PageType::UserData => true,
+            PageType::KernelData | PageType::UserData | PageType::Mmio | PageType::Framebuffer => true,
             _ => false,
         }
     }

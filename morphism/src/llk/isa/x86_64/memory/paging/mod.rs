@@ -39,13 +39,22 @@ impl AddressSpaceInterface for AddressSpace {
 
     fn load(&self) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error> {
         unsafe {
+            // Set the top level page table base register
             asm!("mov cr3, {}", in(reg) self.cr3);
+            // Enable PCID
+            asm!(
+                "mov rax, cr4",
+                "mov r11, 1",
+                "shl r11, 17",
+                "or rax, r11",
+                "mov cr4, rax"
+            );
         }
         Ok(())
     }
 
     fn find_free_region(
-        &self,
+        &mut self,
         n_pages: usize,
         range: (VAddr, VAddr),
     ) -> Result<<MemoryInterfaceImpl as MemoryInterface>::VAddr, <MemoryInterfaceImpl as MemoryInterface>::Error> {
@@ -69,7 +78,6 @@ impl AddressSpaceInterface for AddressSpace {
 
     fn map_page(&mut self, mapping: MemoryMapping) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error> {
         let mut walker = pth_walker::PthWalker::new(self, mapping.vaddr);
-        walker.walk()?;
         walker.map_page(
             mapping.paddr,
             mapping.page_type.is_writable(),
@@ -95,7 +103,7 @@ impl AddressSpaceInterface for AddressSpace {
     }
 
     fn is_mapped(
-        &self,
+        &mut self,
         vaddr: <MemoryInterfaceImpl as MemoryInterface>::VAddr,
     ) -> Result<bool, <MemoryInterfaceImpl as MemoryInterface>::Error> {
         let mut walker = pth_walker::PthWalker::new(self, vaddr);
@@ -107,7 +115,7 @@ impl AddressSpaceInterface for AddressSpace {
     }
 
     fn translate_address(
-        &self,
+        &mut self,
         vaddr: super::address::vaddr::VAddr,
     ) -> Result<super::address::paddr::PAddr, <MemoryInterfaceImpl as MemoryInterface>::Error> {
         let mut walker = pth_walker::PthWalker::new(self, vaddr);

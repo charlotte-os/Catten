@@ -7,7 +7,7 @@
 use core::ptr::addr_of_mut;
 
 use super::is_pagetable_unused;
-use crate::llk::isa::interface::memory::MemoryInterface;
+use crate::llk::isa::interface::memory::{AddressSpaceInterface, MemoryInterface};
 use crate::llk::isa::x86_64::memory::address::paddr::PAddr;
 use crate::llk::isa::x86_64::memory::address::vaddr::VAddr;
 use crate::memory::pmem::PHYSICAL_FRAME_ALLOCATOR;
@@ -15,7 +15,7 @@ use crate::memory::pmem::PHYSICAL_FRAME_ALLOCATOR;
 const CR3_ADDRESS_MASK: u64 = 0x000ffffffffff000;
 
 pub struct PthWalker<'vas> {
-    pub address_space: &'vas super::AddressSpace,
+    pub address_space: &'vas mut super::AddressSpace,
     pub vaddr: VAddr,
     pub pml4_ptr: *mut super::PageTable,
     pub pdpt_ptr: *mut super::PageTable,
@@ -25,7 +25,7 @@ pub struct PthWalker<'vas> {
 }
 
 impl<'vas> PthWalker<'vas> {
-    pub fn new(address_space: &'vas super::AddressSpace, vaddr: VAddr) -> Self {
+    pub fn new(address_space: &'vas mut super::AddressSpace, vaddr: VAddr) -> Self {
         Self {
             address_space,
             vaddr,
@@ -85,7 +85,9 @@ impl<'vas> PthWalker<'vas> {
                     // Obtain the PML4 table pointer; all address spaces must have a top level page table
                     // as they are all required to map the kernel and higher half memory.
                     if self.address_space.cr3 & CR3_ADDRESS_MASK == 0 {
-                        return Err(<super::MemoryInterfaceImpl as MemoryInterface>::Error::UnmappedTopLevelPageTable);
+                        let new_pml4 = PHYSICAL_FRAME_ALLOCATOR.lock().allocate_frame()?;
+                        self.address_space.cr3 = <PAddr as Into<u64>>::into(new_pml4) & CR3_ADDRESS_MASK;
+                        self.address_space.load().expect("Error reloading the CR3 register");
                     }
                     self.pml4_ptr = PAddr::from((self.address_space.cr3 & CR3_ADDRESS_MASK) as usize).into();
                 }
