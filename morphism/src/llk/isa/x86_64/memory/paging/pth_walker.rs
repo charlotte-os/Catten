@@ -6,7 +6,8 @@
 
 use core::ptr::addr_of_mut;
 
-use super::is_pagetable_unused;
+use super::{is_pagetable_unused, PAGE_SIZE};
+use crate::llk::isa::interface::memory::address::VirtualAddress;
 use crate::llk::isa::interface::memory::{AddressSpaceInterface, MemoryInterface};
 use crate::llk::isa::x86_64::memory::address::paddr::PAddr;
 use crate::llk::isa::x86_64::memory::address::vaddr::VAddr;
@@ -90,6 +91,9 @@ impl<'vas> PthWalker<'vas> {
                         self.address_space.load().expect("Error reloading the CR3 register");
                     }
                     self.pml4_ptr = PAddr::from((self.address_space.cr3 & CR3_ADDRESS_MASK) as usize).into();
+                    unsafe {
+                        core::ptr::write_bytes(self.pml4_ptr, 0, PAGE_SIZE);
+                    }
                 }
                 if self.pdpt_ptr.is_null() {
                     // Allocate a new page table for the PDPT
@@ -103,6 +107,9 @@ impl<'vas> PthWalker<'vas> {
                             .set_execute_disabled(no_execute);
                     }
                     self.pdpt_ptr = new_pdpt.into();
+                    unsafe {
+                        core::ptr::write_bytes(self.pdpt_ptr, 0, PAGE_SIZE);
+                    }
                 }
                 if self.pd_ptr.is_null() {
                     // Allocate a new page table for the PD
@@ -116,6 +123,9 @@ impl<'vas> PthWalker<'vas> {
                             .set_execute_disabled(no_execute);
                     }
                     self.pd_ptr = new_pd.into();
+                    unsafe {
+                        core::ptr::write_bytes(self.pd_ptr, 0, PAGE_SIZE);
+                    }
                 }
                 if self.pt_ptr.is_null() {
                     // Allocate a new page table for the PT
@@ -129,6 +139,9 @@ impl<'vas> PthWalker<'vas> {
                             .set_execute_disabled(no_execute);
                     }
                     self.pt_ptr = new_pt.into();
+                    unsafe {
+                        core::ptr::write_bytes(self.pt_ptr, 0, PAGE_SIZE);
+                    }
                 }
                 // Map the page frame
                 unsafe {
@@ -138,7 +151,13 @@ impl<'vas> PthWalker<'vas> {
                         .set_writable(writable)
                         .set_user_accessible(user_accessible)
                         .set_execute_disabled(no_execute);
+                    core::ptr::write_bytes(<PAddr as Into<*mut u8>>::into(frame), 0, PAGE_SIZE);
                 }
+                self.address_space.load().expect("Failed to reload the address space");
+                unsafe {
+                    core::arch::asm!("invlpg [{}]", in(reg) self.vaddr.into_ptr::<u8>());
+                }
+
                 Ok(())
             }
             Err(other) => Err(other),

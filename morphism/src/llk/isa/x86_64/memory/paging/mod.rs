@@ -23,6 +23,7 @@ pub fn is_pagetable_unused(table_ptr: *const PageTable) -> bool {
     true
 }
 
+#[repr(transparent)]
 pub struct AddressSpace {
     // control register 3 i.e. top level page table base register
     cr3: u64,
@@ -41,14 +42,6 @@ impl AddressSpaceInterface for AddressSpace {
         unsafe {
             // Set the top level page table base register
             asm!("mov cr3, {}", in(reg) self.cr3);
-            // Enable PCID
-            asm!(
-                "mov rax, cr4",
-                "mov r11, 1",
-                "shl r11, 17",
-                "or rax, r11",
-                "mov cr4, rax"
-            );
         }
         Ok(())
     }

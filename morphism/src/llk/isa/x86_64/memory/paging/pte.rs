@@ -16,14 +16,14 @@ const FRAME_ADDR_START: u64 = 12;
 const FRAME_ADDR_MASK: u64 = 0xfffffffffffff000;
 const EXECUTE_DISABLE_BIT_INDEX: u64 = 63;
 
-/// the page table entry structure
+/// The page table entry structure
 #[repr(transparent)]
 pub struct PageTableEntry(u64);
 
 impl PageTableEntry {
     pub fn new(
         present: bool,
-        writeable: bool,
+        writable: bool,
         user_accessible: bool,
         pat_index_bits: u64,
         global: bool,
@@ -31,7 +31,7 @@ impl PageTableEntry {
     ) -> Self {
         let mut pte = Self(0);
         pte.set_present(present)
-            .set_writable(writeable)
+            .set_writable(writable)
             .set_user_accessible(user_accessible)
             .set_pat_index_bits(pat_index_bits)
             .set_global(global)
@@ -40,14 +40,14 @@ impl PageTableEntry {
     }
 
     pub fn is_present(&self) -> bool {
-        self.0 & 1 << PRESENT_BIT_INDEX != 0
+        self.0 & (1 << PRESENT_BIT_INDEX) != 0
     }
 
     pub fn set_present(&mut self, present: bool) -> &mut Self {
         if present {
             self.0 |= 1 << PRESENT_BIT_INDEX;
         } else {
-            self.0 &= 0 << PRESENT_BIT_INDEX;
+            self.0 &= !(1 << PRESENT_BIT_INDEX);
         }
         self
     }
@@ -83,7 +83,7 @@ impl PageTableEntry {
     }
 
     pub fn set_pat_index_bits(&mut self, pat_index_bits: u64) -> &mut Self {
-        self.0 |= (pat_index_bits << PAT_INDEX_BITS_START) & PAT_INDEX_MASK;
+        self.0 = (self.0 & !PAT_INDEX_MASK) | ((pat_index_bits << PAT_INDEX_BITS_START) & PAT_INDEX_MASK);
         self
     }
 
@@ -144,7 +144,7 @@ impl PageTableEntry {
     }
 
     pub fn set_frame(&mut self, frame: PAddr) -> &mut Self {
-        self.0 |= ((<PAddr as Into<usize>>::into(frame) as u64) << FRAME_ADDR_START) & FRAME_ADDR_MASK;
+        self.0 = (self.0 & !FRAME_ADDR_MASK) | ((<PAddr as Into<u64>>::into(frame)) & FRAME_ADDR_MASK);
         self
     }
 
