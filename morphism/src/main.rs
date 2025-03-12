@@ -3,15 +3,17 @@
 #![feature(sync_unsafe_cell)]
 #![feature(step_trait)]
 
-//! # Purrnel
+//! # Morphism
 //!
-//! The Purrnel kernel is a component of CharlotteOS, an experimental
-//! modern operating system. The kernel is responsible for initializing the
-//! hardware, providing commonizing abstractions for all hardware resources, and
-//! managing the execution of user-space applications and the environment in
-//! which they run. It is a crucial part of the operating system, as it provides
-//! the foundation on which the rest of the system is built and it touches every
-//! hardware and software component of the system on which it is used.
+//! Morphism is an opearting system supervisor developed as a component of CharlotteOS, an
+//! experimental modern operating system.This kernel is responsible for initializing the hardware,
+//! providing commonizing abstractions for all hardware resources, and managing the execution of
+//! user-space applications and the environment in which they run. It is a crucial part of the
+//! operating system, as it provides the foundation on which the rest of the system is built and it
+//! touches every hardware and software component of the system on which it is used. While it is
+//! developed as a component of CharlotteOS, it is designed to be modular and flexible, and thus
+//! useful in other operating systems, embedded firmware, and other types of software distributions
+//! as well.
 
 pub mod common;
 pub mod framebuffer;
