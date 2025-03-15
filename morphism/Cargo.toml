@@ -19,6 +19,7 @@ flanterm_bindings = ">=1.1.4"
 flat_device_tree = ">=3.1.1"
 gcd = "2.3.0"
 spin = {version = ">=0.9.8", features = ["ticket_mutex"]}
+talc = "4.4.2"
 
 [profile.dev]
 debug = "full"
