@@ -2,6 +2,7 @@ pub use crate::llk::isa::current_isa::memory::address::paddr::PAddr;
 pub use crate::llk::isa::current_isa::memory::address::vaddr::VAddr;
 use crate::llk::isa::interface::memory::MemoryInterface;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PageType {
     KernelCode,   //read, execute
     KernelData,   //read, write
@@ -14,6 +15,18 @@ pub enum PageType {
 }
 
 impl PageType {
+    pub fn new(is_user_accessible: bool, is_writeable: bool, is_no_execute: bool) -> Self {
+        match (is_user_accessible, is_writeable, is_no_execute) {
+            (false, false, false) => PageType::KernelCode,
+            (false, true, false) => PageType::KernelData,
+            (false, false, true) => PageType::KernelRoData,
+            (true, false, false) => PageType::UserCode,
+            (true, true, false) => PageType::UserData,
+            (true, false, true) => PageType::UserRoData,
+            (_, _, _) => panic!("Invalid page type"),
+        }
+    }
+
     pub fn is_user_accessible(&self) -> bool {
         match self {
             PageType::UserCode | PageType::UserData | PageType::UserRoData => true,

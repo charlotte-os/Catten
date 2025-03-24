@@ -83,7 +83,7 @@ impl AddressSpaceInterface for AddressSpace {
     fn unmap_page(
         &mut self,
         vaddr: <MemoryInterfaceImpl as MemoryInterface>::VAddr,
-    ) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error> {
+    ) -> Result<MemoryMapping, <MemoryInterfaceImpl as MemoryInterface>::Error> {
         if <VAddr as Into<usize>>::into(vaddr) == 0 {
             return Err(<MemoryInterfaceImpl as MemoryInterface>::Error::NullVAddrNotAllowed);
         }
@@ -91,8 +91,7 @@ impl AddressSpaceInterface for AddressSpace {
             return Err(<MemoryInterfaceImpl as MemoryInterface>::Error::VAddrNotPageAligned);
         }
         let mut walker = pth_walker::PthWalker::new(self, vaddr);
-        walker.unmap_page()?;
-        Ok(())
+        walker.unmap_page()
     }
 
     fn is_mapped(

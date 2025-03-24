@@ -12,6 +12,7 @@ use crate::llk::isa::interface::memory::{AddressSpaceInterface, MemoryInterface}
 use crate::llk::isa::x86_64::memory::address::paddr::PAddr;
 use crate::llk::isa::x86_64::memory::address::vaddr::VAddr;
 use crate::memory::pmem::PHYSICAL_FRAME_ALLOCATOR;
+use crate::memory::vmem::{MemoryMapping, PageType};
 
 const CR3_ADDRESS_MASK: u64 = 0x000ffffffffff000;
 
@@ -164,13 +165,23 @@ impl<'vas> PthWalker<'vas> {
         }
     }
 
-    pub fn unmap_page(&mut self) -> Result<(), <super::MemoryInterfaceImpl as MemoryInterface>::Error> {
+    pub fn unmap_page(&mut self) -> Result<MemoryMapping, <super::MemoryInterfaceImpl as MemoryInterface>::Error> {
         match self.walk() {
             Ok(_) => {
                 unsafe {
+                    let mut mapping = MemoryMapping {
+                        vaddr: self.vaddr,
+                        paddr: (*self.pt_ptr)[self.vaddr.pt_index()].get_frame(),
+                        page_type: PageType::new(
+                            (*self.pt_ptr)[self.vaddr.pt_index()].is_writable(),
+                            (*self.pt_ptr)[self.vaddr.pt_index()].is_user_accessible(),
+                            (*self.pt_ptr)[self.vaddr.pt_index()].is_execute_disabled(),
+                        ),
+                    };
                     let pte = addr_of_mut!((*self.pt_ptr)[self.vaddr.pt_index()]);
                     if (*pte).is_present() {
-                        PHYSICAL_FRAME_ALLOCATOR.lock().deallocate_frame((*pte).get_frame())?;
+                        // We do not deallocate the page frame here, as it is the responsibility of the VMM client
+                        // calling this function to deallocate the frame if they so choose.
                         (*pte).set_present(false);
                     }
 
@@ -191,8 +202,8 @@ impl<'vas> PthWalker<'vas> {
                         PHYSICAL_FRAME_ALLOCATOR.lock().deallocate_frame((*pml4e).get_frame())?;
                         (*pml4e).set_present(false);
                     }
+                    return Ok(mapping);
                 }
-                Ok(())
             }
             Err(other) => Err(other),
         }

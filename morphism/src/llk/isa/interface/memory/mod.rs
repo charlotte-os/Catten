@@ -21,7 +21,7 @@ pub trait AddressSpaceInterface {
         range: (VAddr, VAddr),
     ) -> Result<VAddr, <MemoryInterfaceImpl as MemoryInterface>::Error>;
     fn map_page(&mut self, mapping: MemoryMapping) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error>;
-    fn unmap_page(&mut self, vaddr: VAddr) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error>;
+    fn unmap_page(&mut self, vaddr: VAddr) -> Result<MemoryMapping, <MemoryInterfaceImpl as MemoryInterface>::Error>;
     fn is_mapped(&mut self, vaddr: VAddr) -> Result<bool, <MemoryInterfaceImpl as MemoryInterface>::Error>;
     fn translate_address(&mut self, vaddr: VAddr) -> Result<PAddr, <MemoryInterfaceImpl as MemoryInterface>::Error>;
 }
