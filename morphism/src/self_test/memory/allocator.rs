@@ -13,7 +13,7 @@ const SLAB_ALLOCATION_REGION_SIZE: usize = PAGE_SIZE * 16;
 
 struct SlabAllocationRegion<const N_BYTES: usize> {
     next: Option<NonNull<SlabAllocationRegion<N_BYTES>>>,
-    data: [u8; N_BYTES],d
+    // Add a proper sized bitmap and then the memory region
 }
 
 struct WordLevelAllocator {
