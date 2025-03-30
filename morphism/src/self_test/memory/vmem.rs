@@ -35,7 +35,7 @@ pub fn test_vmem() {
     const MAGIC_NUMBER: u32 = 0xcafebabe;
     unsafe {
         logln!(
-            "Writing magic number {:?} to virtual address {:?}",
+            "Writing magic number {:x?}_16 to virtual address {:?}",
             MAGIC_NUMBER,
             HIGHER_HALF_START
         );

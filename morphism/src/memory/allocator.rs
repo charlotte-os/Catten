@@ -1,4 +1,5 @@
-use alloc::alloc;
+use core::alloc::{self, AllocError};
+use core::alloc::Layout;
 use core::ptr::{null_mut, NonNull};
 
 use embedded_graphics::mono_font::mapping;
@@ -175,7 +176,7 @@ impl Allocator {
     }
 }
 
-impl alloc::Allocator for Allocator {
+unsafe impl alloc::Allocator for Allocator {
     fn allocate(&self, layout: Layout) -> Result<NonNull<[u8]>, AllocError> {
         // Attempt to allocate a buffer of the requested size and alignment
         // If the allocation fails, return an error
@@ -183,10 +184,7 @@ impl alloc::Allocator for Allocator {
         let size = layout.size();
         let alignment = layout.align();
         if size == 0 {
-            return Ok(NonNull::new(null_mut()).unwrap());
-        }
-        if size > self.heap_end - self.heap_start {
-            return Err(AllocError::Exhausted { request: layout });
+            return Ok(NonNull::new(0 as *mut [u8; 0] ).unwrap());
         }
         todo!("Write code to allocate a buffer with the needed size and alignment.");
     }
@@ -198,9 +196,6 @@ impl alloc::Allocator for Allocator {
         let size = layout.size();
         let alignment = layout.align();
         if size == 0 {
-            return;
-        }
-        if size > self.heap_end - self.heap_start {
             return;
         }
         todo!("Write code to deallocate a buffer with the needed size and alignment.");
