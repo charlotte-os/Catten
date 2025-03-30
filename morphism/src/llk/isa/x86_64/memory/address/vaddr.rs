@@ -1,7 +1,7 @@
 use core::iter::Step;
 use core::ops::{Add, Sub};
 
-use crate::llk::isa::interface::memory::address::VirtualAddress;
+use crate::llk::isa::interface::memory::address::{Address, VirtualAddress};
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct VAddr {
@@ -47,6 +47,30 @@ impl VAddr {
 
     pub fn page_offset(&self) -> usize {
         self.raw & OFFSET_MASK
+    }
+}
+
+impl Address for VAddr {
+    const MIN: Self = VAddr { raw: 0 };
+    const MAX: Self = VAddr { raw: usize::MAX };
+    const NULL: Self = VAddr { raw: 0 };
+
+    fn is_aligned_to(&self, alignment: usize) -> bool {
+        self.raw % alignment == 0
+    }
+
+    fn next_aligned_to(&self, alignment: usize) -> Self {
+        let mask = alignment - 1;
+        let aligned = (<VAddr as Into<usize>>::into(*self) + mask) & !mask;
+        VAddr::from(aligned)
+    }
+
+    fn is_valid(value: usize) -> bool {
+        value != 0
+    }
+
+    fn is_null(&self) -> bool {
+        self.raw == 0
     }
 }
 

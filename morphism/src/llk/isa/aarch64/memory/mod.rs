@@ -3,6 +3,10 @@ pub mod paging;
 
 use core::arch::asm;
 
+use address::vaddr::VAddr;
+use address::paddr::PAddr;
+use crate::llk::isa::interface::memory::address::{Address, PhysicalAddress, VirtualAddress};
+
 use crate::llk::isa::interface::memory::{AddressSpaceInterface, MemoryInterface, MemoryMapping};
 
 pub struct MemoryInterfaceImpl;
@@ -43,9 +47,11 @@ impl AddressSpaceInterface for AddressSpace {
     }
 
     fn find_free_region(
-        &self,
+        &mut self,
         n_pages: usize,
+        range: (<MemoryInterfaceImpl as MemoryInterface>::VAddr, <MemoryInterfaceImpl as MemoryInterface>::VAddr),
     ) -> Result<<MemoryInterfaceImpl as MemoryInterface>::VAddr, <MemoryInterfaceImpl as MemoryInterface>::Error> {
+        // Use n_pages and range to implement the logic
         todo!()
     }
 
@@ -61,16 +67,13 @@ impl AddressSpaceInterface for AddressSpace {
     }
 
     fn is_mapped(
-        &self,
+        &mut self,
         vaddr: <MemoryInterfaceImpl as MemoryInterface>::VAddr,
     ) -> Result<bool, <MemoryInterfaceImpl as MemoryInterface>::Error> {
         todo!()
     }
 
-    fn get_mapping(
-        &self,
-        vaddr: <MemoryInterfaceImpl as MemoryInterface>::VAddr,
-    ) -> Result<MemoryMapping, <MemoryInterfaceImpl as MemoryInterface>::Error> {
-        todo!()
+    fn translate_address(&mut self, vaddr: VAddr) -> Result<PAddr, <MemoryInterfaceImpl as MemoryInterface>::Error> {
+        todo!("Implement the address translation logic for AArch64")
     }
 }

@@ -1,12 +1,35 @@
 use core::ops::Add;
 
-use crate::llk::isa::interface::memory::address::{PhysicalAddress, VirtualAddress};
+use crate::llk::isa::interface::memory::address::{Address, PhysicalAddress, VirtualAddress};
 use crate::memory::pmem::HHDM_BASE;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PAddr {
     addr: usize,
 }
+
+impl Address for PAddr {
+    const MIN: Self = PAddr { addr: 0 };
+    const MAX: Self = PAddr { addr: usize::MAX };
+    const NULL: Self = PAddr { addr: 0 };
+
+    fn is_aligned_to(&self, alignment: usize) -> bool {
+        self.addr % alignment == 0
+    }
+
+    fn is_valid(value: usize) -> bool {
+        value & *super::PADDR_MASK == value
+    }
+
+    fn is_null(&self) -> bool {
+        self.addr == 0
+    }
+
+    fn next_aligned_to(&self, alignment: usize) -> Self {
+        PAddr::from((self.addr + alignment - 1) & !(alignment - 1))
+    }
+}
+
 impl PhysicalAddress for PAddr {
     unsafe fn into_hhdm_ptr<T>(self) -> *const T {
         (*HHDM_BASE).into_ptr::<T>().byte_offset(self.addr as isize)
