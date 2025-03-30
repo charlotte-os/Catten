@@ -1,13 +1,34 @@
 use core::ptr::{null_mut, NonNull};
 
-use crate::llk::isa::interface::memory::address::{Address, VirtualAddress};
+use embedded_graphics::mono_font::mapping;
+
+use crate::llk::isa::interface::memory::address::{self, Address, VirtualAddress};
+use crate::llk::isa::interface::memory::AddressSpaceInterface;
+use crate::llk::isa::current_isa::memory::paging::AddressSpace;
 use crate::llk::isa::current_isa::memory::paging::PAGE_SIZE;
+use crate::llk::isa::current_isa::memory::Error as IsaMemoryError;
 use crate::memory::vmem::VAddr;
+
+use super::pmem::{self, Error as PMemError, PHYSICAL_FRAME_ALLOCATOR};
+use super::vmem::{MemoryMapping, PageType};
 
 pub enum Error {
     FreeBlockTooSmall,
     FreeBlockCannotAccomodateAlignment,
     WouldExceedHeapLimit,
+    PageFrameAllocatorError(PMemError),
+    IsaMemoryError(IsaMemoryError),
+}
+
+impl From<PMemError> for Error {
+    fn from(err: PMemError) -> Self {
+        Error::PageFrameAllocatorError(err)
+    }
+}
+impl From<IsaMemoryError> for Error {
+    fn from(err: IsaMemoryError) -> Self {
+        Error::IsaMemoryError(err)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -119,7 +140,35 @@ impl Allocator {
         if new_end > self.heap_limit.unwrap_or(VAddr::MAX) {
             return Err(Error::WouldExceedHeapLimit);
         }
-
+        let mut address_space = AddressSpace::get_current();
+        for i in 0..n_pages {
+            let page_addr = starting_address + (i * PAGE_SIZE);
+            // Allocate the page
+            // If allocation fails, return an error
+            // Otherwise, add the page to the free list
+            let mapping = MemoryMapping {
+                vaddr: page_addr,
+                paddr: PHYSICAL_FRAME_ALLOCATOR.lock().allocate_frame()?,
+                page_type: PageType::KernelData,
+            };
+            address_space.map_page(mapping)?;
+        }
         Ok(())
+    }
+
+    fn shrink_heap(&mut self)-> Result<usize, Error> {
+        // If the end of the heap is free and greater than a page, shrink the heap
+        // This will require unmapping the page and updating the heap_end pointer
+        // If the unmapping fails, return an error
+        // Otherwise, remove the page from the free list
+        // Return the number of pages freed
+        let mut address_space = AddressSpace::get_current();
+        if let Some(end_block) = self.get_last_free_block() {
+            todo!("If the last block is free and contains at least one full page we can shrink the heap and unmap the page(s).")
+        } else {
+            // If there are not free blocks in the free list, we cannot shrink the heap
+            // Return 0 pages freed as this is a normal possible outcome of this operation
+            Ok(0)
+        }
     }
 }
