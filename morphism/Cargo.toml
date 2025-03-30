@@ -12,6 +12,7 @@ bench = false
 [build-dependencies]
 
 [dependencies]
+alloc = "*"
 lazy_static = {version = ">=1.5.0", features = ["spin_no_std"]}
 limine = ">=0.3.1"
 embedded-graphics = "*"

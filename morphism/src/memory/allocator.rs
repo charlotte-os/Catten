@@ -1,16 +1,15 @@
+use alloc::alloc;
 use core::ptr::{null_mut, NonNull};
 
 use embedded_graphics::mono_font::mapping;
 
-use crate::llk::isa::interface::memory::address::{self, Address, VirtualAddress};
-use crate::llk::isa::interface::memory::AddressSpaceInterface;
-use crate::llk::isa::current_isa::memory::paging::AddressSpace;
-use crate::llk::isa::current_isa::memory::paging::PAGE_SIZE;
-use crate::llk::isa::current_isa::memory::Error as IsaMemoryError;
-use crate::memory::vmem::VAddr;
-
 use super::pmem::{self, Error as PMemError, PHYSICAL_FRAME_ALLOCATOR};
 use super::vmem::{MemoryMapping, PageType};
+use crate::llk::isa::current_isa::memory::paging::{AddressSpace, PAGE_SIZE};
+use crate::llk::isa::current_isa::memory::Error as IsaMemoryError;
+use crate::llk::isa::interface::memory::address::{self, Address, VirtualAddress};
+use crate::llk::isa::interface::memory::AddressSpaceInterface;
+use crate::memory::vmem::VAddr;
 
 pub enum Error {
     FreeBlockTooSmall,
@@ -39,21 +38,23 @@ struct FreeBlock {
 }
 
 impl FreeBlock {
-    fn allocate_from(&mut self, alignment: usize, size: usize)-> Result<VAddr, Error> {
+    fn allocate_from(&mut self, alignment: usize, size: usize) -> Result<VAddr, Error> {
         if self.size < size {
             return Err(Error::FreeBlockTooSmall);
         }
         // Attempt to allocate from the back of the block and shift up as needed to align the address
-        todo!("Write code to allocate a buffer with the needed size and alignment starting from the back of the block.");
+        todo!(
+            "Write code to allocate a buffer with the needed size and alignment starting from the back of the block."
+        );
     }
 }
 
 #[derive(Debug)]
 pub struct Allocator {
     heap_start: VAddr,
-    heap_end:  VAddr,
+    heap_end: VAddr,
     heap_limit: Option<VAddr>,
-    free_list:  *mut FreeBlock,
+    free_list: *mut FreeBlock,
 }
 
 impl Allocator {
@@ -125,9 +126,7 @@ impl Allocator {
                     current = (*current).next.unwrap().as_ptr();
                 }
             }
-            unsafe {
-                Some(&mut *current)
-            }
+            unsafe { Some(&mut *current) }
         }
     }
 
@@ -156,7 +155,7 @@ impl Allocator {
         Ok(())
     }
 
-    fn shrink_heap(&mut self)-> Result<usize, Error> {
+    fn shrink_heap(&mut self) -> Result<usize, Error> {
         // If the end of the heap is free and greater than a page, shrink the heap
         // This will require unmapping the page and updating the heap_end pointer
         // If the unmapping fails, return an error
@@ -164,11 +163,46 @@ impl Allocator {
         // Return the number of pages freed
         let mut address_space = AddressSpace::get_current();
         if let Some(end_block) = self.get_last_free_block() {
-            todo!("If the last block is free and contains at least one full page we can shrink the heap and unmap the page(s).")
+            todo!(
+                "If the last block is free and contains at least one full page we can shrink the heap and unmap the \
+                 page(s)."
+            )
         } else {
             // If there are not free blocks in the free list, we cannot shrink the heap
             // Return 0 pages freed as this is a normal possible outcome of this operation
             Ok(0)
         }
+    }
+}
+
+impl alloc::Allocator for Allocator {
+    fn allocate(&self, layout: Layout) -> Result<NonNull<[u8]>, AllocError> {
+        // Attempt to allocate a buffer of the requested size and alignment
+        // If the allocation fails, return an error
+        // Otherwise, return the allocated buffer
+        let size = layout.size();
+        let alignment = layout.align();
+        if size == 0 {
+            return Ok(NonNull::new(null_mut()).unwrap());
+        }
+        if size > self.heap_end - self.heap_start {
+            return Err(AllocError::Exhausted { request: layout });
+        }
+        todo!("Write code to allocate a buffer with the needed size and alignment.");
+    }
+
+    unsafe fn deallocate(&self, ptr: NonNull<u8>, layout: Layout) {
+        // Attempt to deallocate a buffer of the requested size and alignment
+        // If the deallocation fails, return an error
+        // Otherwise, return the allocated buffer
+        let size = layout.size();
+        let alignment = layout.align();
+        if size == 0 {
+            return;
+        }
+        if size > self.heap_end - self.heap_start {
+            return;
+        }
+        todo!("Write code to deallocate a buffer with the needed size and alignment.");
     }
 }
