@@ -1,12 +1,13 @@
-use core::mem::MaybeUninit;
-use core::ptr::{addr_of, null_mut, NonNull};
+use core::ptr::{null_mut, NonNull};
 
-use crate::llk::isa::x86_64::memory::paging::PAGE_SIZE;
+use crate::llk::isa::interface::memory::address::{Address, VirtualAddress};
+use crate::llk::isa::current_isa::memory::paging::PAGE_SIZE;
 use crate::memory::vmem::VAddr;
 
 pub enum Error {
     FreeBlockTooSmall,
     FreeBlockCannotAccomodateAlignment,
+    WouldExceedHeapLimit,
 }
 
 #[derive(Debug, Clone)]
@@ -17,7 +18,7 @@ struct FreeBlock {
 }
 
 impl FreeBlock {
-    fn allocate_from(&mut self, alignment: usize, size: usize)-> Result<VAddr, Error>> {
+    fn allocate_from(&mut self, alignment: usize, size: usize)-> Result<VAddr, Error> {
         if self.size < size {
             return Err(Error::FreeBlockTooSmall);
         }
@@ -29,15 +30,17 @@ impl FreeBlock {
 #[derive(Debug)]
 pub struct Allocator {
     heap_start: VAddr,
-    heap_size:  usize,
+    heap_end:  VAddr,
+    heap_limit: Option<VAddr>,
     free_list:  *mut FreeBlock,
 }
 
 impl Allocator {
-    pub const unsafe fn new(heap_start: VAddr, heap_size: usize) -> Self {
+    pub const unsafe fn new(heap_start: VAddr, heap_end: VAddr, heap_limit: Option<VAddr>) -> Self {
         Self {
             heap_start,
-            heap_size,
+            heap_end: heap_end,
+            heap_limit: heap_limit,
             free_list: null_mut(),
         }
     }
@@ -86,5 +89,37 @@ impl Allocator {
                 current = (*current).next.unwrap().as_ptr();
             }
         }
+    }
+
+    fn get_last_free_block(&self) -> Option<&mut FreeBlock> {
+        if self.free_list.is_null() {
+            None
+        } else {
+            let mut current = self.free_list;
+            while current.is_null() == false {
+                unsafe {
+                    if (*current).next.is_none() {
+                        return Some(&mut *current);
+                    }
+                    current = (*current).next.unwrap().as_ptr();
+                }
+            }
+            unsafe {
+                Some(&mut *current)
+            }
+        }
+    }
+
+    fn grow_heap(&mut self, n_pages: usize) -> Result<(), Error> {
+        // Attempt to grow the heap by n_pages
+        // This will require allocating a new page and updating the heap_end pointer
+        // If the allocation fails, return an error
+        let starting_address = self.heap_end.next_aligned_to(PAGE_SIZE);
+        let new_end = starting_address + (n_pages * PAGE_SIZE);
+        if new_end > self.heap_limit.unwrap_or(VAddr::MAX) {
+            return Err(Error::WouldExceedHeapLimit);
+        }
+
+        Ok(())
     }
 }
