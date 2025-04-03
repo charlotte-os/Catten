@@ -1,5 +1,4 @@
-use core::alloc::{self, AllocError};
-use core::alloc::Layout;
+use core::alloc::{self, AllocError, Layout};
 use core::ptr::{null_mut, NonNull};
 
 use embedded_graphics::mono_font::mapping;
@@ -43,9 +42,11 @@ impl FreeBlock {
         if self.size < size {
             return Err(Error::FreeBlockTooSmall);
         }
-        // Attempt to allocate from the back of the block and shift up as needed to align the address
+        // Attempt to allocate from the back of the block and shift up as needed to align the
+        // address
         todo!(
-            "Write code to allocate a buffer with the needed size and alignment starting from the back of the block."
+            "Write code to allocate a buffer with the needed size and alignment starting from the \
+             back of the block."
         );
     }
 }
@@ -164,13 +165,22 @@ impl Allocator {
         // Return the number of pages freed
         let mut address_space = AddressSpace::get_current();
         if let Some(end_block) = self.get_last_free_block() {
-            todo!(
-                "If the last block is free and contains at least one full page we can shrink the heap and unmap the \
-                 page(s)."
-            )
+            if end_block.size < PAGE_SIZE {
+                Ok(0)
+            } else {
+                let end_block_base = VAddr::from(addr_of!(end_block));
+                let end_block_end = end_block_base + end_block.size;
+                // Find the first page aligned address in the free block
+                let first_page_addr = end_block_base.next_aligned_to(PAGE_SIZE);
+                todo!(
+                    "If the last block is free and contains at least one full page we can shrink \
+                     the heap and unmap the page(s)."
+                );
+            }
         } else {
-            // If there are not free blocks in the free list, we cannot shrink the heap
+            // If there are no free blocks in the free list, we cannot shrink the heap
             // Return 0 pages freed as this is a normal possible outcome of this operation
+            // and not an error
             Ok(0)
         }
     }
@@ -184,7 +194,7 @@ unsafe impl alloc::Allocator for Allocator {
         let size = layout.size();
         let alignment = layout.align();
         if size == 0 {
-            return Ok(NonNull::new(0 as *mut [u8; 0] ).unwrap());
+            return Ok(NonNull::new(0 as *mut [u8; 0]).unwrap());
         }
         todo!("Write code to allocate a buffer with the needed size and alignment.");
     }
