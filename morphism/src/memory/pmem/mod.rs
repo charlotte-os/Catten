@@ -1,17 +1,17 @@
 //! # Physical Memory Management
 //!
-//! This module is responsible for managing physical memory. It provides an interface for allocating and freeing
-//! physical memory frames.
+//! This module is responsible for managing physical memory. It provides an interface for allocating
+//! and freeing physical memory frames.
 
 use lazy_static::lazy_static;
 use limine::response::MemoryMapResponse;
 use spin::Mutex;
 
 use crate::llk::environment::boot_protocol::limine::{HHDM_REQUEST, MEMEORY_MAP_REQUEST};
-use crate::llk::isa::current_isa::memory::address::paddr::PAddr;
-use crate::llk::isa::current_isa::memory::MemoryInterfaceImpl;
-use crate::llk::isa::interface::memory::address::PhysicalAddress;
-use crate::llk::isa::interface::memory::MemoryInterface;
+pub use crate::llk::isa::current_isa::memory::address::paddr::PAddr;
+pub use crate::llk::isa::current_isa::memory::MemoryInterfaceImpl;
+pub use crate::llk::isa::interface::memory::address::PhysicalAddress;
+pub use crate::llk::isa::interface::memory::MemoryInterface;
 use crate::logln;
 
 pub type VAddr = <MemoryInterfaceImpl as MemoryInterface>::VAddr;
@@ -22,11 +22,12 @@ lazy_static! {
     } else {
         panic!("Limine failed to provide a higher half direct mapping region.");
     };
-    pub static ref PHYSICAL_FRAME_ALLOCATOR: Mutex<PhysicalFrameAllocator> = Mutex::new(PhysicalFrameAllocator::from(
-        MEMEORY_MAP_REQUEST
-            .get_response()
-            .expect("Limine failed to provide a memory map.")
-    ));
+    pub static ref PHYSICAL_FRAME_ALLOCATOR: Mutex<PhysicalFrameAllocator> =
+        Mutex::new(PhysicalFrameAllocator::from(
+            MEMEORY_MAP_REQUEST
+                .get_response()
+                .expect("Limine failed to provide a memory map.")
+        ));
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -98,7 +99,10 @@ impl From<&MemoryMapResponse> for PhysicalFrameAllocator {
         logln!("PhysicalFrameAllocator bitmap size: {:?}", bitmap_size);
         logln!("Finding best fit memory location for the PhysicalFrameAllocator bitmap...");
         let bitmap_addr: PAddr = find_mmap_best_fit(response, bitmap_size).unwrap();
-        logln!("PhysicalFrameAllocator bitmap addr (physical): {:?}", bitmap_addr);
+        logln!(
+            "PhysicalFrameAllocator bitmap addr (physical): {:?}",
+            bitmap_addr
+        );
         let pfa = PhysicalFrameAllocator {
             bitmap_ptr: unsafe { bitmap_addr.into_hhdm_mut::<u8>() },
             bitmap_len: bitmap_size,
@@ -176,7 +180,8 @@ fn init_bitmap_from_mmap(bitmap_ptr: *mut u8, mmap: &MemoryMapResponse) {
             let end = entry.base + entry.length;
             for i in (start..end).step_by(4096) {
                 //logln!("Marking frame at physical address {:?} as available...", i);
-                let (byte_index, bit_offset) = addr_to_bitmap_index(PAddr::from(i as usize)).unwrap();
+                let (byte_index, bit_offset) =
+                    addr_to_bitmap_index(PAddr::from(i as usize)).unwrap();
                 unsafe {
                     *(bitmap_ptr.offset(byte_index as isize)) &= !(1 << bit_offset);
                 }
@@ -193,8 +198,8 @@ fn mark_pfa_bitmap_unusable(bitmap_ptr: *mut u8, base: PAddr, length: usize) {
     };
 
     for i in 0..n_pages {
-        let pfa_index =
-            addr_to_bitmap_index(base + (i * 4096) as isize).expect("Failed to convert PAddr to bitmap index.");
+        let pfa_index = addr_to_bitmap_index(base + (i * 4096) as isize)
+            .expect("Failed to convert PAddr to bitmap index.");
         unsafe {
             *(bitmap_ptr.offset(pfa_index.0 as isize)) |= 1 << pfa_index.1;
         }
