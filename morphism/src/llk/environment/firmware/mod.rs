@@ -18,16 +18,5 @@
 
 // Advanced Configuration and Power Interface (ACPI)
 pub mod acpi;
-// Flattened Device Tree (FDT) aka Device Tree Blob (DTB)
-#[cfg(not(target_arch = "x86_64"))]
-pub mod fdt;
-// RISC-V Supervisor Binary Interface (SBI)
-#[cfg(target_arch = "riscv64")]
-pub mod sbi;
-// System Management BIOS (SMBIOS)
-pub mod smbios;
-// ARM Secure Monitor Calls (SMC)
-#[cfg(target_arch = "aarch64")]
-pub mod smc;
 // Unified Extensible Firmware Interface (UEFI) Runtime Services
 pub mod uefi_rt;
