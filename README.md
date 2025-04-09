@@ -1,6 +1,6 @@
 # CharlotteOS - Morphism
 
-Morphism is the kernel developed as part of the CharlotteOS project. It is a monolithic kernel with low-level system call interfaces that borrows ideas from exokernels and modern systems like Fuchsia. Its design allows almost any OS personality to be layered on top and a flexible, typesafe system namespace (akin to the namespaces found in Fuschsia and Plan9 but more flexible).
+Morphism is the kernel developed as key component of the CharlotteOS project with the hope that it can also find use in many other places. It is a monolithic kernel with low-level system call interfaces that borrows ideas from exokernels and modern systems like Fuchsia. Its design allows almost any OS personality to be layered on top and a flexible, typesafe system namespace (akin to the namespaces found in Fuschsia and Plan9 but more flexible).
 
 Morphism is still in early development, and core subsystems are actively being built. We welcome contributions—feel free to grab an issue from the tracker, suggest features, or participate in discussions on our repository or Discord server.
 
