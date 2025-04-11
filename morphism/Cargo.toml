@@ -14,12 +14,9 @@ bench = false
 [dependencies]
 lazy_static = {version = ">=1.5.0", features = ["spin_no_std"]}
 limine = ">=0.3.1"
-embedded-graphics = "*"
-flanterm_bindings = ">=1.1.4"
-flat_device_tree = ">=3.1.1"
+#flat_device_tree = ">=3.1.1"
 gcd = "2.3.0"
 spin = {version = ">=0.9.8", features = ["ticket_mutex"]}
-talc = "4.4.2"
 
 [profile.dev]
 debug = "full"

@@ -2,8 +2,9 @@ use core::cell::UnsafeCell;
 
 /// A wrapper around `UnsafeCell` that is `Send`.
 ///
-/// This is useful for when you need to store a value in a `static` variable, but the value is not `Send`.
-/// Safety: The developer must ensure that the contained value is not used to access memory that is aliased elsewhere.
+/// This is useful for when you need to store a value in a `static` variable, but the value is not
+/// `Send`. Safety: The developer must ensure that the contained value is not used to access memory
+/// that is aliased elsewhere.
 pub struct SendUnsafeCell<T> {
     value: UnsafeCell<T>,
 }

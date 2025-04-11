@@ -36,7 +36,9 @@ impl PageType {
 
     pub fn is_writable(&self) -> bool {
         match self {
-            PageType::KernelData | PageType::UserData | PageType::Mmio | PageType::Framebuffer => true,
+            PageType::KernelData | PageType::UserData | PageType::Mmio | PageType::Framebuffer => {
+                true
+            }
             _ => false,
         }
     }

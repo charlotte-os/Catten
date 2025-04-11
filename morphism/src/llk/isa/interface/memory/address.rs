@@ -1,6 +1,8 @@
 use core::fmt::Debug;
 
-pub trait Address: Copy + Clone + Debug + PartialEq + Eq + PartialOrd + Ord + From<usize> + Into<usize> {
+pub trait Address:
+    Copy + Clone + Debug + PartialEq + Eq + PartialOrd + Ord + From<usize> + Into<usize>
+{
     const MIN: Self;
     const MAX: Self;
     const NULL: Self;

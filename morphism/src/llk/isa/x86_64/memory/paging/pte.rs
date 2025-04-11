@@ -83,7 +83,8 @@ impl PageTableEntry {
     }
 
     pub fn set_pat_index_bits(&mut self, pat_index_bits: u64) -> &mut Self {
-        self.0 = (self.0 & !PAT_INDEX_MASK) | ((pat_index_bits << PAT_INDEX_BITS_START) & PAT_INDEX_MASK);
+        self.0 = (self.0 & !PAT_INDEX_MASK)
+            | ((pat_index_bits << PAT_INDEX_BITS_START) & PAT_INDEX_MASK);
         self
     }
 
@@ -144,7 +145,8 @@ impl PageTableEntry {
     }
 
     pub fn set_frame(&mut self, frame: PAddr) -> &mut Self {
-        self.0 = (self.0 & !FRAME_ADDR_MASK) | ((<PAddr as Into<u64>>::into(frame)) & FRAME_ADDR_MASK);
+        self.0 =
+            (self.0 & !FRAME_ADDR_MASK) | ((<PAddr as Into<u64>>::into(frame)) & FRAME_ADDR_MASK);
         self
     }
 

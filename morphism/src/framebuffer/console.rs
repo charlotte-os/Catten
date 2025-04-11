@@ -58,7 +58,12 @@ impl Console {
     }
 
     /// Write a char to the console
-    pub fn write_char(&mut self, character: char, color: Option<u32>, background_color: Option<u32>) {
+    pub fn write_char(
+        &mut self,
+        character: char,
+        color: Option<u32>,
+        background_color: Option<u32>,
+    ) {
         // Write the character to the buffer
         match character {
             // Newline
@@ -173,7 +178,8 @@ impl Console {
     }
 }
 
-static INNER_STYLE_SETTINGS: TicketMutex<InnerPrintStyle> = TicketMutex::new(InnerPrintStyle::new());
+static INNER_STYLE_SETTINGS: TicketMutex<InnerPrintStyle> =
+    TicketMutex::new(InnerPrintStyle::new());
 
 /// Inner style settings for print macros
 struct InnerPrintStyle {
@@ -213,7 +219,8 @@ impl fmt::Write for Console {
             return Ok(());
         }
         if styling.setting_background_color {
-            styling.background_color = Some(u32::from_str_radix(string, 16).unwrap_or(Color::BLACK));
+            styling.background_color =
+                Some(u32::from_str_radix(string, 16).unwrap_or(Color::BLACK));
             styling.setting_background_color = false;
             return Ok(());
         }

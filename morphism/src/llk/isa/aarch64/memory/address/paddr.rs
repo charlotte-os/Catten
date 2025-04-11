@@ -16,8 +16,8 @@ impl Into<usize> for PAddr {
 }
 
 impl Address for PAddr {
-    const MIN: Self = PAddr(0);
     const MAX: Self = PAddr(usize::MAX);
+    const MIN: Self = PAddr(0);
     const NULL: Self = PAddr(0);
 
     fn is_aligned_to(&self, alignment: usize) -> bool {

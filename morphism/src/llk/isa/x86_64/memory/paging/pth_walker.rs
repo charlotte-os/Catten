@@ -1,8 +1,9 @@
 //! # Page Table Hierarchy Walker
 //!
 //! This module implements the page table hierarchy walker for the x86_64 architecture.
-//! This structure performs the actual page table walk, translating virtual addresses to physical addresses,
-//! mapping pages, and unmapping pages as well as adding and removing page table entries and page tables as needed.
+//! This structure performs the actual page table walk, translating virtual addresses to physical
+//! addresses, mapping pages, and unmapping pages as well as adding and removing page table entries
+//! and page tables as needed.
 
 use core::ptr::addr_of_mut;
 
@@ -39,7 +40,9 @@ impl<'vas> PthWalker<'vas> {
         }
     }
 
-    pub fn walk(&mut self) -> Result<(), <super::MemoryInterfaceImpl as super::MemoryInterface>::Error> {
+    pub fn walk(
+        &mut self,
+    ) -> Result<(), <super::MemoryInterfaceImpl as super::MemoryInterface>::Error> {
         self.pml4_ptr = PAddr::from((self.address_space.cr3 & CR3_ADDRESS_MASK) as usize).into();
         self.pdpt_ptr = unsafe {
             let pml4e = &mut (*self.pml4_ptr)[self.vaddr.pml4_index()];
@@ -84,14 +87,19 @@ impl<'vas> PthWalker<'vas> {
             Ok(_) => Err(<super::MemoryInterfaceImpl as MemoryInterface>::Error::AlreadyMapped),
             Err(<super::MemoryInterfaceImpl as MemoryInterface>::Error::Unmapped) => {
                 if self.pml4_ptr.is_null() {
-                    // Obtain the PML4 table pointer; all address spaces must have a top level page table
-                    // as they are all required to map the kernel and higher half memory.
+                    // Obtain the PML4 table pointer; all address spaces must have a top level page
+                    // table as they are all required to map the kernel and
+                    // higher half memory.
                     if self.address_space.cr3 & CR3_ADDRESS_MASK == 0 {
                         let new_pml4 = PHYSICAL_FRAME_ALLOCATOR.lock().allocate_frame()?;
-                        self.address_space.cr3 = <PAddr as Into<u64>>::into(new_pml4) & CR3_ADDRESS_MASK;
-                        self.address_space.load().expect("Error reloading the CR3 register");
+                        self.address_space.cr3 =
+                            <PAddr as Into<u64>>::into(new_pml4) & CR3_ADDRESS_MASK;
+                        self.address_space
+                            .load()
+                            .expect("Error reloading the CR3 register");
                     }
-                    self.pml4_ptr = PAddr::from((self.address_space.cr3 & CR3_ADDRESS_MASK) as usize).into();
+                    self.pml4_ptr =
+                        PAddr::from((self.address_space.cr3 & CR3_ADDRESS_MASK) as usize).into();
                     unsafe {
                         core::ptr::write_bytes(self.pml4_ptr, 0, PAGE_SIZE);
                     }
@@ -154,7 +162,9 @@ impl<'vas> PthWalker<'vas> {
                         .set_execute_disabled(no_execute);
                     core::ptr::write_bytes(<PAddr as Into<*mut u8>>::into(frame), 0, PAGE_SIZE);
                 }
-                self.address_space.load().expect("Failed to reload the address space");
+                self.address_space
+                    .load()
+                    .expect("Failed to reload the address space");
                 unsafe {
                     core::arch::asm!("invlpg [{}]", in(reg) self.vaddr.into_ptr::<u8>());
                 }
@@ -165,7 +175,9 @@ impl<'vas> PthWalker<'vas> {
         }
     }
 
-    pub fn unmap_page(&mut self) -> Result<MemoryMapping, <super::MemoryInterfaceImpl as MemoryInterface>::Error> {
+    pub fn unmap_page(
+        &mut self,
+    ) -> Result<MemoryMapping, <super::MemoryInterfaceImpl as MemoryInterface>::Error> {
         match self.walk() {
             Ok(_) => {
                 unsafe {
@@ -180,26 +192,33 @@ impl<'vas> PthWalker<'vas> {
                     };
                     let pte = addr_of_mut!((*self.pt_ptr)[self.vaddr.pt_index()]);
                     if (*pte).is_present() {
-                        // We do not deallocate the page frame here, as it is the responsibility of the VMM client
-                        // calling this function to deallocate the frame if they so choose.
+                        // We do not deallocate the page frame here, as it is the responsibility of
+                        // the VMM client calling this function to
+                        // deallocate the frame if they so choose.
                         (*pte).set_present(false);
                     }
 
                     let pde = addr_of_mut!((*self.pd_ptr)[self.vaddr.pd_index()]);
                     if is_pagetable_unused(self.pt_ptr) {
-                        PHYSICAL_FRAME_ALLOCATOR.lock().deallocate_frame((*pde).get_frame())?;
+                        PHYSICAL_FRAME_ALLOCATOR
+                            .lock()
+                            .deallocate_frame((*pde).get_frame())?;
                         (*pde).set_present(false);
                     }
 
                     let pdpte = addr_of_mut!((*self.pdpt_ptr)[self.vaddr.pdpt_index()]);
                     if is_pagetable_unused(self.pd_ptr) {
-                        PHYSICAL_FRAME_ALLOCATOR.lock().deallocate_frame((*pdpte).get_frame())?;
+                        PHYSICAL_FRAME_ALLOCATOR
+                            .lock()
+                            .deallocate_frame((*pdpte).get_frame())?;
                         (*pdpte).set_present(false);
                     }
 
                     let pml4e = addr_of_mut!((*self.pml4_ptr)[self.vaddr.pml4_index()]);
                     if is_pagetable_unused(self.pdpt_ptr) {
-                        PHYSICAL_FRAME_ALLOCATOR.lock().deallocate_frame((*pml4e).get_frame())?;
+                        PHYSICAL_FRAME_ALLOCATOR
+                            .lock()
+                            .deallocate_frame((*pml4e).get_frame())?;
                         (*pml4e).set_present(false);
                     }
                     return Ok(mapping);

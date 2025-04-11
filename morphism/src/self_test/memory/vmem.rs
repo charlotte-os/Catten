@@ -26,7 +26,10 @@ pub fn test_vmem() {
         paddr: frame,
         page_type: PageType::KernelData,
     };
-    logln!("Created MemoryMapping struct.\nMapping the allocated frame to the beginning of the higher half.");
+    logln!(
+        "Created MemoryMapping struct.\nMapping the allocated frame to the beginning of the \
+         higher half."
+    );
     match current_as.map_page(mapping) {
         Ok(_) => logln!("Page mapped successfully."),
         Err(e) => panic!("Error mapping page: {:?}", e),
@@ -46,7 +49,9 @@ pub fn test_vmem() {
         logln!("Magic number matches.");
         logln!("Test completed successfully.");
         logln!("Unmapping test page.");
-        current_as.unmap_page(HIGHER_HALF_START).expect("Error unmapping page.");
+        current_as
+            .unmap_page(HIGHER_HALF_START)
+            .expect("Error unmapping page.");
         logln!("Test page successfully unmapped.");
         logln!("All virtual memory tests passed!");
     }

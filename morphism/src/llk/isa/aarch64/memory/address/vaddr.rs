@@ -1,15 +1,13 @@
-use crate::llk::isa::interface::{
-    system_info::CpuInfoIfce,
-    memory::address::{Address, VirtualAddress}
-};
 use crate::llk::isa::aarch64::system_info::CpuInfo;
+use crate::llk::isa::interface::memory::address::{Address, VirtualAddress};
+use crate::llk::isa::interface::system_info::CpuInfoIfce;
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct VAddr(usize);
 
 impl Address for VAddr {
-    const MIN: Self = VAddr(0);
     const MAX: Self = VAddr(usize::MAX);
+    const MIN: Self = VAddr(0);
     const NULL: Self = VAddr(0);
 
     fn is_aligned_to(&self, alignment: usize) -> bool {

@@ -135,7 +135,14 @@ impl FrameBufferInfo {
     /// * `text` - The text to draw.
     /// * `color` - The color of the text in ARGB format.
 
-    pub fn draw_text(&self, mut x: usize, mut y: usize, text: &str, color: u32, background_color: u32) {
+    pub fn draw_text(
+        &self,
+        mut x: usize,
+        mut y: usize,
+        text: &str,
+        color: u32,
+        background_color: u32,
+    ) {
         let start_x = x; // Remember the starting x position to reset to it on new lines
         for c in text.chars() {
             match c {
@@ -214,16 +221,20 @@ impl FrameBufferInfo {
         };
 
         // Function to fill between two edges from startY to endY
-        let fill_between_edges =
-            |self_ref: &Self, start_y: isize, end_y: isize, p_left: Point, p_right_start: Point, p_right_end: Point| {
-                for y in start_y..=end_y {
-                    let x_start = interpolate_x(p_left, p_right_start, y);
-                    let x_end = interpolate_x(p_left, p_right_end, y);
-                    for x in x_start.min(x_end)..=x_start.max(x_end) {
-                        self_ref.draw_pixel(x as usize, y as usize, color);
-                    }
+        let fill_between_edges = |self_ref: &Self,
+                                  start_y: isize,
+                                  end_y: isize,
+                                  p_left: Point,
+                                  p_right_start: Point,
+                                  p_right_end: Point| {
+            for y in start_y..=end_y {
+                let x_start = interpolate_x(p_left, p_right_start, y);
+                let x_end = interpolate_x(p_left, p_right_end, y);
+                for x in x_start.min(x_end)..=x_start.max(x_end) {
+                    self_ref.draw_pixel(x as usize, y as usize, color);
                 }
-            };
+            }
+        };
 
         // Fill from top vertex to middle vertex
         fill_between_edges(

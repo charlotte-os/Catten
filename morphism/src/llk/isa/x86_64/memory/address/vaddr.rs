@@ -51,8 +51,8 @@ impl VAddr {
 }
 
 impl Address for VAddr {
-    const MIN: Self = VAddr { raw: 0 };
     const MAX: Self = VAddr { raw: usize::MAX };
+    const MIN: Self = VAddr { raw: 0 };
     const NULL: Self = VAddr { raw: 0 };
 
     fn is_aligned_to(&self, alignment: usize) -> bool {
@@ -125,7 +125,9 @@ impl Add<usize> for VAddr {
     type Output = VAddr;
 
     fn add(self, other: usize) -> Self::Output {
-        VAddr { raw: self.raw + other }
+        VAddr {
+            raw: self.raw + other,
+        }
     }
 }
 
@@ -140,7 +142,9 @@ impl Step for VAddr {
 
     fn forward_checked(start: Self, count: usize) -> Option<Self> {
         if start.raw.saturating_add(count) < usize::MAX {
-            Some(VAddr { raw: start.raw + count })
+            Some(VAddr {
+                raw: start.raw + count,
+            })
         } else {
             None
         }
@@ -148,7 +152,9 @@ impl Step for VAddr {
 
     fn backward_checked(start: Self, count: usize) -> Option<Self> {
         if start.raw.saturating_sub(count) > usize::MIN {
-            Some(VAddr { raw: start.raw - count })
+            Some(VAddr {
+                raw: start.raw - count,
+            })
         } else {
             None
         }

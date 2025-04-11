@@ -1,12 +1,13 @@
 #![no_std]
 #![no_main]
-#![feature(sync_unsafe_cell)]
-#![feature(step_trait)]
 #![feature(allocator_api)]
+#![feature(likely_unlikely)]
+#![feature(step_trait)]
+#![feature(sync_unsafe_cell)]
 
 //! # Morphism
 //!
-//! Morphism is an opearting system supervisor developed as a component of CharlotteOS, an
+//! Morphism is an operating system kernel developed as a component of CharlotteOS, an
 //! experimental modern operating system.This kernel is responsible for initializing the hardware,
 //! providing commonizing abstractions for all hardware resources, and managing the execution of
 //! user-space applications and the environment in which they run. It is a crucial part of the
@@ -46,8 +47,14 @@ pub unsafe extern "C" fn main() -> ! {
     logln!("CPU Vendor: {:?}", (CpuInfo::get_vendor()));
     // TODO: Root cause the reason the following line halts execution without output or a panic.
     //logln!("CPU Model: {}", (CpuInfo::get_brand()));
-    logln!("Physical Address bits implmented: {}", (CpuInfo::get_paddr_sig_bits()));
-    logln!("Virtual Address bits implmented: {}", (CpuInfo::get_vaddr_sig_bits()));
+    logln!(
+        "Physical Address bits implmented: {}",
+        (CpuInfo::get_paddr_sig_bits())
+    );
+    logln!(
+        "Virtual Address bits implmented: {}",
+        (CpuInfo::get_vaddr_sig_bits())
+    );
 
     self_test::run_self_tests();
 

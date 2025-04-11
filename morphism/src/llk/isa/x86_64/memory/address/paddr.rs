@@ -9,8 +9,8 @@ pub struct PAddr {
 }
 
 impl Address for PAddr {
-    const MIN: Self = PAddr { addr: 0 };
     const MAX: Self = PAddr { addr: usize::MAX };
+    const MIN: Self = PAddr { addr: 0 };
     const NULL: Self = PAddr { addr: 0 };
 
     fn is_aligned_to(&self, alignment: usize) -> bool {
