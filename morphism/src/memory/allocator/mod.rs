@@ -61,5 +61,9 @@ impl DoubleFreeListAllocator {
             vaddr: self.heap_end,
             page_type: PageType::KernelData,
         };
+        todo!(
+            "Allocate and map as many pages as needed and update the structure after each page is \
+             mapped"
+        )
     }
 }
