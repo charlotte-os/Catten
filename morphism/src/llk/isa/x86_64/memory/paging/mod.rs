@@ -57,10 +57,10 @@ impl AddressSpaceInterface for AddressSpace {
         let mut free_region_base = VAddr::from(range.0);
         let mut free_region_size = 0isize;
         for vaddr in (range.0..range.1).step_by(PAGE_SIZE) {
-            if <VAddr as Into<usize>>::into(range.1 - vaddr) < n_pages * PAGE_SIZE {
+            if ((range.1 - vaddr) as usize) < n_pages * PAGE_SIZE {
                 return Err(<MemoryInterfaceImpl as MemoryInterface>::Error::NoRequestedVAddrRegionAvailable);
             } else if *&self.is_mapped(vaddr)? == false {
-                free_region_base = vaddr + PAGE_SIZE;
+                free_region_base = vaddr + PAGE_SIZE as isize;
                 free_region_size = 0;
             } else {
                 free_region_size += PAGE_SIZE as isize;

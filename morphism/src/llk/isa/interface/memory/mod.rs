@@ -10,6 +10,8 @@ pub trait MemoryInterface {
     type PAddr: address::PhysicalAddress;
     type Error;
     type AddressSpace: AddressSpaceInterface;
+
+    const PAGE_SIZE: usize;
 }
 
 pub trait AddressSpaceInterface {

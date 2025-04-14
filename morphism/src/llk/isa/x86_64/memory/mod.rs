@@ -26,4 +26,6 @@ impl MemoryInterface for MemoryInterfaceImpl {
     type Error = Error;
     type PAddr = address::paddr::PAddr;
     type VAddr = address::vaddr::VAddr;
+
+    const PAGE_SIZE: usize = paging::PAGE_SIZE;
 }

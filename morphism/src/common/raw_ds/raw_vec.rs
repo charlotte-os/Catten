@@ -1,3 +1,9 @@
+//! Raw Vector
+//!
+//! This is a vector data structure that takes in the functions to use for reallocation and
+//! deallocation as function pointers on construction and uses those to modify the allocation it
+//! owns.
+
 use core::hint::{likely, unlikely};
 use core::marker::PhantomData;
 use core::ops::{Index, IndexMut};
@@ -100,6 +106,29 @@ impl<T: Sized + Clone + Copy> RawVec<T> {
             self[index] = val;
             Ok(())
         }
+    }
+
+    pub fn remove(&mut self, index: isize) -> Result<T, Error> {
+        if index < 0 || index > self.len {
+            Err(Error::IndexOutOfRange)
+        } else {
+            let ret = self[index];
+
+            for i in index..self.len as isize {
+                self[i] = self[i + 1];
+            }
+            self.len -= 1;
+
+            Ok(ret)
+        }
+    }
+
+    pub fn length(&self) -> usize {
+        self.len
+    }
+
+    pub fn capacity(&self) -> usize {
+        self.cap
     }
 }
 

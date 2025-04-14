@@ -6,6 +6,6 @@
 //! there is a compelling reason to do so.
 
 pub mod cell;
-pub mod ds;
 pub mod io;
+pub mod raw_ds;
 pub mod traits;

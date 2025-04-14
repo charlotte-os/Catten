@@ -112,21 +112,19 @@ impl Into<usize> for VAddr {
 }
 
 impl Sub for VAddr {
-    type Output = VAddr;
+    type Output = isize;
 
     fn sub(self, other: Self) -> Self::Output {
-        VAddr {
-            raw: self.raw - other.raw,
-        }
+        self.raw as isize - other.raw as isize
     }
 }
 
-impl Add<usize> for VAddr {
+impl Add<isize> for VAddr {
     type Output = VAddr;
 
-    fn add(self, other: usize) -> Self::Output {
+    fn add(self, other: isize) -> Self::Output {
         VAddr {
-            raw: self.raw + other,
+            raw: (self.raw as isize + other) as usize,
         }
     }
 }
