@@ -7,5 +7,4 @@
 
 pub mod cell;
 pub mod io;
-pub mod raw_ds;
 pub mod traits;
