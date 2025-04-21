@@ -34,6 +34,7 @@ enum FreeListError {
     ListsFull,
     ListsEmpty,
     IndexOutOfRange,
+    RegionNotFound,
 }
 
 impl FreeList {
@@ -54,13 +55,21 @@ impl FreeList {
         self.len == self.pages_per_list * PAGE_SIZE / size_of::<FreeRegion>()
     }
 
-    unsafe fn shift_forward_elements_at(mut list: *mut FreeList, len: usize, index: usize) -> Result<(), FreeListError> {
-        if index >= list.len {
+    fn shift_up_elements_at(
+        list: *mut FreeRegion,
+        len: usize,
+        cap: usize,
+        index: usize,
+    ) -> Result<(), FreeListError> {
+        if index >= len {
             Err(FreeListError::IndexOutOfRange)
+        } else if len + 1 > cap {
+            Err(FreeListError::ListsFull)
         } else {
             unsafe {
                 for i in index..len.rev() {
-                    list.offset(i as isize + 1).write(list.offset(i as isize).read());
+                    list.offset(i as isize + 1)
+                        .write(list.offset(i as isize).read());
                 }
                 list.offset(index as isize).write(FreeRegion::default());
                 Ok(())
@@ -68,16 +77,34 @@ impl FreeList {
         }
     }
 
+    fn shift_down_elements_at(
+        list: *mut FreeRegion,
+        len: usize,
+        index: usize,
+    ) -> Result<(), FreeListError> {
+        if index >= len {
+            Err(FreeListError::IndexOutOfRange)
+        } else if len == 1 {
+            Ok(())
+        } else {
+            for i in index..(len - 1) {
+                unsafe { list.offset(i).write(list.offset(i + 1).read()) };
+            }
+            Ok(())
+        }
+    }
+
     unsafe fn insert_at(
         mut ptr: *mut FreeRegion,
         len: usize,
+        cap: usize,
         index: usize,
         new_region: FreeRegion,
     ) -> Result<(), FreeListError> {
         if index >= self.len {
             Err(FreeListError::IndexOutOfRange)
         } else {
-            shift_forward_elements_at(ptr, len, index)?;
+            shift_up_elements_at(ptr, len, cap, index)?;
             ptr.offset(index as isize).write(new_region);
             Ok(())
         }
@@ -105,7 +132,7 @@ impl FreeList {
                 .iter()
                 .position(|r| r.size > region.size)
                 .unwrap_or(self.len);
-            unsafe { Self::insert_at(self.by_size.as_mut_ptr(), index, region) }
+            unsafe { Self::insert_at(self.by_size.as_mut_ptr(), self.len, self.cap, index, region) }
         }
     }
 
@@ -125,7 +152,45 @@ impl FreeList {
         }
     }
 
-    fn remove_by
+    fn remove(&mut self, base: VAddr) -> Result<FreeRegion, FreeListError> {
+        let region = Option::<FreeRegion>::None;
+        // remove the region for the by_addr array
+        for i in 0..self.len {
+            let elem = unsafe { self.by_addr.offset(i).read() };
+            if elem.start == base {
+                region = Some(elem);
+                Self::shift_down_elements_at(self.by_addr, self.len, i);
+            }
+        }
+        if region == None {
+            return Err(FreeListError::RegionNotFound);
+        }
+        // remove the same element from the by_size array
+        for i in 0..self.len {
+            let elem = unsafe { self.by_size.offset(i).read() };
+            if elem.start == base {
+                Self::shift_down_elements_at(self.by_size, self.len, i);
+            }
+        }
+        // this will never panic because if region was None then this function would have returned
+        // early with an error
+        Ok(region.unwrap())
+    }
+
+    fn find_smallest_larger_than(&self, size: usize) -> Option<VAddr> {
+        let elem: FreeRegion;
+        for i in 0..self.len {
+            elem = self.by_size(i).offset(i).read();
+            // the by_size array is sorted by size so the first element larger than the requested
+            // size is the smallest free region larger than the requested size
+            if elem.size > size {
+                Some(elem.start)
+            }
+        }
+        None
+    }
+
+    fn try_allocate(&mut self, size: usize, alignment: usize) -> Result<VAddr, Error> {}
 }
 
 pub enum Error {
