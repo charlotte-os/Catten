@@ -6,7 +6,6 @@ Morphism is still in early development, and core subsystems are actively being b
 
 
 [Find us on Matrix](https://matrix.to/#/#charlotteos:matrix.org)
----
 
 ## Design Philosophy
 
