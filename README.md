@@ -7,25 +7,19 @@ Morphism is still in early development, and core subsystems are actively being b
 
 [Find us on Matrix](https://matrix.to/#/#charlotteos:matrix.org)
 
-## Design Philosophy
+## Programming Languages
+- Morphism is written in Rust and ISA specific assembly Languages
+- x86_64 assembly should use Intel syntax exclusively in this project
 
-- **Portability:**
-  Morphism strives to be as independent as possible from the target ISA, hardware features, and firmware interfaces.
-  - ISA-specific features should be developed for the `x86_64-unknown-none` target first.
-  - All assembly code is assembled by the rustc built-in assembler to enable inlining and optimizations when interfacing with Rust.
-
-- **Programming Languages and Dependencies:**
-  - Morphism is written in Rust and ISA specific assembly Languages
-  - x86_64 assembly should use Intel syntax exclusively in this project
-  - **External Dependencies:**
+## External Dependencies:
     - C dependencies are allowed if vetted by maintainers.
     - Any dependencies in languages other than Rust, C, and assembly are strictly forbidden.
     - Always prefer a high-quality Rust equivalent over an external C library unless there is good
       reason to do otherwise
 
-- **Licensing:**
-  This kernel is licensed under the GNU General Public License version 3.0 (or at your option, any later version).
-  If you cannot comply with this license, please do not contribute.
+## Licensing
+This kernel is licensed under the GNU General Public License version 3.0 (or at your option, any later version).
+If you cannot comply with this license, please do not contribute.
 
 ---
 
