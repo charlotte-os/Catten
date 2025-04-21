@@ -39,7 +39,7 @@ Morphism is still in early development, and core subsystems are actively being b
 - Input: PS/2 or USB keyboard
 
 > **Note:**
-> If you are interested in porting Morphism to a new target please reach out to us on Discord or
+> If you are interested in porting Morphism to a new target please reach out to us on Matrix or
 > open an issue on our GitHub repository.
 
 ---
