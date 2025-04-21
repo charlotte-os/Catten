@@ -8,20 +8,14 @@ Morphism is still in early development, and core subsystems are actively being b
 [Find us on Matrix](https://matrix.to/#/#charlotteos:matrix.org)
 
 ## Programming Languages
-- Morphism is written in Rust and ISA specific assembly Languages
+- Morphism is written in Rust and ISA specific assembly languages
 - x86_64 assembly should use Intel syntax exclusively in this project
 
 ## External Dependencies:
-    - C dependencies are allowed if vetted by maintainers.
-    - Any dependencies in languages other than Rust, C, and assembly are strictly forbidden.
-    - Always prefer a high-quality Rust equivalent over an external C library unless there is good
-      reason to do otherwise
-
-## Licensing
-This kernel is licensed under the GNU General Public License version 3.0 (or at your option, any later version).
-If you cannot comply with this license, please do not contribute.
-
----
+- C dependencies are allowed if vetted by maintainers.
+- Any dependencies in languages other than Rust, C, and assembly are strictly forbidden.
+- Always prefer a high-quality Rust equivalent over an external C library unless there is good
+  reason to do otherwise
 
 ## Target System Requirements
 - Processor: x86_64 CPU with x2APICs
@@ -36,8 +30,6 @@ If you cannot comply with this license, please do not contribute.
 > If you are interested in porting Morphism to a new target please reach out to us on Matrix or
 > open an issue on our GitHub repository.
 
----
-
 ## Contributing
 
 We welcome your contributions! Here’s how you can get involved:
@@ -46,4 +38,6 @@ We welcome your contributions! Here’s how you can get involved:
 - Participate in discussions on GitHub or Matrix
 - Open issues for proposed features or improvements.
 
-Everyone interested in contributing is encouraged to join the CharlotteOS community!
+## Licensing
+This kernel is licensed under the GNU General Public License version 3.0 (or at your option, any later version).
+If you cannot comply with this license, please do not contribute.
