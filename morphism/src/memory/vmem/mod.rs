@@ -3,6 +3,11 @@ pub use crate::llk::isa::current_isa::memory::address::vaddr::VAddr;
 use crate::llk::isa::interface::memory::MemoryInterface;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Error {
+    InvalidPageAttributes,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PageType {
     KernelCode,   //read, execute
     KernelData,   //read, write
@@ -15,27 +20,41 @@ pub enum PageType {
 }
 
 impl PageType {
-    pub fn new(is_user_accessible: bool, is_writeable: bool, is_no_execute: bool) -> Self {
-        match (is_user_accessible, is_writeable, is_no_execute) {
-            (false, false, false) => PageType::KernelCode,
-            (false, true, false) => PageType::KernelData,
-            (false, false, true) => PageType::KernelRoData,
-            (true, false, false) => PageType::UserCode,
-            (true, true, false) => PageType::UserData,
-            (true, false, true) => PageType::UserRoData,
-            (_, _, _) => panic!("Invalid page type"),
+    pub fn try_new(
+        is_user_accessible: bool,
+        is_writeable: bool,
+        is_no_execute: bool,
+        is_uncacheable: bool,
+        should_combine_writes: bool,
+    ) -> Result<Self, Error> {
+        match (
+            is_user_accessible,
+            is_writeable,
+            is_no_execute,
+            is_uncacheable,
+            should_combine_writes,
+        ) {
+            (false, false, false, false, false) => Ok(PageType::KernelCode),
+            (false, true, true, false, false) => Ok(PageType::KernelData),
+            (false, false, true, false, false) => Ok(PageType::KernelRoData),
+            (true, false, false, false, false) => Ok(PageType::UserCode),
+            (true, true, true, false, false) => Ok(PageType::UserData),
+            (true, false, true, false, false) => Ok(PageType::UserRoData),
+            (false, true, true, true, false) => Ok(PageType::Mmio),
+            (false, true, true, true, true) => Ok(PageType::Framebuffer),
+            (_, _, _, _, _) => Err(Error::InvalidPageAttributes),
         }
     }
 
     pub fn is_user_accessible(&self) -> bool {
-        match self {
+        match *self {
             PageType::UserCode | PageType::UserData | PageType::UserRoData => true,
             _ => false,
         }
     }
 
     pub fn is_writable(&self) -> bool {
-        match self {
+        match *self {
             PageType::KernelData | PageType::UserData | PageType::Mmio | PageType::Framebuffer => {
                 true
             }
@@ -44,9 +63,24 @@ impl PageType {
     }
 
     pub fn is_no_execute(&self) -> bool {
-        match self {
+        match *self {
             PageType::KernelCode | PageType::UserCode => false,
             _ => true,
+        }
+    }
+
+    pub fn is_uncacheable(&self) -> bool {
+        match *self {
+            PageType::Mmio | PageType::Framebuffer => true,
+            _ => false,
+        }
+    }
+
+    pub fn should_combine_writes(&self) -> bool {
+        if *self == PageType::Framebuffer {
+            true
+        } else {
+            false
         }
     }
 }

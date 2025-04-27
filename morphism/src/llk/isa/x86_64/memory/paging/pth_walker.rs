@@ -193,8 +193,8 @@ impl<'vas> PthWalker<'vas> {
                     let pte = addr_of_mut!((*self.pt_ptr)[self.vaddr.pt_index()]);
                     if (*pte).is_present() {
                         // We do not deallocate the page frame here, as it is the responsibility of
-                        // the VMM client calling this function to
-                        // deallocate the frame if they so choose.
+                        // the VMM client calling this function to deallocate the frame if they need
+                        // to.
                         (*pte).set_present(false);
                     }
 

@@ -1,16 +1,19 @@
 //! # Page Table Entry
 
+use crate::common::bitwise::assign_bits_at;
 use crate::llk::isa::x86_64::memory::address::paddr::PAddr;
 
 /// PTE component indexes and masks
 const PRESENT_BIT_INDEX: u64 = 0;
 const WRITABLE_BIT_INDEX: u64 = 1;
 const USER_ACCESSIBLE_BIT_INDEX: u64 = 2;
-const PAT_INDEX_BITS_START: u64 = 3;
-const PAT_INDEX_MASK: u64 = 0b11 << PAT_INDEX_BITS_START;
+const PAT_INDEX_0: u64 = 3;
+const PAT_INDEX_1: u64 = 4;
+const PAT_INDEX_2_STANDARD: u64 = 7; // only for PTEs pointing to a 4 KiB page
+const PAT_INDEX_2_LARGE_HUGE: u64 = 12; // only for PTEs pointing to a 2 MiB or 1 GiB page
 const ACCESSED_BIT_INDEX: u64 = 5;
 const DIRTY_BIT_INDEX: u64 = 6;
-const PAGE_SIZE_BIT_INDEX: u64 = 7;
+const PAGE_SIZE_BIT_INDEX: u64 = 7; // only for PTEs pointing to a 2 MiB or 1 GiB page
 const GLOBAL_BIT_INDEX: u64 = 8;
 const FRAME_ADDR_START: u64 = 12;
 const FRAME_ADDR_MASK: u64 = 0xfffffffffffff000;
@@ -161,5 +164,17 @@ impl PageTableEntry {
             self.0 &= !(1 << EXECUTE_DISABLE_BIT_INDEX);
         }
         self
+    }
+
+    pub fn is_uncached(&self) -> bool {
+        self.0 & (0b11 << PAT_INDEX_0) == 0
+    }
+
+    pub fn is_write_combining(&self) -> bool {
+        (self.0 & (0b11 << PAT_INDEX_0) >> PAT_INDEX_0) == 0b01
+    }
+
+    pub fn set_caching_attrs(&mut self, mode: CachingMode) {
+        assign_bits_at(&mut self.0, PAT_INDEX_0, 2, mode as u64);
     }
 }

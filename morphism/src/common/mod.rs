@@ -5,6 +5,7 @@
 //! functionality that is already provided by core or any other high quality no_std library unless
 //! there is a compelling reason to do so.
 
+pub mod bitwise;
 pub mod cell;
 pub mod io;
 pub mod traits;

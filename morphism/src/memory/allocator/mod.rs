@@ -177,14 +177,14 @@ impl FreeList {
         Ok(region.unwrap())
     }
 
-    fn find_smallest_larger_than(&self, size: usize) -> Option<VAddr> {
+    fn find_smallest_larger_than(&self, size: usize) -> Option<usize> {
         let elem: FreeRegion;
         for i in 0..self.len {
             elem = self.by_size(i).offset(i).read();
             // the by_size array is sorted by size so the first element larger than the requested
             // size is the smallest free region larger than the requested size
             if elem.size > size {
-                Some(elem.start)
+                Some(i)
             }
         }
         None

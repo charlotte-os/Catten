@@ -16,6 +16,7 @@ use spin::Mutex;
 
 use crate::llk::isa::interface::init::InitInterface;
 use crate::llk::isa::x86_64::interrupts::*;
+use crate::llk::isa::x86_64::memory::paging::pat::init_pat;
 use crate::{log, logln};
 
 /// The BSP stack size is 4 pages by default.
@@ -55,16 +56,25 @@ impl InitInterface for IsaInitializer {
     type Error = Error;
 
     fn init() -> Result<(), Self::Error> {
+        // load the GDT and reload the segment registers
         BSP_GDT.lock().load();
         logln!("Loaded GDT");
         Gdt::reload_segment_regs();
         logln!("Segment registers reloaded");
+        // load the TSS
         Gdt::load_tss();
         logln!("Loaded TSS");
+        // register the exception handlers in the IDT
         load_exceptions(IDT.lock().borrow_mut());
         logln!("Registered exceptions ISRs");
+        // load the IDT
         IDT.lock().load();
         logln!("Loaded IDT");
+        // initialize the PAT to the expected value
+        logln!("Loading the expected value into the Page Attribute Table...");
+        init_pat();
+        logln!("Initialized the PAT.");
+        // return success
         Ok(())
     }
 

@@ -1,3 +1,4 @@
+pub mod pat;
 pub mod pte;
 pub mod pth_walker;
 
