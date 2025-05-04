@@ -13,7 +13,6 @@ use spin::Mutex;
 
 use crate::llk::isa::interface::init::InitInterface;
 use crate::llk::isa::x86_64::interrupts::*;
-use crate::llk::isa::x86_64::memory::paging::pat::init_pat;
 use crate::logln;
 
 /// The BSP stack size is 4 pages by default.
@@ -67,10 +66,6 @@ impl InitInterface for IsaInitializer {
         // load the IDT
         IDT.lock().load();
         logln!("Loaded IDT");
-        // initialize the PAT to the expected value
-        logln!("Loading the expected value into the Page Attribute Table...");
-        init_pat();
-        logln!("Initialized the PAT.");
         // return success
         Ok(())
     }
