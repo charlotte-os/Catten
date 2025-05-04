@@ -33,11 +33,8 @@ impl Idt {
         gate.segment_selector = segment_selector;
         gate.reserved_ist_index = 0u8; // the IST is not used
         gate.flags = if is_trap { 0b1111u8 } else { 0b1110u8 }; //gate type
-                                                                //reserved bit
-        gate.flags &= !(0b1u8 << 4);
-        //privilege ring required to use gate
-        gate.flags &= !(0b11u8 << 5);
-        //present bit
+        gate.flags &= !(0b1u8 << 4); //reserved bit
+        gate.flags &= !(0b11u8 << 5); //privilege ring required to use gate
         if is_present {
             gate.flags |= 0b1u8 << 7;
         } else {
@@ -64,7 +61,10 @@ impl Idt {
 
     pub fn load(&self) {
         unsafe {
-            IDTR.write(Idtr::new(size_of::<InterruptGate>() as u16 * N_INTERRUPT_VECTORS as u16 - 1u16, self as *const Idt as u64));
+            IDTR.write(Idtr::new(
+                size_of::<InterruptGate>() as u16 * N_INTERRUPT_VECTORS as u16 - 1u16,
+                self as *const Idt as u64,
+            ));
             asm_load_idt(IDTR.as_ptr());
         }
     }
@@ -107,6 +107,7 @@ impl Idtr {
     }
 }
 
+#[inline(always)]
 unsafe fn asm_load_idt(idtr: *const Idtr) {
     asm!("lidt [rdi]", in("rdi") idtr);
 }
