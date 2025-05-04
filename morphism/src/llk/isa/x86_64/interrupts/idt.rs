@@ -1,6 +1,5 @@
 use core::arch::asm;
 use core::mem::MaybeUninit;
-use core::ptr::addr_of;
 
 static mut IDTR: MaybeUninit<Idtr> = MaybeUninit::uninit();
 
