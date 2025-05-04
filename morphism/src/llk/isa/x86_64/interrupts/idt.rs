@@ -2,9 +2,9 @@ use core::arch::asm;
 use core::mem::MaybeUninit;
 use core::ptr::addr_of;
 
-use spin::lazy;
-
 static mut IDTR: MaybeUninit<Idtr> = MaybeUninit::uninit();
+
+const N_INTERRUPT_VECTORS: usize = 256;
 
 #[derive(Debug)]
 #[repr(C, align(16))]
@@ -65,7 +65,7 @@ impl Idt {
 
     pub fn load(&self) {
         unsafe {
-            IDTR.write(Idtr::new(16u16 * 256u16 - 1u16, addr_of!(*self) as u64));
+            IDTR.write(Idtr::new(size_of::<InterruptGate>() as u16 * N_INTERRUPT_VECTORS as u16 - 1u16, self as *const Idt as u64));
             asm_load_idt(IDTR.as_ptr());
         }
     }

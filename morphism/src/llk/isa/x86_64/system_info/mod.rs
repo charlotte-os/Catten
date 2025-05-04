@@ -5,9 +5,9 @@ use core::mem::transmute_copy;
 use crate::llk::isa::interface::system_info::CpuInfoIfce;
 
 pub enum IsaExtension {
-    avx2,
-    avx512,
-    pml5,
+    Avx2,
+    Avx512,
+    Pml5,
 }
 
 #[repr(transparent)]
@@ -106,15 +106,15 @@ impl CpuInfoIfce for CpuInfo {
 
     fn is_extension_supported(extension: Self::IsaExtension) -> bool {
         match extension {
-            IsaExtension::avx2 => unsafe {
+            IsaExtension::Avx2 => unsafe {
                 let cpuid_result = __cpuid_count(7, 0);
                 (cpuid_result.ebx & 0x20) != 0
             },
-            IsaExtension::avx512 => unsafe {
+            IsaExtension::Avx512 => unsafe {
                 let cpuid_result = __cpuid_count(7, 0);
                 (cpuid_result.ebx & 0x40000000) != 0
             },
-            IsaExtension::pml5 => unsafe {
+            IsaExtension::Pml5 => unsafe {
                 let cpuid_result = __cpuid_count(0x80000008, 0);
                 (cpuid_result.ecx & 0x100) != 0
             },

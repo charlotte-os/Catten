@@ -1,6 +1,5 @@
 //! # Page Table Entry
 
-use crate::common::bitwise::assign_bits_at;
 use crate::llk::isa::x86_64::memory::address::paddr::PAddr;
 
 /// PTE component indexes and masks
@@ -28,7 +27,7 @@ impl PageTableEntry {
         present: bool,
         writable: bool,
         user_accessible: bool,
-        pat_index_bits: u64,
+        pat_index: u8,
         global: bool,
         frame_addr: PAddr,
     ) -> Self {
@@ -36,7 +35,7 @@ impl PageTableEntry {
         pte.set_present(present)
             .set_writable(writable)
             .set_user_accessible(user_accessible)
-            .set_pat_index_bits(pat_index_bits)
+            .set_pat_index_bits(pat_index)
             .set_global(global)
             .set_frame(frame_addr);
         pte
@@ -81,13 +80,18 @@ impl PageTableEntry {
         self
     }
 
-    pub fn get_pat_index_bits(&self) -> u64 {
-        (self.0 & PAT_INDEX_MASK) >> PAT_INDEX_BITS_START
+    pub fn get_pat_index(&self) -> u8 {
+        let mut pat_index = 0u8;
+        pat_index |= ((self.0 & (1 << PAT_INDEX_0)) >> PAT_INDEX_0) as u8;
+        pat_index |= ((self.0 & (1 << PAT_INDEX_1)) >> PAT_INDEX_1 - 1) as u8;
+        pat_index |= ((self.0 & (1 << PAT_INDEX_2_STANDARD)) >> PAT_INDEX_2_STANDARD - 2) as u8;
+        pat_index
     }
 
-    pub fn set_pat_index_bits(&mut self, pat_index_bits: u64) -> &mut Self {
-        self.0 = (self.0 & !PAT_INDEX_MASK)
-            | ((pat_index_bits << PAT_INDEX_BITS_START) & PAT_INDEX_MASK);
+    pub fn set_pat_index_bits(&mut self, pat_index: u8) -> &mut Self {
+        self.0 |= ((pat_index & 1) << PAT_INDEX_0) as u64;
+        self.0 |= ((pat_index & 1 << 1) << PAT_INDEX_1 - 1) as u64;
+        self.0 |= ((pat_index & 1 << 2) << PAT_INDEX_2_STANDARD - 2) as u64;
         self
     }
 
@@ -172,9 +176,5 @@ impl PageTableEntry {
 
     pub fn is_write_combining(&self) -> bool {
         (self.0 & (0b11 << PAT_INDEX_0) >> PAT_INDEX_0) == 0b01
-    }
-
-    pub fn set_caching_attrs(&mut self, mode: CachingMode) {
-        assign_bits_at(&mut self.0, PAT_INDEX_0, 2, mode as u64);
     }
 }

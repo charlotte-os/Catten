@@ -181,14 +181,16 @@ impl<'vas> PthWalker<'vas> {
         match self.walk() {
             Ok(_) => {
                 unsafe {
-                    let mut mapping = MemoryMapping {
+                    let mapping = MemoryMapping {
                         vaddr: self.vaddr,
                         paddr: (*self.pt_ptr)[self.vaddr.pt_index()].get_frame(),
-                        page_type: PageType::new(
+                        page_type: PageType::try_new(
                             (*self.pt_ptr)[self.vaddr.pt_index()].is_writable(),
                             (*self.pt_ptr)[self.vaddr.pt_index()].is_user_accessible(),
                             (*self.pt_ptr)[self.vaddr.pt_index()].is_execute_disabled(),
-                        ),
+                            (*self.pt_ptr)[self.vaddr.pt_index()].is_uncached(),
+                            (*self.pt_ptr)[self.vaddr.pt_index()].is_write_combining(),
+                        )?,
                     };
                     let pte = addr_of_mut!((*self.pt_ptr)[self.vaddr.pt_index()]);
                     if (*pte).is_present() {

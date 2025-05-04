@@ -1,12 +1,6 @@
-use core::f64::consts::LOG2_E;
-use core::ops::Add;
-
-use lazy_static::lazy_static;
-
 use crate::llk::isa::current_isa::memory::paging::AddressSpace;
 use crate::llk::isa::interface::memory::address::VirtualAddress;
 use crate::llk::isa::interface::memory::AddressSpaceInterface;
-use crate::llk::isa::x86_64::memory::paging::PAGE_SIZE;
 use crate::logln;
 use crate::memory::pmem::PHYSICAL_FRAME_ALLOCATOR;
 use crate::memory::vmem::{MemoryMapping, PageType, VAddr};
@@ -20,9 +14,9 @@ pub fn test_vmem() {
     let mut current_as = AddressSpace::get_current();
     logln!("Obtained current address space.");
     logln!("Creating MemoryMapping struct.");
-    let HIGHER_HALF_START: VAddr = VAddr::from(0xffff_ffff_ffff_f000usize);
+    let higher_half_start: VAddr = VAddr::from(0xffff_ffff_ffff_f000usize);
     let mapping = MemoryMapping {
-        vaddr: HIGHER_HALF_START,
+        vaddr: higher_half_start,
         paddr: frame,
         page_type: PageType::KernelData,
     };
@@ -34,23 +28,23 @@ pub fn test_vmem() {
         Ok(_) => logln!("Page mapped successfully."),
         Err(e) => panic!("Error mapping page: {:?}", e),
     }
-    let addr: *mut u32 = HIGHER_HALF_START.into_mut();
+    let addr: *mut u32 = higher_half_start.into_mut();
     const MAGIC_NUMBER: u32 = 0xcafebabe;
     unsafe {
         logln!(
             "Writing magic number {:x?}_16 to virtual address {:?}",
             MAGIC_NUMBER,
-            HIGHER_HALF_START
+            higher_half_start
         );
         addr.write(MAGIC_NUMBER);
-        logln!("Reading magic number back from {:?}", HIGHER_HALF_START);
+        logln!("Reading magic number back from {:?}", higher_half_start);
         let read_value = addr.read();
         assert_eq!(read_value, MAGIC_NUMBER);
         logln!("Magic number matches.");
         logln!("Test completed successfully.");
         logln!("Unmapping test page.");
         current_as
-            .unmap_page(HIGHER_HALF_START)
+            .unmap_page(higher_half_start)
             .expect("Error unmapping page.");
         logln!("Test page successfully unmapped.");
         logln!("All virtual memory tests passed!");

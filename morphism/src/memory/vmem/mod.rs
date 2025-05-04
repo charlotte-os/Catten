@@ -1,6 +1,5 @@
 pub use crate::llk::isa::current_isa::memory::address::paddr::PAddr;
 pub use crate::llk::isa::current_isa::memory::address::vaddr::VAddr;
-use crate::llk::isa::interface::memory::MemoryInterface;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Error {

@@ -1,15 +1,12 @@
 mod gdt;
 
-use core::borrow::{Borrow, BorrowMut};
-use core::ops::Deref;
+use core::borrow::BorrowMut;
 // core
 use core::ptr;
-use core::ptr::addr_of;
 
 use exceptions::load_exceptions;
 // crate local
 use gdt::{Gdt, Tss};
-use idt::Idt;
 // external crates
 use lazy_static::lazy_static;
 use spin::Mutex;
@@ -17,7 +14,7 @@ use spin::Mutex;
 use crate::llk::isa::interface::init::InitInterface;
 use crate::llk::isa::x86_64::interrupts::*;
 use crate::llk::isa::x86_64::memory::paging::pat::init_pat;
-use crate::{log, logln};
+use crate::logln;
 
 /// The BSP stack size is 4 pages by default.
 const BSP_STACK_SIZE: usize = 4096 * 4;

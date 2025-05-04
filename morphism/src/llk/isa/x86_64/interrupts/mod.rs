@@ -1,8 +1,6 @@
 pub mod exceptions;
 pub mod idt;
 
-use core::mem::MaybeUninit;
-
 use idt::*;
 use spin::Mutex;
 

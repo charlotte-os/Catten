@@ -3,6 +3,7 @@ pub mod paging;
 
 use crate::llk::isa::interface::memory::MemoryInterface;
 use crate::memory::pmem::Error as PMemError;
+use crate::memory::vmem::Error as VMemError;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Error {
@@ -12,11 +13,18 @@ pub enum Error {
     VAddrNotPageAligned,
     NoRequestedVAddrRegionAvailable,
     PMemError(PMemError),
+    VMemError(VMemError),
 }
 
 impl From<PMemError> for Error {
     fn from(err: PMemError) -> Self {
         Error::PMemError(err)
+    }
+}
+
+impl From<VMemError> for Error {
+    fn from(err: VMemError) -> Self {
+        Error::VMemError(err)
     }
 }
 pub struct MemoryInterfaceImpl;

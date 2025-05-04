@@ -1,10 +1,10 @@
 use limine::request::{
     FramebufferRequest,
     HhdmRequest,
-    KernelAddressRequest,
+    ExecutableAddressRequest,
     MemoryMapRequest,
     RsdpRequest,
-    SmpRequest,
+    MpRequest,
     StackSizeRequest,
 };
 use limine::BaseRevision;
@@ -12,8 +12,8 @@ use limine::BaseRevision;
 pub static BASE_REVISION: BaseRevision = BaseRevision::new();
 pub static MEMEORY_MAP_REQUEST: MemoryMapRequest = MemoryMapRequest::new();
 pub static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
-pub static KERNEL_ADDRESS_REQUEST: KernelAddressRequest = KernelAddressRequest::new();
+pub static KERNEL_ADDRESS_REQUEST: ExecutableAddressRequest = ExecutableAddressRequest::new();
 pub static FRAMEBUFFER_REQUEST: FramebufferRequest = FramebufferRequest::new();
-pub static SMP_REQUEST: SmpRequest = SmpRequest::new();
+pub static SMP_REQUEST: MpRequest = MpRequest::new();
 pub static RSDP_REQUEST: RsdpRequest = RsdpRequest::new();
 pub static STACK_SIZE: StackSizeRequest = StackSizeRequest::new().with_size(4096 * 4);
