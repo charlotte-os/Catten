@@ -12,7 +12,7 @@ pub fn kernel_init() {
             panic!("ISA specific initialization failed: {:?}", e);
         }
     }
-    logln!("Performing ISA agnostic initialization...");
+    logln!("Performing ISA independent initialization...");
     logln!("Initializing physical memory...");
     match PHYSICAL_FRAME_ALLOCATOR.try_lock() {
         Some(pfa) => {
@@ -20,6 +20,13 @@ pub fn kernel_init() {
         }
         None => {
             panic!("Failed to acquire lock on PhysicalFrameAllocator.");
+        }
+    }
+    logln!("Initializing kernel allocator...");
+    match crate::memory::allocator::init_allocator() {
+        Ok(_) => logln!("Kernel allocator initialized."),
+        Err(_) => {
+            panic!("Kernel allocator initialization failed!");
         }
     }
 }

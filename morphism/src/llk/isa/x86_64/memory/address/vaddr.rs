@@ -48,6 +48,11 @@ impl VAddr {
     pub fn page_offset(&self) -> usize {
         self.raw & OFFSET_MASK
     }
+
+    /// Safety: The address must be in canonical form
+    pub const unsafe fn from_raw_unchecked(raw: usize) -> Self {
+        VAddr { raw }
+    }
 }
 
 impl Address for VAddr {
