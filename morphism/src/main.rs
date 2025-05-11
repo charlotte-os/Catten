@@ -27,9 +27,9 @@ pub mod self_test;
 
 use core::panic::PanicInfo;
 
-use llk::isa::current_isa::lp_control::LpCtl;
+use llk::isa::current_isa::lp_control::LpControl;
 use llk::isa::current_isa::system_info::CpuInfo;
-use llk::isa::interface::lp_control::LpCtlIfce;
+use llk::isa::interface::lp_control::LpControlIfce;
 use llk::isa::interface::system_info::CpuInfoIfce;
 
 /// This is the entry point for the kernel. The `main` function is called by the
@@ -59,11 +59,11 @@ pub unsafe extern "C" fn main() -> ! {
     self_test::run_self_tests();
 
     logln!("Nothing left to do. Waiting for interrupts...");
-    LpCtl::halt()
+    LpControl::halt()
 }
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     logln!("{}", _info);
-    LpCtl::halt()
+    LpControl::halt()
 }
