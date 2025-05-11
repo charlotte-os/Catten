@@ -8,4 +8,5 @@
 pub mod bitwise;
 pub mod cell;
 pub mod io;
+pub mod raw_mutex;
 pub mod traits;

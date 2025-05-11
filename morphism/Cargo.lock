@@ -55,6 +55,7 @@ dependencies = [
  "gcd",
  "lazy_static",
  "limine",
+ "lock_api",
  "spin 0.10.0",
  "talc",
 ]
