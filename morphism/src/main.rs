@@ -2,6 +2,7 @@
 #![no_main]
 #![feature(allocator_api)]
 #![feature(likely_unlikely)]
+#![feature(slice_ptr_get)]
 #![feature(step_trait)]
 #![feature(sync_unsafe_cell)]
 
