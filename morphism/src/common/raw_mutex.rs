@@ -1,12 +1,13 @@
 use lock_api::GuardSend;
+use spin::Mutex;
 
 pub struct RawMutex {
-    inner: spin::Mutex<()>,
+    raw: Mutex<bool>,
 }
 impl RawMutex {
     pub const fn new() -> Self {
         RawMutex {
-            inner: spin::Mutex::new(()),
+            raw: Mutex::new(false),
         }
     }
 }
@@ -17,14 +18,20 @@ unsafe impl lock_api::RawMutex for RawMutex {
     const INIT: Self = Self::new();
 
     fn lock(&self) {
-        self.inner.lock();
+        *self.raw.lock() = true;
     }
 
     fn try_lock(&self) -> bool {
-        self.inner.try_lock().is_some()
+        match *self.raw.lock() {
+            true => false,
+            false => {
+                *(self.raw.lock()) = true;
+                true
+            }
+        }
     }
 
     unsafe fn unlock(&self) {
-        self.inner.unlock()
+        *self.raw.lock() = false;
     }
 }
