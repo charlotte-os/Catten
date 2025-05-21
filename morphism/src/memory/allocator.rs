@@ -30,6 +30,8 @@ pub fn init_allocator() -> Result<(), ()> {
         kernel_heap_start,
         (KERNEL_HEAP_START + kernel_heap_size as isize).into_mut(),
     );
+
+    let mut address_space = AddressSpace::get_current();
     for i in (VAddr::from_mut(kernel_heap_start)
         ..VAddr::from_mut(kernel_heap_start.wrapping_add(kernel_heap_size)))
         .step_by(PAGE_SIZE)
@@ -38,7 +40,7 @@ pub fn init_allocator() -> Result<(), ()> {
             .lock()
             .allocate_frame()
             .expect("Failed to allocate frame for kernel heap");
-        let mut address_space = AddressSpace::get_current();
+
         address_space
             .map_page(MemoryMapping {
                 vaddr: i,

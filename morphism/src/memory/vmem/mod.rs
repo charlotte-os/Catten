@@ -33,14 +33,14 @@ impl PageType {
             is_uncacheable,
             should_combine_writes,
         ) {
-            (false, false, false, false, false) => Ok(PageType::KernelCode),
-            (false, true, true, false, false) => Ok(PageType::KernelData),
-            (false, false, true, false, false) => Ok(PageType::KernelRoData),
-            (true, false, false, false, false) => Ok(PageType::UserCode),
-            (true, true, true, false, false) => Ok(PageType::UserData),
-            (true, false, true, false, false) => Ok(PageType::UserRoData),
             (false, true, true, true, false) => Ok(PageType::Mmio),
             (false, true, true, true, true) => Ok(PageType::Framebuffer),
+            (false, false, false, _, _) => Ok(PageType::KernelCode),
+            (false, true, true, _, _) => Ok(PageType::KernelData),
+            (false, false, true, _, _) => Ok(PageType::KernelRoData),
+            (true, false, false, _, _) => Ok(PageType::UserCode),
+            (true, true, true, _, _) => Ok(PageType::UserData),
+            (true, false, true, _, _) => Ok(PageType::UserRoData),
             (_, _, _, _, _) => Err(Error::InvalidPageAttributes),
         }
     }
