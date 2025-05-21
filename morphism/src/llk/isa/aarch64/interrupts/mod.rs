@@ -11,11 +11,11 @@ pub fn load_ivt() {
         asm!("ldr x0, =ivt", "msr vbar_el1, x0");
     }
 }
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn sync_dispatcher() {}
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn irq_dispatcher() {}
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn fiq_dispatcher() {}
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn serr_dispatcher() {}

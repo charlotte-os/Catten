@@ -5,6 +5,7 @@
 #![feature(slice_ptr_get)]
 #![feature(step_trait)]
 #![feature(sync_unsafe_cell)]
+#![allow(static_mut_refs)]
 
 //! # Morphism
 //!
@@ -37,7 +38,7 @@ use llk::isa::interface::system_info::CpuInfoIfce;
 /// bootloader after setting up the environment. It is made C ABI compatible so
 /// that it can be called by Limine or any other Limine Boot Protocol compliant
 /// bootloader.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn main() -> ! {
     logln!("Morphism Kernel Version 0.0.8");
     logln!("=========================");

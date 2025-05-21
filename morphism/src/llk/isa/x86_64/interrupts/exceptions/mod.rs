@@ -31,7 +31,7 @@ pub fn load_exceptions(idt: &mut Idt) {
 core::arch::global_asm! {
     include_str!("exceptions.asm"),
 }
-extern "C" {
+unsafe extern "C" {
     fn isr_divide_by_zero();
     fn isr_debug();
     fn isr_non_maskable_interrupt();
@@ -58,85 +58,85 @@ extern "C" {
     fn isr_security_exception();
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_double_fault(_error_code: u64) {
     logln!("A double fault has occurred in kernelspace! Panicking!");
     panic!("Double fault");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_divide_by_zero() {
     logln!("Divide by zero exception occurred!");
     panic!("Divide by zero");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_debug() {
     logln!("Debug exception occurred!");
     panic!("Debug exception");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_non_maskable_interrupt() {
     logln!("Non-maskable interrupt occurred!");
     panic!("Non-maskable interrupt");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_breakpoint() {
     logln!("Breakpoint exception occurred!");
     panic!("Breakpoint exception");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_overflow() {
     logln!("Overflow exception occurred!");
     panic!("Overflow exception");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_bound_range_exceeded() {
     logln!("Bound range exceeded exception occurred!");
     panic!("Bound range exceeded");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_invalid_opcode() {
     logln!("Invalid opcode exception occurred!");
     panic!("Invalid opcode");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_device_not_available() {
     logln!("Device not available exception occurred!");
     panic!("Device not available");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_invalid_tss() {
     logln!("Invalid TSS exception occurred!");
     panic!("Invalid TSS");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_segment_not_present() {
     logln!("Segment not present exception occurred!");
     panic!("Segment not present");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_stack_segment_fault() {
     logln!("Stack segment fault occurred!");
     panic!("Stack segment fault");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_general_protection_fault(_error_code: u64) {
     logln!("General protection fault occurred!");
     panic!("General protection fault");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_page_fault(error_code: u64) {
     logln!("Page fault occurred with error code {:X}!", error_code);
     let pf_addr: u64;
@@ -147,61 +147,61 @@ extern "C" fn ih_page_fault(error_code: u64) {
     panic!("Page fault");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_reserved() {
     logln!("Reserved exception occurred!");
     panic!("Reserved exception");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_x87_floating_point() {
     logln!("x87 floating point exception occurred!");
     panic!("x87 floating point exception");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_alignment_check() {
     logln!("Alignment check exception occurred!");
     panic!("Alignment check");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_machine_check() {
     logln!("Machine check exception occurred!");
     panic!("Machine check");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_simd_floating_point() {
     logln!("SIMD floating point exception occurred!");
     panic!("SIMD floating point exception");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_virtualization() {
     logln!("Virtualization exception occurred!");
     panic!("Virtualization exception");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_control_protection() {
     logln!("Control protection exception occurred!");
     panic!("Control protection exception");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_hypervisor_injection() {
     logln!("Hypervisor injection exception occurred!");
     panic!("Hypervisor injection");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_vmm_communication() {
     logln!("VMM communication exception occurred!");
     panic!("VMM communication");
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 extern "C" fn ih_security_exception() {
     logln!("Security exception occurred!");
     panic!("Security exception");

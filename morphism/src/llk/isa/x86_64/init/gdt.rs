@@ -146,7 +146,7 @@ impl Tss {
 }
 
 global_asm! { include_str!("gdt.asm") }
-extern "C" {
+unsafe extern "C" {
     fn asm_load_gdt(gdt: *const Gdt);
     fn asm_reload_segment_regs();
     fn asm_load_tss();
