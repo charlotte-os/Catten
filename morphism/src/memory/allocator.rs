@@ -9,8 +9,8 @@ use super::vmem::{MemoryMapping, VAddr};
 use crate::common::raw_mutex::RawMutex;
 use crate::llk::environment::boot_protocol::limine::EXECUTABLE_ADDRESS_REQUEST;
 use crate::llk::isa::current_isa::memory::paging::AddressSpace;
-use crate::llk::isa::interface::memory::address::VirtualAddress;
 use crate::llk::isa::interface::memory::AddressSpaceInterface;
+use crate::llk::isa::interface::memory::address::VirtualAddress;
 use crate::llk::isa::x86_64::memory::paging::PAGE_SIZE;
 
 lazy_static! {
@@ -32,8 +32,7 @@ pub fn init_allocator() -> Result<(), ()> {
     );
 
     let mut address_space = AddressSpace::get_current();
-    for i in (VAddr::from_mut(kernel_heap_start)
-        ..VAddr::from_mut(kernel_heap_start.wrapping_add(kernel_heap_size)))
+    for i in (VAddr::from_mut(kernel_heap_start)..VAddr::from_mut(kernel_heap_start.wrapping_add(kernel_heap_size)))
         .step_by(PAGE_SIZE)
     {
         let frame = PHYSICAL_FRAME_ALLOCATOR

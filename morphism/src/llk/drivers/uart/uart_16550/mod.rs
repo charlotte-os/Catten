@@ -11,8 +11,7 @@ use crate::llk::isa::interface::io::{IReg8Ifce, OReg8Ifce};
 
 #[cfg(target_arch = "x86_64")]
 lazy_static! {
-    pub static ref LOG_PORT: Mutex<Uart16550> =
-        Mutex::new(Uart16550::try_new(io::IoReg8::IoPort(COM1)).unwrap());
+    pub static ref LOG_PORT: Mutex<Uart16550> = Mutex::new(Uart16550::try_new(io::IoReg8::IoPort(COM1)).unwrap());
 }
 
 // standard PC COM port base addresses

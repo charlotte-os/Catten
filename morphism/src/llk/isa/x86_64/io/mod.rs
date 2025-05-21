@@ -49,9 +49,7 @@ impl Add<u16> for IoReg8 {
     fn add(self, rhs: u16) -> Self::Output {
         match self {
             IoReg8::IoPort(port) => IoReg8::IoPort(port + rhs),
-            IoReg8::Mmio(address) => {
-                IoReg8::Mmio(unsafe { (address as *mut u8).add(rhs as usize) as *mut u8 })
-            }
+            IoReg8::Mmio(address) => IoReg8::Mmio(unsafe { (address as *mut u8).add(rhs as usize) as *mut u8 }),
         }
     }
 }

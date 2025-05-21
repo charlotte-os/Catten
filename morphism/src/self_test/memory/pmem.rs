@@ -19,10 +19,7 @@ pub fn test_pmem() {
             unsafe {
                 let frame_ptr = frame.into_hhdm_mut::<u32>();
                 frame_ptr.write(magic_number);
-                logln!(
-                    "Reading back magic number from the frame: {:X}",
-                    (frame_ptr.read())
-                );
+                logln!("Reading back magic number from the frame: {:X}", (frame_ptr.read()));
             }
             match pfa_lock.deallocate_frame(*frame) {
                 Ok(()) => {
@@ -31,8 +28,7 @@ pub fn test_pmem() {
                 Err(e) => {
                     logln!("Failed to deallocate frame!");
                     panic!(
-                        "Self-test failure: Failed to deallocate a physical memory frame at \
-                         address {:?}. Error: {:?}",
+                        "Self-test failure: Failed to deallocate a physical memory frame at address {:?}. Error: {:?}",
                         frame, e
                     );
                 }
@@ -41,8 +37,7 @@ pub fn test_pmem() {
         Err(e) => {
             logln!("Failed to allocate a frame!");
             panic!(
-                "Self-test failure: Failed to allocate a frame from the physical frame allocator. \
-                 Error: {:?}",
+                "Self-test failure: Failed to allocate a frame from the physical frame allocator. Error: {:?}",
                 e
             );
         }

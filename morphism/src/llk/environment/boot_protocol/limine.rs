@@ -1,3 +1,4 @@
+use limine::BaseRevision;
 use limine::request::{
     ExecutableAddressRequest,
     FramebufferRequest,
@@ -7,7 +8,6 @@ use limine::request::{
     RsdpRequest,
     StackSizeRequest,
 };
-use limine::BaseRevision;
 
 pub static BASE_REVISION: BaseRevision = BaseRevision::new();
 pub static MEMEORY_MAP_REQUEST: MemoryMapRequest = MemoryMapRequest::new();

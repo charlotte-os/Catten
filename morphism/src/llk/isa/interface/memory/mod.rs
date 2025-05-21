@@ -1,8 +1,8 @@
 pub mod address;
 
+use crate::llk::isa::current_isa::memory::MemoryInterfaceImpl;
 use crate::llk::isa::current_isa::memory::address::paddr::PAddr;
 use crate::llk::isa::current_isa::memory::address::vaddr::VAddr;
-use crate::llk::isa::current_isa::memory::MemoryInterfaceImpl;
 pub use crate::memory::vmem::{MemoryMapping, PageType};
 
 pub trait MemoryInterface {
@@ -22,20 +22,8 @@ pub trait AddressSpaceInterface {
         n_pages: usize,
         range: (VAddr, VAddr),
     ) -> Result<VAddr, <MemoryInterfaceImpl as MemoryInterface>::Error>;
-    fn map_page(
-        &mut self,
-        mapping: MemoryMapping,
-    ) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error>;
-    fn unmap_page(
-        &mut self,
-        vaddr: VAddr,
-    ) -> Result<MemoryMapping, <MemoryInterfaceImpl as MemoryInterface>::Error>;
-    fn is_mapped(
-        &mut self,
-        vaddr: VAddr,
-    ) -> Result<bool, <MemoryInterfaceImpl as MemoryInterface>::Error>;
-    fn translate_address(
-        &mut self,
-        vaddr: VAddr,
-    ) -> Result<PAddr, <MemoryInterfaceImpl as MemoryInterface>::Error>;
+    fn map_page(&mut self, mapping: MemoryMapping) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error>;
+    fn unmap_page(&mut self, vaddr: VAddr) -> Result<MemoryMapping, <MemoryInterfaceImpl as MemoryInterface>::Error>;
+    fn is_mapped(&mut self, vaddr: VAddr) -> Result<bool, <MemoryInterfaceImpl as MemoryInterface>::Error>;
+    fn translate_address(&mut self, vaddr: VAddr) -> Result<PAddr, <MemoryInterfaceImpl as MemoryInterface>::Error>;
 }

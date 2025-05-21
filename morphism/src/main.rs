@@ -48,14 +48,8 @@ pub unsafe extern "C" fn main() -> ! {
     logln!("CPU Vendor: {:?}", (CpuInfo::get_vendor()));
     // TODO: Root cause the reason the following line halts execution without output or a panic.
     //logln!("CPU Model: {}", (CpuInfo::get_brand()));
-    logln!(
-        "Physical Address bits implmented: {}",
-        (CpuInfo::get_paddr_sig_bits())
-    );
-    logln!(
-        "Virtual Address bits implmented: {}",
-        (CpuInfo::get_vaddr_sig_bits())
-    );
+    logln!("Physical Address bits implmented: {}", (CpuInfo::get_paddr_sig_bits()));
+    logln!("Virtual Address bits implmented: {}", (CpuInfo::get_vaddr_sig_bits()));
 
     self_test::run_self_tests();
 

@@ -1,6 +1,6 @@
 use crate::llk::isa::current_isa::memory::paging::AddressSpace;
-use crate::llk::isa::interface::memory::address::VirtualAddress;
 use crate::llk::isa::interface::memory::AddressSpaceInterface;
+use crate::llk::isa::interface::memory::address::VirtualAddress;
 use crate::logln;
 use crate::memory::pmem::PHYSICAL_FRAME_ALLOCATOR;
 use crate::memory::vmem::{MemoryMapping, PageType, VAddr};
@@ -20,10 +20,7 @@ pub fn test_vmem() {
         paddr: frame,
         page_type: PageType::KernelData,
     };
-    logln!(
-        "Created MemoryMapping struct.\nMapping the allocated frame to the beginning of the \
-         higher half."
-    );
+    logln!("Created MemoryMapping struct.\nMapping the allocated frame to the beginning of the higher half.");
     match current_as.map_page(mapping) {
         Ok(_) => logln!("Page mapped successfully."),
         Err(e) => panic!("Error mapping page: {:?}", e),
@@ -43,9 +40,7 @@ pub fn test_vmem() {
         logln!("Magic number matches.");
         logln!("Test completed successfully.");
         logln!("Unmapping test page.");
-        current_as
-            .unmap_page(higher_half_start)
-            .expect("Error unmapping page.");
+        current_as.unmap_page(higher_half_start).expect("Error unmapping page.");
         logln!("Test page successfully unmapped.");
         logln!("All virtual memory tests passed!");
     }

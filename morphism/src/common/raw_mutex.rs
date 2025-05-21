@@ -6,9 +6,7 @@ pub struct RawMutex {
 }
 impl RawMutex {
     pub const fn new() -> Self {
-        RawMutex {
-            raw: Mutex::new(false),
-        }
+        RawMutex { raw: Mutex::new(false) }
     }
 }
 
