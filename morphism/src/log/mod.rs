@@ -6,6 +6,8 @@
 //! stored in a file. For now they print to the COM1 serial port on x86_64
 //! systems only.
 
+static mut log_prefix: Mutex<MaybeUninit<&'static str>>;
+
 #[macro_export]
 macro_rules! log {
     ($text:expr $(, $arg:tt)*) => ({
