@@ -7,7 +7,6 @@ pub fn test_allocator() {
     logln!("Starting the kernel allocator self-test...");
     logln!("Kernel allocator self-test: Allocating 1024 bytes...");
     let ptr = KERNEL_ALLOCATOR
-        .lock()
         .allocate(Layout::from_size_align(1024, 8).unwrap())
         .unwrap()
         .as_non_null_ptr();
@@ -26,14 +25,11 @@ pub fn test_allocator() {
     logln!("Kernel allocator self-test: Read complete.");
     logln!("Kernel allocator self-test: Deallocating allocated memory...");
     unsafe {
-        KERNEL_ALLOCATOR
-            .lock()
-            .deallocate(ptr, Layout::from_size_align(1024, 8).unwrap());
+        KERNEL_ALLOCATOR.deallocate(ptr, Layout::from_size_align(1024, 8).unwrap());
     }
     logln!("Kernel allocator self-test: Deallocation complete.");
     logln!("Kernel allocator self-test: Allocating 8 KiB...");
     let ptr = KERNEL_ALLOCATOR
-        .lock()
         .allocate(Layout::from_size_align(8192, 8).unwrap())
         .unwrap()
         .as_non_null_ptr();
@@ -52,9 +48,7 @@ pub fn test_allocator() {
     logln!("Kernel allocator self-test: Read complete.");
     logln!("Kernel allocator self-test: Deallocating allocated memory...");
     unsafe {
-        KERNEL_ALLOCATOR
-            .lock()
-            .deallocate(ptr, Layout::from_size_align(8192, 8).unwrap());
+        KERNEL_ALLOCATOR.deallocate(ptr, Layout::from_size_align(8192, 8).unwrap());
     }
     logln!("Kernel allocator self-test: Deallocation complete.");
 

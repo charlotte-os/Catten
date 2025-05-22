@@ -6,7 +6,11 @@
 //! stored in a file. For now they print to the COM1 serial port on x86_64
 //! systems only.
 
-static mut log_prefix: Mutex<MaybeUninit<&'static str>>;
+use spin::Mutex;
+
+use crate::common::vector::Vec;
+
+pub static mut LOG_PREFIX: Mutex<Vec<&'static str>> = Mutex::new(Vec::new());
 
 #[macro_export]
 macro_rules! log {
@@ -17,6 +21,18 @@ macro_rules! log {
             let _ = write!(LOG_PORT.lock(), $text $(, $arg)*);
         } */
         use crate::print;
+        use crate::log::LOG_PREFIX;
+
+        let prefix = unsafe {LOG_PREFIX.lock()};
+        print!("[ ");
+        for i in 0..prefix.len() {
+            if i == prefix.len() - 1 {
+                print!("{} ", i);
+            } else {
+                print!("{} |> ", i);
+            }
+        }
+        print!("] ");
         print!($text $(, $arg)*);
     })
 }
@@ -29,6 +45,19 @@ macro_rules! logln {
             let _ = writeln!(LOG_PORT.lock(), $text $(, $arg)*);
         } */
         use crate::println;
+        use crate::print;
+        use crate::log::LOG_PREFIX;
+
+        let prefix = unsafe {LOG_PREFIX.lock()};
+        print!("[ ");
+        for i in 0..prefix.len() {
+            if i == prefix.len() - 1 {
+                print!("{} ", i);
+            } else {
+                print!("{} |> ", i);
+            }
+        }
+        print!("] ");
         println!($text $(, $arg)*);
     })
 }

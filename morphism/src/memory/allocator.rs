@@ -1,13 +1,10 @@
-use core::alloc::Layout;
-
 use lazy_static::lazy_static;
 use spin::Mutex;
-use talc::{ErrOnOom, OomHandler, Span, Talc, Talck};
+use talc::{ErrOnOom, Span, Talc, Talck};
 
 use super::pmem::PHYSICAL_FRAME_ALLOCATOR;
 use super::vmem::{MemoryMapping, VAddr};
 use crate::common::raw_mutex::RawMutex;
-use crate::llk::environment::boot_protocol::limine::EXECUTABLE_ADDRESS_REQUEST;
 use crate::llk::isa::current_isa::memory::paging::AddressSpace;
 use crate::llk::isa::interface::memory::AddressSpaceInterface;
 use crate::llk::isa::interface::memory::address::VirtualAddress;
@@ -15,8 +12,7 @@ use crate::llk::isa::x86_64::memory::paging::PAGE_SIZE;
 
 lazy_static! {
     pub static ref ALLOCATOR_SPAN: Mutex<Span> = Mutex::new(Span::empty());
-    pub static ref KERNEL_ALLOCATOR: Mutex<Talck<RawMutex, ErrOnOom>> =
-        Mutex::new(Talc::new(ErrOnOom).lock::<RawMutex>());
+    pub static ref KERNEL_ALLOCATOR: Talck<RawMutex, ErrOnOom> = Talc::new(ErrOnOom).lock::<RawMutex>();
 }
 
 const KERNEL_HEAP_START: VAddr = unsafe { VAddr::from_raw_unchecked(0xffff800000000000) };
@@ -49,7 +45,7 @@ pub fn init_allocator() -> Result<(), ()> {
             .expect("Failed to map page for kernel heap");
     }
 
-    match unsafe { KERNEL_ALLOCATOR.lock().lock().claim(kernel_heap_span) } {
+    match unsafe { KERNEL_ALLOCATOR.lock().claim(kernel_heap_span) } {
         Ok(alloc_span) => {
             *ALLOCATOR_SPAN.lock() = alloc_span;
             Ok(())
