@@ -20,7 +20,7 @@ lazy_static! {
 }
 
 const KERNEL_HEAP_START: VAddr = unsafe { VAddr::from_raw_unchecked(0xffff800000000000) };
-const KERNEL_HEAP_SIZE: usize = 64 * 1024 * 1024; // 64MiB
+const KERNEL_HEAP_SIZE: usize = 64 * 1024 * PAGE_SIZE; // 64MiB
 
 pub fn init_allocator() -> Result<(), ()> {
     let kernel_heap_start = KERNEL_HEAP_START.into_mut();
