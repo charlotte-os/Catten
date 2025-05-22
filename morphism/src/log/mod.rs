@@ -21,18 +21,6 @@ macro_rules! log {
             let _ = write!(LOG_PORT.lock(), $text $(, $arg)*);
         } */
         use crate::print;
-        use crate::log::LOG_PREFIX;
-
-        let prefix = unsafe {LOG_PREFIX.lock()};
-        print!("[ ");
-        for i in 0..prefix.len() {
-            if i == prefix.len() - 1 {
-                print!("{} ", i);
-            } else {
-                print!("{} |> ", i);
-            }
-        }
-        print!("] ");
         print!($text $(, $arg)*);
     })
 }
@@ -45,19 +33,6 @@ macro_rules! logln {
             let _ = writeln!(LOG_PORT.lock(), $text $(, $arg)*);
         } */
         use crate::println;
-        use crate::print;
-        use crate::log::LOG_PREFIX;
-
-        let prefix = unsafe {LOG_PREFIX.lock()};
-        print!("[ ");
-        for i in 0..prefix.len() {
-            if i == prefix.len() - 1 {
-                print!("{} ", i);
-            } else {
-                print!("{} |> ", i);
-            }
-        }
-        print!("] ");
         println!($text $(, $arg)*);
     })
 }
