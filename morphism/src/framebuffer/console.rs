@@ -245,20 +245,23 @@ impl fmt::Write for Console {
 #[macro_export]
 macro_rules! print {
     ($($arg:tt)*) => {
-        use core::fmt::Write;
-        use crate::framebuffer::console::CONSOLE;
-        CONSOLE.lock().write_fmt(format_args!($($arg)*)).unwrap();
-        CONSOLE.lock().clear_inner_styling();
+            //use core::fmt::Write;
+            //crate::framebuffer::console::CONSOLE.lock().write_fmt(format_args!($($arg)*)).unwrap();
+            {
+                <crate::framebuffer::console::Console as core::fmt::Write>::write_fmt(&mut*(crate::framebuffer::console::CONSOLE.lock()), format_args!($($arg)*)).unwrap();
+                crate::framebuffer::console::CONSOLE.lock().clear_inner_styling();
+            }
     }
 }
-
 #[macro_export]
 macro_rules! println {
     ($($arg:tt)*) => {
-        use core::fmt::Write;
-        use crate::framebuffer::console::CONSOLE;
-        CONSOLE.lock().write_fmt(format_args!($($arg)*)).unwrap();
-        CONSOLE.lock().write_char('\n', None, None);
-        CONSOLE.lock().clear_inner_styling();
+            //use core::fmt::Write;
+            //crate::framebuffer::console::CONSOLE.lock().write_fmt(format_args!($($arg)*)).unwrap();
+        {
+            <crate::framebuffer::console::Console as core::fmt::Write>::write_fmt(&mut*(crate::framebuffer::console::CONSOLE.lock()), format_args!($($arg)*)).unwrap();
+            crate::framebuffer::console::CONSOLE.lock().write_char('\n', None, None);
+            crate::framebuffer::console::CONSOLE.lock().clear_inner_styling();
+        }
     }
 }

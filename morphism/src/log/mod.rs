@@ -6,33 +6,36 @@
 //! stored in a file. For now they print to the COM1 serial port on x86_64
 //! systems only.
 
-use spin::Mutex;
-
-use crate::common::vector::Vec;
-
-pub static mut LOG_PREFIX: Mutex<Vec<&'static str>> = Mutex::new(Vec::new());
-
 #[macro_export]
 macro_rules! log {
     ($text:expr $(, $arg:tt)*) => ({
-/*         if cfg! (target_arch = "x86_64") {
+         if cfg! (target_arch = "x86_64") {
             use core::fmt::Write;
             use crate::llk::drivers::uart::uart_16550::LOG_PORT;
             let _ = write!(LOG_PORT.lock(), $text $(, $arg)*);
-        } */
-        use crate::print;
-        print!($text $(, $arg)*);
+        }
+        use core::fmt::Write;
+        use crate::log::print_prefix;
+
+        print_prefix();
+        crate::framebuffer::console::CONSOLE.lock().write_fmt(format_args!($($arg)*)).unwrap();
+        crate::framebuffer::console::CONSOLE.lock().clear_inner_styling();
     })
 }
 #[macro_export]
 macro_rules! logln {
     ($text:expr $(, $arg:tt)*) => ({
-/*         if cfg! (target_arch = "x86_64") {
+         if cfg! (target_arch = "x86_64") {
             use core::fmt::Write;
             use crate::llk::drivers::uart::uart_16550::LOG_PORT;
             let _ = writeln!(LOG_PORT.lock(), $text $(, $arg)*);
-        } */
-        use crate::println;
-        println!($text $(, $arg)*);
+        }
+        use core::fmt::Write;
+        use crate::log::print_prefix;
+
+        print_prefix();
+        crate::framebuffer::console::CONSOLE.lock().write_fmt(format_args!($text $(, $arg)*)).unwrap();
+        crate::framebuffer::console::CONSOLE.lock().write_char('\n', None, None);
+        crate::framebuffer::console::CONSOLE.lock().clear_inner_styling();
     })
 }

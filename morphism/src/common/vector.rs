@@ -1,7 +1,9 @@
 use core::alloc::{AllocError, Allocator, Layout, LayoutError};
+use core::fmt::Debug;
 use core::mem::transmute;
 use core::ops::{Index, IndexMut, Neg};
 
+use crate::logln;
 use crate::memory::allocator::KERNEL_ALLOCATOR;
 
 #[derive(Debug)]
@@ -24,19 +26,24 @@ impl From<AllocError> for VecError {
 }
 
 #[derive(Debug)]
-pub struct Vec<T> {
+pub struct Vec<T: Debug> {
     data: *mut T,
     len:  usize,
     cap:  usize,
 }
 
-impl<T> Vec<T> {
-    pub const fn new() -> Self {
-        Self {
-            data: core::ptr::null_mut(),
+impl<T: Debug> Vec<T> {
+    pub fn try_new() -> Result<Self, VecError> {
+        Ok(Self {
+            data: KERNEL_ALLOCATOR
+                .allocate(Layout::from_size_align(
+                    core::mem::size_of::<T>(),
+                    core::mem::align_of::<T>(),
+                )?)?
+                .as_mut_ptr() as *mut T,
             len:  0,
-            cap:  0,
-        }
+            cap:  1,
+        })
     }
 
     fn resize(&mut self, new_cap: usize) -> Result<(), VecError> {
@@ -65,7 +72,9 @@ impl<T> Vec<T> {
             self.resize(self.cap * 2)?;
         }
         unsafe {
-            core::ptr::write(self.data.add(self.len), value);
+            logln!("Writing to the raw pointer of the vector: {:?}", (*self));
+            self.data.add(self.len).write(value);
+            logln!("Wrote to the vector raw pointer: {:?}", (*self));
         }
         self.len += 1;
         Ok(())
@@ -86,7 +95,7 @@ impl<T> Vec<T> {
     }
 }
 
-impl<T> Index<usize> for Vec<T> {
+impl<T: Debug> Index<usize> for Vec<T> {
     type Output = T;
 
     fn index(&self, index: usize) -> &Self::Output {
@@ -97,7 +106,7 @@ impl<T> Index<usize> for Vec<T> {
     }
 }
 
-impl<T> IndexMut<usize> for Vec<T> {
+impl<T: Debug> IndexMut<usize> for Vec<T> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         if index >= self.len {
             panic!("Index out of bounds");
@@ -106,11 +115,11 @@ impl<T> IndexMut<usize> for Vec<T> {
     }
 }
 
-pub struct VecIter<T: Clone> {
+pub struct VecIter<T: Clone + Debug> {
     vec: *const Vec<T>,
     index: usize,
 }
-impl<'a, T: Clone> Iterator for VecIter<T> {
+impl<'a, T: Clone + Debug> Iterator for VecIter<T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -123,7 +132,7 @@ impl<'a, T: Clone> Iterator for VecIter<T> {
         }
     }
 }
-impl<T: Clone> IntoIterator for Vec<T> {
+impl<T: Clone + Debug> IntoIterator for Vec<T> {
     type IntoIter = VecIter<T>;
     type Item = T;
 
@@ -132,7 +141,7 @@ impl<T: Clone> IntoIterator for Vec<T> {
     }
 }
 
-impl<T> Drop for Vec<T> {
+impl<T: Debug> Drop for Vec<T> {
     fn drop(&mut self) {
         if !self.data.is_null() {
             unsafe {
@@ -147,3 +156,5 @@ impl<T> Drop for Vec<T> {
         }
     }
 }
+
+unsafe impl<T: Debug> Send for Vec<T> {}
