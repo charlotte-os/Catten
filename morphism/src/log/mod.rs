@@ -14,11 +14,7 @@ macro_rules! log {
             use crate::llk::drivers::uart::uart_16550::LOG_PORT;
             let _ = write!(LOG_PORT.lock(), $text $(, $arg)*);
         }
-        use core::fmt::Write;
-        use crate::log::print_prefix;
-
-        print_prefix();
-        crate::framebuffer::console::CONSOLE.lock().write_fmt(format_args!($($arg)*)).unwrap();
+        <crate::framebuffer::console::Console as core::fmt::Write>::write_fmt(&mut crate::framebuffer::console::CONSOLE.lock(), (format_args!($text $(, $arg)*)));
         crate::framebuffer::console::CONSOLE.lock().clear_inner_styling();
     })
 }
@@ -30,11 +26,7 @@ macro_rules! logln {
             use crate::llk::drivers::uart::uart_16550::LOG_PORT;
             let _ = writeln!(LOG_PORT.lock(), $text $(, $arg)*);
         }
-        use core::fmt::Write;
-        use crate::log::print_prefix;
-
-        print_prefix();
-        crate::framebuffer::console::CONSOLE.lock().write_fmt(format_args!($text $(, $arg)*)).unwrap();
+        <crate::framebuffer::console::Console as core::fmt::Write>::write_fmt(&mut crate::framebuffer::console::CONSOLE.lock(), (format_args!($text $(, $arg)*)));
         crate::framebuffer::console::CONSOLE.lock().write_char('\n', None, None);
         crate::framebuffer::console::CONSOLE.lock().clear_inner_styling();
     })

@@ -30,9 +30,4 @@ pub fn kernel_init() {
             panic!("Kernel allocator initialization failed!");
         }
     }
-    logln!("Initializing the log prefix vector...");
-    crate::log::LOG_PREFIX
-        .lock()
-        .insert(Vec::try_new().expect("Failed to initialize the log prefix vector."));
-    logln!("Log prefix vector initialized.")
 }
