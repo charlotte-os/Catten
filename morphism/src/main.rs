@@ -20,9 +20,9 @@
 //! useful in other operating systems, embedded firmware, and other types of software distributions
 //! as well.
 
-pub mod common;
 pub mod framebuffer;
 pub mod init;
+pub mod lib;
 pub mod llk;
 pub mod log;
 pub mod memory;

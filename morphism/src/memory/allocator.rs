@@ -4,7 +4,7 @@ use talc::{ErrOnOom, Span, Talc, Talck};
 
 use super::pmem::PHYSICAL_FRAME_ALLOCATOR;
 use super::vmem::{MemoryMapping, VAddr};
-use crate::common::raw_mutex::RawMutex;
+use crate::lib::raw_mutex::RawMutex;
 use crate::llk::isa::current_isa::memory::paging::AddressSpace;
 use crate::llk::isa::interface::memory::AddressSpaceInterface;
 use crate::llk::isa::interface::memory::address::VirtualAddress;
