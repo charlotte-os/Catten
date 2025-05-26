@@ -65,7 +65,7 @@ build-x86_64-release: limine
 	rm -rf iso_root
 
 run-x86_64-release: ovmf-x86_64 build-x86_64-release
-	qemu-system-x86_64 -enable-kvm -M q35 -cpu host -m 12G -bios ovmf-x86_64/OVMF.fd -cdrom morphism-x86_64-release.iso -boot d
+	qemu-system-x86_64 -enable-kvm -M q35 -cpu host -m 12G -bios ovmf-x86_64/OVMF.fd -cdrom morphism-x86_64-release.iso -boot d -serial stdio
 
 check-x86_64:
 	cd morphism && cargo check --target x86_64-unknown-none
@@ -91,9 +91,9 @@ morphism-aarch64-debug.iso: build-aarch64-debug
 		iso_root -o morphism-aarch64-debug.iso
 	rm -rf iso_root
 run-aarch64-debug: ovmf-aarch64 morphism-aarch64-debug.iso
-	qemu-system-aarch64 -M virt -cpu cortex-a72 -device ramfb -device qemu-xhci -device usb-kbd -m 2G -bios ovmf-aarch64/OVMF.fd -cdrom morphism-aarch64-debug.iso -boot d
+	qemu-system-aarch64 -M virt -cpu cortex-a76 -device ramfb -device qemu-xhci -device usb-kbd -m 2G -bios ovmf-aarch64/OVMF.fd -cdrom morphism-aarch64-debug.iso -boot d
 run-aarch64-log: ovmf-aarch64 morphism-aarch64-debug.iso
-	qemu-system-aarch64 -M virt -cpu cortex-a72 -device ramfb -device qemu-xhci -device usb-kbd -m 2G -bios ovmf-aarch64/OVMF.fd -cdrom morphism-aarch64-debug.iso -boot d \
+	qemu-system-aarch64 -M virt -cpu cortex-a76 -device ramfb -device qemu-xhci -device usb-kbd -m 2G -bios ovmf-aarch64/OVMF.fd -cdrom morphism-aarch64-debug.iso -boot d \
 		-serial file:log_aarch64.txt
 
 
