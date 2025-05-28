@@ -41,7 +41,7 @@ use llk::isa::interface::system_info::CpuInfoIfce;
 /// bootloader.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn main() -> ! {
-    logln!("charlottek Kernel Version 0.0.8");
+    logln!("charlottek Kernel Version 0.1.0");
     logln!("=========================");
     logln!("Initializing system...");
     init::kernel_init();
