@@ -2,7 +2,7 @@
 ovmf-aarch64
 ovmf-riscv64
 ovmf-x86_64
-morphism/target/**
+charlottek/target/**
 log.txt
 limine
 .vscode/**

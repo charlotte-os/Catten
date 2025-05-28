@@ -15,6 +15,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5c8214115b7bf84099f1309324e63141d4c5d7cc26862f97a0a857dbefe165bd"
 
 [[package]]
+name = "charlottek"
+version = "0.1.0"
+dependencies = [
+ "gcd",
+ "lazy_static",
+ "limine",
+ "lock_api",
+ "spin",
+ "talc",
+]
+
+[[package]]
 name = "gcd"
 version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -46,18 +58,6 @@ checksum = "07af8b9cdd281b7915f413fa73f29ebd5d55d0d3f0155584dade1ff18cea1b17"
 dependencies = [
  "autocfg",
  "scopeguard",
-]
-
-[[package]]
-name = "morphism"
-version = "0.1.0"
-dependencies = [
- "gcd",
- "lazy_static",
- "limine",
- "lock_api",
- "spin",
- "talc",
 ]
 
 [[package]]

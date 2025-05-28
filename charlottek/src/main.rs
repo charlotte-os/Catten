@@ -8,9 +8,9 @@
 #![feature(sync_unsafe_cell)]
 #![allow(static_mut_refs)]
 
-//! # Morphism
+//! # charlottek
 //!
-//! Morphism is an operating system kernel developed as a component of CharlotteOS, an
+//! charlottek is an operating system kernel developed as a component of CharlotteOS, an
 //! experimental modern operating system.This kernel is responsible for initializing the hardware,
 //! providing commonizing abstractions for all hardware resources, and managing the execution of
 //! user-space applications and the environment in which they run. It is a crucial part of the
@@ -41,7 +41,7 @@ use llk::isa::interface::system_info::CpuInfoIfce;
 /// bootloader.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn main() -> ! {
-    logln!("Morphism Kernel Version 0.0.8");
+    logln!("charlottek Kernel Version 0.0.8");
     logln!("=========================");
     logln!("Initializing system...");
     init::kernel_init();
