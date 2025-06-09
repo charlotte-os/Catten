@@ -4,7 +4,7 @@ use core::result::Result;
 use lazy_static::lazy_static;
 use spin::Mutex;
 
-use crate::lib::io::Read;
+use crate::klib::io::Read;
 use crate::llk::drivers::uart::Uart;
 use crate::llk::isa::current_isa::io::{self, IoReg8};
 use crate::llk::isa::interface::io::{IReg8Ifce, OReg8Ifce};

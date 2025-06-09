@@ -26,7 +26,7 @@ macro_rules! logln {
             use crate::llk::drivers::uart::uart_16550::LOG_PORT;
             let _ = writeln!(LOG_PORT.lock(), $text $(, $arg)*);
         }
-        <crate::framebuffer::console::Console as core::fmt::Write>::write_fmt(&mut crate::framebuffer::console::CONSOLE.lock(), (format_args!($text $(, $arg)*)));
+        <crate::framebuffer::console::Console as core::fmt::Write>::write_fmt(&mut crate::framebuffer::console::CONSOLE.lock(), (format_args!($text $(, $arg)*))).unwrap();
         crate::framebuffer::console::CONSOLE.lock().write_char('\n', None, None);
         crate::framebuffer::console::CONSOLE.lock().clear_inner_styling();
     })

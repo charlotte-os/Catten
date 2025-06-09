@@ -32,11 +32,11 @@ impl Address for PAddr {
 
 impl PhysicalAddress for PAddr {
     unsafe fn into_hhdm_ptr<T>(self) -> *const T {
-        (*HHDM_BASE).into_ptr::<T>().byte_offset(self.addr as isize)
+        unsafe { (*HHDM_BASE).into_ptr::<T>().byte_offset(self.addr as isize) }
     }
 
     unsafe fn into_hhdm_mut<T>(self) -> *mut T {
-        (*HHDM_BASE).into_mut::<T>().byte_offset(self.addr as isize)
+        unsafe { (*HHDM_BASE).into_mut::<T>().byte_offset(self.addr as isize) }
     }
 }
 

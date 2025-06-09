@@ -1,7 +1,7 @@
 use core::alloc::{AllocError, Allocator, Layout, LayoutError};
 use core::fmt::Debug;
 use core::mem::transmute;
-use core::ops::{Index, IndexMut, Neg};
+use core::ops::{Index, IndexMut};
 
 use crate::logln;
 use crate::memory::allocator::KERNEL_ALLOCATOR;

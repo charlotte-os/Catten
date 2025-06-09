@@ -22,7 +22,7 @@
 
 pub mod framebuffer;
 pub mod init;
-pub mod lib;
+pub mod klib;
 pub mod llk;
 pub mod log;
 pub mod memory;
