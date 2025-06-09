@@ -1,5 +1,5 @@
-use crate::llk::isa::current_isa::init::IsaInitializer;
-use crate::llk::isa::interface::init::InitInterface;
+use crate::isa::current_isa::init::IsaInitializer;
+use crate::isa::interface::init::InitInterface;
 use crate::logln;
 use crate::memory::pmem::*;
 

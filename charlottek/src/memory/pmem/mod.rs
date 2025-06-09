@@ -7,11 +7,11 @@ use lazy_static::lazy_static;
 use limine::response::MemoryMapResponse;
 use spin::Mutex;
 
-use crate::llk::environment::boot_protocol::limine::{HHDM_REQUEST, MEMEORY_MAP_REQUEST};
-pub use crate::llk::isa::current_isa::memory::MemoryInterfaceImpl;
-pub use crate::llk::isa::current_isa::memory::address::paddr::PAddr;
-pub use crate::llk::isa::interface::memory::MemoryInterface;
-pub use crate::llk::isa::interface::memory::address::PhysicalAddress;
+use crate::environment::boot_protocol::limine::{HHDM_REQUEST, MEMEORY_MAP_REQUEST};
+pub use crate::isa::current_isa::memory::MemoryInterfaceImpl;
+pub use crate::isa::current_isa::memory::address::paddr::PAddr;
+pub use crate::isa::interface::memory::MemoryInterface;
+pub use crate::isa::interface::memory::address::PhysicalAddress;
 use crate::logln;
 
 pub type VAddr = <MemoryInterfaceImpl as MemoryInterface>::VAddr;

@@ -20,20 +20,22 @@
 //! useful in other operating systems, embedded firmware, and other types of software distributions
 //! as well.
 
+pub mod drivers;
+pub mod environment;
 pub mod framebuffer;
 pub mod init;
+pub mod isa;
 pub mod klib;
-pub mod llk;
 pub mod log;
 pub mod memory;
 pub mod self_test;
 
 use core::panic::PanicInfo;
 
-use llk::isa::current_isa::lp_control::LpControl;
-use llk::isa::current_isa::system_info::CpuInfo;
-use llk::isa::interface::lp_control::LpControlIfce;
-use llk::isa::interface::system_info::CpuInfoIfce;
+use isa::current_isa::lp_control::LpControl;
+use isa::current_isa::system_info::CpuInfo;
+use isa::interface::lp_control::LpControlIfce;
+use isa::interface::system_info::CpuInfoIfce;
 
 /// This is the entry point for the kernel. The `main` function is called by the
 /// bootloader after setting up the environment. It is made C ABI compatible so

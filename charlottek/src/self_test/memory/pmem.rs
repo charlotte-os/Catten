@@ -1,4 +1,4 @@
-use crate::llk::isa::interface::memory::address::PhysicalAddress;
+use crate::isa::interface::memory::address::PhysicalAddress;
 use crate::logln;
 use crate::memory::pmem::PHYSICAL_FRAME_ALLOCATOR;
 
