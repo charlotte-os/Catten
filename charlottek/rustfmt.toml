@@ -1,11 +1,11 @@
 combine_control_expr = false
 wrap_comments = true
-comment_width = 120
+comment_width = 100
 force_explicit_abi = true
 format_strings = true
 hex_literal_case = "Lower"
 imports_layout = "HorizontalVertical"
-max_width = 120
+max_width = 100
 merge_derives = true
 imports_granularity = "Module"
 newline_style = "Unix"

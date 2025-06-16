@@ -28,6 +28,7 @@ pub mod isa;
 pub mod klib;
 pub mod log;
 pub mod memory;
+pub mod panic;
 pub mod self_test;
 
 use core::panic::PanicInfo;
@@ -37,12 +38,11 @@ use isa::current_isa::system_info::CpuInfo;
 use isa::interface::lp_control::LpControlIfce;
 use isa::interface::system_info::CpuInfoIfce;
 
-/// This is the entry point for the kernel. The `main` function is called by the
-/// bootloader after setting up the environment. It is made C ABI compatible so
-/// that it can be called by Limine or any other Limine Boot Protocol compliant
-/// bootloader.
+/// This is the bootstrap processor's entry point into the kernel. The `bsp_main` function is
+/// called by the bootloader after setting up the environment. It is made C ABI compatible so
+/// that it can be called by Limine or any other Limine Boot Protocol compliant bootloader.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn main() -> ! {
+pub unsafe extern "C" fn bsp_main() -> ! {
     logln!("charlottek Kernel Version 0.1.0");
     logln!("=========================");
     logln!("Initializing system...");
@@ -52,8 +52,14 @@ pub unsafe extern "C" fn main() -> ! {
     logln!("CPU Vendor: {:?}", (CpuInfo::get_vendor()));
     // TODO: Root cause the reason the following line halts execution without output or a panic.
     //logln!("CPU Model: {}", (CpuInfo::get_brand()));
-    logln!("Physical Address bits implmented: {}", (CpuInfo::get_paddr_sig_bits()));
-    logln!("Virtual Address bits implmented: {}", (CpuInfo::get_vaddr_sig_bits()));
+    logln!(
+        "Physical Address bits implmented: {}",
+        (CpuInfo::get_paddr_sig_bits())
+    );
+    logln!(
+        "Virtual Address bits implmented: {}",
+        (CpuInfo::get_vaddr_sig_bits())
+    );
 
     self_test::run_self_tests();
 
@@ -61,8 +67,12 @@ pub unsafe extern "C" fn main() -> ! {
     LpControl::halt()
 }
 
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    logln!("{}", _info);
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn ap_main() -> ! {
+    let lp_identifier = CurentIsa::LpControl::get_lp_id();
+    logln!(
+        "Logical Processor {} has entered charlottek via ap_main",
+        lp_identifier
+    );
     LpControl::halt()
 }

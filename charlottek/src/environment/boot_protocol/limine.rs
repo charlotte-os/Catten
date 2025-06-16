@@ -16,4 +16,6 @@ pub static EXECUTABLE_ADDRESS_REQUEST: ExecutableAddressRequest = ExecutableAddr
 pub static FRAMEBUFFER_REQUEST: FramebufferRequest = FramebufferRequest::new();
 pub static SMP_REQUEST: MpRequest = MpRequest::new();
 pub static RSDP_REQUEST: RsdpRequest = RsdpRequest::new();
-pub static STACK_SIZE: StackSizeRequest = StackSizeRequest::new().with_size(4096 * 4);
+pub static STACK_SIZE: StackSizeRequest =
+    StackSizeRequest::new().with_size(CurrentIsa::PAGE_SIZE * 4);
+pub static MP: MpRequest = MpRequest::new();

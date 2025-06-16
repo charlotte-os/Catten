@@ -18,17 +18,36 @@ charlottek is still in early development, and core subsystems are actively being
   reason to do otherwise
 
 ## Target System Requirements
-- Processor: x86_64 CPU with x2APICs
-- Firmware: Must provide standards compliant implementations of the Unified Extensible Firmware
-  Interface (UEFI) and Advanced Configuration and Power Interface (ACPI)
-- Memory: 512 MiB required; 4 GiB or more recommended
-- Display Adapter: Any adaptor capable of providing framebuffers via the UEFI Graphics Output Protocol
+- Processor:
+  - x86_64
+    - x2APIC LAPIC operating mode
+  - ARM64
+- Firmware:
+  - Preferred (All ISAs)
+    - Unified Extensible Firmware Interface (UEFI)
+    - Advanced Configuration and Power Interface (ACPI)
+  - Supported (ARM Only)
+    - Embedded Base Boot Requirements (EBBR) subset of UEFI (typically provided by Das U-Boot)
+    - Devicetree (DT) binary
+    - Power State Configuration Interface (PSCI)
+- Memory: 512 MiB required;
+  - Recommended: >= 2 GiB
+  - Required: 512 MiB
 - Storage: NVMe compatible storage medium with a capacity of 4 GiB or more
-- Input: PS/2 or USB keyboard
-
-> **Note:**
-> If you are interested in porting `charlottek` to a new target please reach out to us on Matrix or
-> open an issue on our GitHub repository.
+- Output:
+  - Display Adapter: Any adapter capable of providing framebuffers via the UEFI Graphics Output Protocol
+  - Serial
+    - NS16550 compatible UART
+    - PL011 compatible UART
+    - USB CDC ACM (Virtual UART)
+- Input:
+  - Keyboard
+    - PS/2
+    - USB HID
+  - Serial
+    - NS16550 compatible UART
+    - PL011 compatible UART
+    - USB CDC ACM (Virtual UART)
 
 ## Contributing
 
