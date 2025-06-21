@@ -31,7 +31,7 @@ pub mod memory;
 pub mod panic;
 pub mod self_test;
 
-use core::panic::PanicInfo;
+use limine::mp::Cpu;
 
 use isa::current_isa::lp_control::LpControl;
 use isa::current_isa::system_info::CpuInfo;
@@ -68,8 +68,8 @@ pub unsafe extern "C" fn bsp_main() -> ! {
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ap_main() -> ! {
-    let lp_identifier = CurentIsa::LpControl::get_lp_id();
+pub unsafe extern "C" fn ap_main(cpuinfo: &Cpu) -> ! {
+    let lp_identifier = LpControl::get_lp_id();
     logln!(
         "Logical Processor {} has entered charlottek via ap_main",
         lp_identifier
