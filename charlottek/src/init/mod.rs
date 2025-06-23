@@ -32,6 +32,4 @@ pub fn kernel_init() {
     }
     logln!("Intialized kernel allocator.");
     logln!("Starting secondary processors...");
-    
-    }
 }

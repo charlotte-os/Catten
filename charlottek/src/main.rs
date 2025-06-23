@@ -61,6 +61,9 @@ pub unsafe extern "C" fn bsp_main() -> ! {
         (CpuInfo::get_vaddr_sig_bits())
     );
 
+    logln!("Starting secondary LPs...");
+    tsmp::mp::start_secondary_lps().expect("Failed to start secondary LPs");
+
     self_test::run_self_tests();
 
     logln!("Nothing left to do. Waiting for interrupts...");
@@ -68,10 +71,10 @@ pub unsafe extern "C" fn bsp_main() -> ! {
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn ap_main(cpuinfo: &Cpu) -> ! {
+pub unsafe extern "C" fn ap_main(_cpuinfo: &Cpu) -> ! {
     let lp_identifier = LpControl::get_lp_id();
     logln!(
-        "Logical Processor {} has entered charlottek via ap_main",
+        "Logical Processor with x2APIC ID = {} has entered charlottek via ap_main",
         lp_identifier
     );
     LpControl::halt()

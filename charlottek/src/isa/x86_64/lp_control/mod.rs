@@ -39,7 +39,7 @@ impl LpControlIfce for LpControl {
             asm!(
                 "mov ecx, 0x802",
                 "rdmsr",
-                out reg("eax") lp_id
+                out("eax") lp_id
             );
         }
         lp_id
