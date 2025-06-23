@@ -6,16 +6,23 @@ pub enum MpControlError {
     SecondaryLpStartupFailed,
 }
 
-static SLP_MAIN_LIMINE: fn (&limine::mp::Cpu) -> ! = crate::main::ap_main;
+static SLP_MAIN_LIMINE: fn(&limine::mp::Cpu) -> ! = crate::main::ap_main;
 
 pub fn start_secondary_lps() -> Result<(), MpControlError> {
-    /// Attempts to start the secondary logical processors (LPs) in the system using four different approaches:
-    /// 1. **Limine MP Feature**: Uses the Limine Multiprocessing feature to take control of the secondary LPs.
-    /// 2. **ACPI MPSS**: Use the ACPI Multiprocessor Startup Structure Mailboxes to take control of the secondary LPs.
-    /// 3. **Device Tree CPU Mailbox**: Use the Device Tree CPU mailboxes to take control of the secondary LPs. On x86_64, this is always a no-op since x86_64 effectively never uses DTs.
-    /// 4. **ISA MP Control**: Use an ISA specific firmware interface or interrupt sequence to start and take control of the secondary LPs.
+    /// Attempts to start the secondary logical processors (LPs) in the system using four different
+    /// approaches:
+    /// 1. **Limine MP Feature**: Uses the Limine Multiprocessing feature to take control of the
+    ///    secondary LPs.
+    /// 2. **ACPI MPSS**: Use the ACPI Multiprocessor Startup Structure Mailboxes to take control of
+    ///    the secondary LPs.
+    /// 3. **Device Tree CPU Mailbox**: Use the Device Tree CPU mailboxes to take control of the
+    ///    secondary LPs.
+    ///    - On x86_64, this is always a no-op since x86_64 effectively never uses DTs.
+    /// 4. **ISA MP Control**: Use an ISA specific firmware interface or interrupt sequence to start
+    ///    and take control of the secondary LPs.
     ///    - On ARM64 this uses PSCI.
-    ///    - On x86_64 this uses the x2APIC to send an INIT IPI to the secondary LPs, followed by two STARTUP IPIs with the appropriate timings to start them.
+    ///    - On x86_64 this uses the x2APIC to send an INIT IPI to the secondary LPs, followed by
+    ///      two STARTUP IPIs with the appropriate timings to start them.
     if mp_start_limine() {
         Ok(())
     } else if mp_start_acpi() {

@@ -30,13 +30,13 @@ pub mod log;
 pub mod memory;
 pub mod panic;
 pub mod self_test;
-
-use limine::mp::Cpu;
+pub mod tsmp;
 
 use isa::current_isa::lp_control::LpControl;
 use isa::current_isa::system_info::CpuInfo;
 use isa::interface::lp_control::LpControlIfce;
 use isa::interface::system_info::CpuInfoIfce;
+use limine::mp::Cpu;
 
 /// This is the bootstrap processor's entry point into the kernel. The `bsp_main` function is
 /// called by the bootloader after setting up the environment. It is made C ABI compatible so
