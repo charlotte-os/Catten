@@ -19,9 +19,9 @@ charlottek is still in early development, and core subsystems are actively being
 
 ## Target System Requirements
 - Processor:
-  - x86_64
+  - x86_64 (Primary ISA)
     - x2APIC LAPIC operating mode
-  - ARM64
+  - ARM64 (Best Efforts Basis)
 - Firmware:
   - Preferred (All ISAs)
     - Unified Extensible Firmware Interface (UEFI)
@@ -30,9 +30,9 @@ charlottek is still in early development, and core subsystems are actively being
     - Embedded Base Boot Requirements (EBBR) subset of UEFI (typically provided by Das U-Boot)
     - Devicetree (DT) binary
     - Power State Configuration Interface (PSCI)
-- Memory: 512 MiB required;
-  - Recommended: >= 2 GiB
-  - Required: 512 MiB
+- Memory:
+  - Recommended: >= 1 GiB
+  - Required: 128 MiB
 - Storage: NVMe compatible storage medium with a capacity of 4 GiB or more
 - Output:
   - Display Adapter: Any adapter capable of providing framebuffers via the UEFI Graphics Output Protocol
@@ -48,15 +48,13 @@ charlottek is still in early development, and core subsystems are actively being
     - NS16550 compatible UART
     - PL011 compatible UART
     - USB CDC ACM (Virtual UART)
+- Networking:
+  - USB CDC Network Control Model
 
 ## Contributing
 
-We welcome your contributions! Here’s how you can get involved:
-
-- Pick an issue from our tracker.
-- Participate in discussions on GitHub or Matrix
-- Open issues for proposed features or improvements.
+Please reach out to us on Matrix if you are interested in contributing.
 
 ## Licensing
 This kernel is licensed under the GNU General Public License version 3.0 (or at your option, any later version).
-If you cannot comply with this license, please do not contribute.
+By contributing to this project you agree to license your contributions under these license terms exclusively.
