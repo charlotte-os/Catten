@@ -13,10 +13,12 @@ pub fn start_secondary_lps() -> Result<(), MpControlError> {
     logln!("Starting Secondary LPs...");
     if let Some(res) = MP.get_response() {
         logln!("Obtained multiprocessor response from Limine");
-        if res.flags().contains(limine::mp::ResponseFlags::X2APIC) {
-            logln!("Limine has set APICs to x2APIC mode.")
-        } else {
-            logln!("Limine has not set APICs to x2APIC mode.")
+        if cfg!(target_arch = "x86_64") {
+            if res.flags().contains(limine::mp::ResponseFlags::X2APIC) {
+                logln!("Limine has set all LAPICs to x2APIC mode.")
+            } else {
+                logln!("Limine has not set any LAPICs to x2APIC mode.")
+            }
         }
         let lps = res.cpus();
         for lp in lps {
