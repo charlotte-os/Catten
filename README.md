@@ -23,17 +23,20 @@ charlottek is still in early development, and core subsystems are actively being
     - x2APIC LAPIC operating mode
   - ARM64 (Best Efforts Basis)
 - Firmware:
-  - Preferred (All ISAs)
-    - Unified Extensible Firmware Interface (UEFI)
-    - Advanced Configuration and Power Interface (ACPI)
-  - Supported (ARM Only)
-    - Embedded Base Boot Requirements (EBBR) subset of UEFI (typically provided by Das U-Boot)
-    - Devicetree (DT) binary
-    - Power State Configuration Interface (PSCI)
+  - Unified Extensible Firmware Interface (UEFI)
+    - [ARM64 Only] U-Boot UEFI is acceptable
+  - Advanced Configuration and Power Interface (ACPI) or Devicetree (DT)
+  - [ARM64 Only] Secure Monitor Calls (SMC)
+    - Power State Coordination Interface (PSCI)
 - Memory:
   - Recommended: >= 1 GiB
   - Required: 128 MiB
-- Storage: NVMe compatible storage medium with a capacity of 4 GiB or more
+- Storage:
+  - Recommended: >= 64 GiB
+  - Required: 4 GiB
+  - Device Types:
+    - Non-Volatile Memory Express (NVMe)
+    - USB Mass Storage Device Class
 - Output:
   - Display Adapter: Any adapter capable of providing framebuffers via the UEFI Graphics Output Protocol
   - Serial
