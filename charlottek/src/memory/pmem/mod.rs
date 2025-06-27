@@ -18,11 +18,12 @@ use crate::logln;
 pub type VAddr = <MemoryInterfaceImpl as MemoryInterface>::VAddr;
 
 lazy_static! {
-    pub static ref HHDM_BASE: VAddr = if let Some(response) = HHDM_REQUEST.get_response() {
-        return VAddr::from(response.offset() as usize);
-    } else {
-        panic!("Limine failed to provide a higher half direct mapping region.");
-    };
+    pub static ref HHDM_BASE: VAddr = VAddr::from(
+        HHDM_REQUEST
+            .get_response()
+            .expect("Limine failed to provide a higher half direct mapping region.")
+            .offset() as usize,
+    );
     pub static ref PHYSICAL_FRAME_ALLOCATOR: Mutex<PhysicalFrameAllocator> =
         Mutex::new(PhysicalFrameAllocator::from(
             MEMEORY_MAP_REQUEST
@@ -62,10 +63,11 @@ impl PhysicalFrameAllocator {
             unsafe {
                 curr_byte_ptr = self.bitmap_ptr.offset(byte_idx as isize);
                 if curr_byte_ptr.read() != 0xff {
-                    for bit_idx in 0..8 {
+                    for bit_idx in 0..7 {
                         if curr_byte_ptr.read() & (1 << bit_idx) == 0u8 {
                             //set the bit corresponding to the allocated frame
-                            *curr_byte_ptr |= 1 << bit_idx;
+                            curr_byte_ptr
+                                .write_volatile(curr_byte_ptr.read_volatile() | (1 << bit_idx));
                             let raw_addr = (byte_idx * 8 + bit_idx) * 4096;
                             return Ok(PAddr::try_from(raw_addr)?);
                         }
@@ -84,12 +86,11 @@ impl PhysicalFrameAllocator {
             let byte_idx = idx.0;
             let bit_idx = idx.1;
             unsafe {
-                let target_byte_ptr = self.bitmap_ptr.offset(byte_idx as isize);
-                if target_byte_ptr.read() & 1 << bit_idx == 0 {
+                if self.bitmap_ptr.offset(byte_idx as isize).read_volatile() & (1 << bit_idx) == 0 {
                     Err(Error::CannotDeallocateUnallocatedFrame)
                 } else {
                     // clear the bit corresponding to the frame being deallocated
-                    *target_byte_ptr &= !(1 << bit_idx);
+                    *self.bitmap_ptr.offset(byte_idx as isize) &= !(1 << bit_idx);
                     return Ok(());
                 }
             }
