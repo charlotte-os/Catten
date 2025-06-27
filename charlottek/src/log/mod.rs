@@ -8,45 +8,25 @@
 
 #[macro_export]
 macro_rules! log {
-    ($text:expr) => ({
-        if cfg!(target_arch = "x86_64") {
+    ($text:expr $(, $arg:tt)*) => ({
+/*         if cfg! (target_arch = "x86_64") {
             use core::fmt::Write;
-            use crate::drivers::uart::ns16550::LOG_PORT;
-            let _ = write!(LOG_PORT.lock(), $text);
-        }
-        <crate::framebuffer::console::Console as core::fmt::Write>::write_fmt(&mut crate::framebuffer::console::CONSOLE.lock(), format_args!($text)).unwrap();
-        crate::framebuffer::console::CONSOLE.lock().clear_inner_styling();
-    });
-    ($text:expr, $($arg:tt)*) => ({
-        if cfg!(target_arch = "x86_64") {
-            use core::fmt::Write;
-            use crate::drivers::uart::ns16550::LOG_PORT;
-            let _ = write!(LOG_PORT.lock(), $text, $($arg)*);
-        }
-        <crate::framebuffer::console::Console as core::fmt::Write>::write_fmt(&mut crate::framebuffer::console::CONSOLE.lock(), format_args!($text, $($arg)*)).unwrap();
-        crate::framebuffer::console::CONSOLE.lock().clear_inner_styling();
+            use crate::llk::drivers::uart::uart_16550::LOG_PORT;
+            let _ = write!(LOG_PORT.lock(), $text $(, $arg)*);
+        } */
+        use crate::print;
+        print!($text $(, $arg)*);
     })
 }
 #[macro_export]
 macro_rules! logln {
-    ($text:expr) => ({
-        if cfg!(target_arch = "x86_64") {
+    ($text:expr $(, $arg:tt)*) => ({
+/*         if cfg! (target_arch = "x86_64") {
             use core::fmt::Write;
-            use crate::drivers::uart::ns16550::LOG_PORT;
-            let _ = writeln!(LOG_PORT.lock(), $text);
-        }
-        <crate::framebuffer::console::Console as core::fmt::Write>::write_fmt(&mut crate::framebuffer::console::CONSOLE.lock(), format_args!($text)).unwrap();
-        crate::framebuffer::console::CONSOLE.lock().write_char('\n', None, None);
-        crate::framebuffer::console::CONSOLE.lock().clear_inner_styling();
-    });
-    ($text:expr, $($arg:tt)*) => ({
-        if cfg!(target_arch = "x86_64") {
-            use core::fmt::Write;
-            use crate::drivers::uart::ns16550::LOG_PORT;
-            let _ = writeln!(LOG_PORT.lock(), $text, $($arg)*);
-        }
-        <crate::framebuffer::console::Console as core::fmt::Write>::write_fmt(&mut crate::framebuffer::console::CONSOLE.lock(), format_args!($text, $($arg)*)).unwrap();
-        crate::framebuffer::console::CONSOLE.lock().write_char('\n', None, None);
-        crate::framebuffer::console::CONSOLE.lock().clear_inner_styling();
+            use crate::llk::drivers::uart::uart_16550::LOG_PORT;
+            let _ = writeln!(LOG_PORT.lock(), $text $(, $arg)*);
+        } */
+        use crate::println;
+        println!($text $(, $arg)*);
     })
 }

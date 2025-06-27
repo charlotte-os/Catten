@@ -58,7 +58,12 @@ impl Console {
     }
 
     /// Write a char to the console
-    pub fn write_char(&mut self, character: char, color: Option<u32>, background_color: Option<u32>) {
+    pub fn write_char(
+        &mut self,
+        character: char,
+        color: Option<u32>,
+        background_color: Option<u32>,
+    ) {
         // Write the character to the buffer
         match character {
             // Newline
@@ -173,7 +178,8 @@ impl Console {
     }
 }
 
-static INNER_STYLE_SETTINGS: TicketMutex<InnerPrintStyle> = TicketMutex::new(InnerPrintStyle::new());
+static INNER_STYLE_SETTINGS: TicketMutex<InnerPrintStyle> =
+    TicketMutex::new(InnerPrintStyle::new());
 
 /// Inner style settings for print macros
 struct InnerPrintStyle {
@@ -213,7 +219,8 @@ impl fmt::Write for Console {
             return Ok(());
         }
         if styling.setting_background_color {
-            styling.background_color = Some(u32::from_str_radix(string, 16).unwrap_or(Color::BLACK));
+            styling.background_color =
+                Some(u32::from_str_radix(string, 16).unwrap_or(Color::BLACK));
             styling.setting_background_color = false;
             return Ok(());
         }
@@ -245,23 +252,20 @@ impl fmt::Write for Console {
 #[macro_export]
 macro_rules! print {
     ($($arg:tt)*) => {
-            //use core::fmt::Write;
-            //crate::framebuffer::console::CONSOLE.lock().write_fmt(format_args!($($arg)*)).unwrap();
-            {
-                <crate::framebuffer::console::Console as core::fmt::Write>::write_fmt(&mut*(crate::framebuffer::console::CONSOLE.lock()), format_args!($($arg)*)).unwrap();
-                crate::framebuffer::console::CONSOLE.lock().clear_inner_styling();
-            }
+        use core::fmt::Write;
+        use crate::framebuffer::console::CONSOLE;
+        CONSOLE.lock().write_fmt(format_args!($($arg)*)).unwrap();
+        CONSOLE.lock().clear_inner_styling();
     }
 }
+
 #[macro_export]
 macro_rules! println {
     ($($arg:tt)*) => {
-            //use core::fmt::Write;
-            //crate::framebuffer::console::CONSOLE.lock().write_fmt(format_args!($($arg)*)).unwrap();
-        {
-            <crate::framebuffer::console::Console as core::fmt::Write>::write_fmt(&mut*(crate::framebuffer::console::CONSOLE.lock()), format_args!($($arg)*)).unwrap();
-            crate::framebuffer::console::CONSOLE.lock().write_char('\n', None, None);
-            crate::framebuffer::console::CONSOLE.lock().clear_inner_styling();
-        }
+        use core::fmt::Write;
+        use crate::framebuffer::console::CONSOLE;
+        CONSOLE.lock().write_fmt(format_args!($($arg)*)).unwrap();
+        CONSOLE.lock().write_char('\n', None, None);
+        CONSOLE.lock().clear_inner_styling();
     }
 }

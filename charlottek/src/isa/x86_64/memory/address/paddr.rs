@@ -3,7 +3,13 @@ use core::ops::Add;
 use crate::isa::interface::memory::address::{Address, PhysicalAddress, VirtualAddress};
 use crate::memory::pmem::HHDM_BASE;
 
+#[derive(Debug, Clone, Copy)]
+pub enum PAddrError {
+    OutOfCpuSupportedRange(usize),
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(transparent)]
 pub struct PAddr {
     addr: usize,
 }
@@ -26,7 +32,11 @@ impl Address for PAddr {
     }
 
     fn next_aligned_to(&self, alignment: usize) -> Self {
-        PAddr::from((self.addr + alignment - 1) & !(alignment - 1))
+        unsafe { PAddr::from_unchecked((self.addr + alignment - 1) & !(alignment - 1)) }
+    }
+
+    unsafe fn from_unchecked(addr: usize) -> Self {
+        PAddr { addr }
     }
 }
 
@@ -52,10 +62,14 @@ impl<T> Into<*mut T> for PAddr {
     }
 }
 
-impl From<usize> for PAddr {
-    fn from(value: usize) -> Self {
-        PAddr {
-            addr: value & *super::PADDR_MASK,
+impl TryFrom<usize> for PAddr {
+    type Error = PAddrError;
+
+    fn try_from(value: usize) -> Result<Self, PAddrError> {
+        if value & !*super::PADDR_MASK != 0 {
+            Err(PAddrError::OutOfCpuSupportedRange(value))
+        } else {
+            Ok(PAddr { addr: value })
         }
     }
 }
@@ -84,6 +98,6 @@ impl Add<isize> for PAddr {
     type Output = PAddr;
 
     fn add(self, rhs: isize) -> Self::Output {
-        PAddr::from(self.addr.wrapping_add(rhs as usize))
+        PAddr::try_from(self.addr.wrapping_add(rhs as usize)).unwrap()
     }
 }

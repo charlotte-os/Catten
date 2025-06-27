@@ -12,7 +12,8 @@ use crate::klib::raw_mutex::RawMutex;
 
 lazy_static! {
     pub static ref ALLOCATOR_SPAN: Mutex<Span> = Mutex::new(Span::empty());
-    pub static ref KERNEL_ALLOCATOR: Talck<RawMutex, ErrOnOom> = Talc::new(ErrOnOom).lock::<RawMutex>();
+    pub static ref KERNEL_ALLOCATOR: Talck<RawMutex, ErrOnOom> =
+        Talc::new(ErrOnOom).lock::<RawMutex>();
 }
 
 const KERNEL_HEAP_START: VAddr = unsafe { VAddr::from_raw_unchecked(0xffff800000000000) };
@@ -28,7 +29,8 @@ pub fn init_allocator() -> Result<(), ()> {
     );
 
     let mut address_space = AddressSpace::get_current();
-    for i in (VAddr::from_mut(kernel_heap_start)..VAddr::from_mut(kernel_heap_start.wrapping_add(kernel_heap_size)))
+    for i in (VAddr::from_mut(kernel_heap_start)
+        ..VAddr::from_mut(kernel_heap_start.wrapping_add(kernel_heap_size)))
         .step_by(PAGE_SIZE)
     {
         let frame = PHYSICAL_FRAME_ALLOCATOR
@@ -39,7 +41,7 @@ pub fn init_allocator() -> Result<(), ()> {
         address_space
             .map_page(MemoryMapping {
                 vaddr: i,
-                paddr: frame.into(),
+                paddr: frame,
                 page_type: crate::memory::vmem::PageType::KernelData,
             })
             .expect("Failed to map page for kernel heap");

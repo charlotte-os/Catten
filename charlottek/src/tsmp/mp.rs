@@ -22,7 +22,7 @@ pub fn start_secondary_lps() -> Result<(), MpControlError> {
         }
         let lps = res.cpus();
         for lp in lps {
-            logln!("Writing entrypoint address for LP{}", lp.id);
+            logln!("Writing entrypoint address for LP{}", (lp.id));
             lp.goto_address.write(ap_main);
         }
         Ok(())

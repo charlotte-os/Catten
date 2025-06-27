@@ -1,6 +1,6 @@
 use core::fmt::Debug;
 
-pub trait Address: Copy + Clone + Debug + PartialEq + Eq + PartialOrd + Ord + From<usize> + Into<usize> {
+pub trait Address: Copy + Clone + Debug + PartialEq + Eq + PartialOrd + Ord + Into<usize> {
     const MIN: Self;
     const MAX: Self;
     const NULL: Self;
@@ -9,6 +9,8 @@ pub trait Address: Copy + Clone + Debug + PartialEq + Eq + PartialOrd + Ord + Fr
     fn next_aligned_to(&self, alignment: usize) -> Self;
     fn is_valid(value: usize) -> bool;
     fn is_null(&self) -> bool;
+
+    unsafe fn from_unchecked(addr: usize) -> Self;
 }
 
 pub trait VirtualAddress: Address {

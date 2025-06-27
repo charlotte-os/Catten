@@ -50,7 +50,10 @@ impl AddressSpaceInterface for AddressSpace {
         &mut self,
         n_pages: usize,
         range: (VAddr, VAddr),
-    ) -> Result<<MemoryInterfaceImpl as MemoryInterface>::VAddr, <MemoryInterfaceImpl as MemoryInterface>::Error> {
+    ) -> Result<
+        <MemoryInterfaceImpl as MemoryInterface>::VAddr,
+        <MemoryInterfaceImpl as MemoryInterface>::Error,
+    > {
         let mut free_region_base = VAddr::from(range.0);
         let mut free_region_size = 0isize;
         for vaddr in (range.0..range.1).step_by(PAGE_SIZE) {
@@ -69,7 +72,10 @@ impl AddressSpaceInterface for AddressSpace {
         Err(<MemoryInterfaceImpl as MemoryInterface>::Error::NoRequestedVAddrRegionAvailable)
     }
 
-    fn map_page(&mut self, mapping: MemoryMapping) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error> {
+    fn map_page(
+        &mut self,
+        mapping: MemoryMapping,
+    ) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error> {
         let mut walker = pth_walker::PthWalker::new(self, mapping.vaddr);
         walker.map_page(
             mapping.paddr,
@@ -112,7 +118,7 @@ impl AddressSpaceInterface for AddressSpace {
     ) -> Result<super::address::paddr::PAddr, <MemoryInterfaceImpl as MemoryInterface>::Error> {
         let mut walker = pth_walker::PthWalker::new(self, vaddr);
         walker.walk()?;
-        let paddr = unsafe { (*(walker.pt_ptr))[vaddr.pt_index()].get_frame().into() };
+        let paddr = unsafe { (*(walker.pt_ptr))[vaddr.pt_index()].try_get_frame()?.into() };
         Ok(paddr)
     }
 }

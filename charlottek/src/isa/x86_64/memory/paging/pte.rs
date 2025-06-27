@@ -14,7 +14,7 @@ const ACCESSED_BIT_INDEX: u64 = 5;
 const DIRTY_BIT_INDEX: u64 = 6;
 const PAGE_SIZE_BIT_INDEX: u64 = 7; // only for PTEs pointing to a 2 MiB or 1 GiB page
 const GLOBAL_BIT_INDEX: u64 = 8;
-const FRAME_ADDR_MASK: u64 = 0xfffffffffffff000;
+lazy_static::lazy_static! {static ref FRAME_ADDR_MASK: u64 = 0xfffffffffffff000 & *super::super::address::PADDR_MASK as u64;}
 const EXECUTE_DISABLE_BIT_INDEX: u64 = 63;
 
 /// The page table entry structure
@@ -146,12 +146,13 @@ impl PageTableEntry {
         self
     }
 
-    pub fn get_frame(&self) -> PAddr {
-        PAddr::from((self.0 & FRAME_ADDR_MASK) as usize)
+    pub fn try_get_frame(&self) -> Result<PAddr, super::super::Error> {
+        Ok(PAddr::try_from((self.0 & *FRAME_ADDR_MASK) as usize)?)
     }
 
     pub fn set_frame(&mut self, frame: PAddr) -> &mut Self {
-        self.0 = (self.0 & !FRAME_ADDR_MASK) | ((<PAddr as Into<u64>>::into(frame)) & FRAME_ADDR_MASK);
+        self.0 =
+            (self.0 & !*FRAME_ADDR_MASK) | ((<PAddr as Into<u64>>::into(frame)) & *FRAME_ADDR_MASK);
         self
     }
 

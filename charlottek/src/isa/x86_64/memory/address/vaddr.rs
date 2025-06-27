@@ -77,6 +77,10 @@ impl Address for VAddr {
     fn is_null(&self) -> bool {
         self.raw == 0
     }
+
+    unsafe fn from_unchecked(addr: usize) -> Self {
+        VAddr { raw: addr }
+    }
 }
 
 impl VirtualAddress for VAddr {
@@ -145,7 +149,9 @@ impl Step for VAddr {
 
     fn forward_checked(start: Self, count: usize) -> Option<Self> {
         if start.raw.saturating_add(count) < usize::MAX {
-            Some(VAddr { raw: start.raw + count })
+            Some(VAddr {
+                raw: start.raw + count,
+            })
         } else {
             None
         }
@@ -153,7 +159,9 @@ impl Step for VAddr {
 
     fn backward_checked(start: Self, count: usize) -> Option<Self> {
         if start.raw.saturating_sub(count) > usize::MIN {
-            Some(VAddr { raw: start.raw - count })
+            Some(VAddr {
+                raw: start.raw - count,
+            })
         } else {
             None
         }

@@ -9,8 +9,9 @@ use spin::Mutex;
 
 use crate::environment::boot_protocol::limine::{HHDM_REQUEST, MEMEORY_MAP_REQUEST};
 pub use crate::isa::current_isa::memory::MemoryInterfaceImpl;
-pub use crate::isa::current_isa::memory::address::paddr::PAddr;
+pub use crate::isa::current_isa::memory::address::paddr::{PAddr, PAddrError};
 pub use crate::isa::interface::memory::MemoryInterface;
+use crate::isa::interface::memory::address::Address;
 pub use crate::isa::interface::memory::address::PhysicalAddress;
 use crate::logln;
 
@@ -22,20 +23,28 @@ lazy_static! {
     } else {
         panic!("Limine failed to provide a higher half direct mapping region.");
     };
-    pub static ref PHYSICAL_FRAME_ALLOCATOR: Mutex<PhysicalFrameAllocator> = Mutex::new(PhysicalFrameAllocator::from(
-        MEMEORY_MAP_REQUEST
-            .get_response()
-            .expect("Limine failed to provide a memory map.")
-    ));
+    pub static ref PHYSICAL_FRAME_ALLOCATOR: Mutex<PhysicalFrameAllocator> =
+        Mutex::new(PhysicalFrameAllocator::from(
+            MEMEORY_MAP_REQUEST
+                .get_response()
+                .expect("Limine failed to provide a memory map.")
+        ));
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum Error {
     UnableToAllocateTrackingStructure,
     MisalignedPhysicalAddress,
     OutOfFrames,
     InvalidPAddr,
     CannotDeallocateUnallocatedFrame,
+    PAddrError(PAddrError),
+}
+
+impl From<PAddrError> for Error {
+    fn from(err: PAddrError) -> Self {
+        Error::PAddrError(err)
+    }
 }
 
 #[derive(Debug)]
@@ -57,7 +66,8 @@ impl PhysicalFrameAllocator {
                         if curr_byte_ptr.read() & (1 << bit_idx) == 0u8 {
                             //set the bit corresponding to the allocated frame
                             *curr_byte_ptr |= 1 << bit_idx;
-                            return Ok(PAddr::from((byte_idx * 8 + bit_idx) * 4096));
+                            let raw_addr = (byte_idx * 8 + bit_idx) * 4096;
+                            return Ok(PAddr::try_from(raw_addr)?);
                         }
                     }
                 }
@@ -98,7 +108,10 @@ impl From<&MemoryMapResponse> for PhysicalFrameAllocator {
         logln!("PhysicalFrameAllocator bitmap size: {:?}", bitmap_size);
         logln!("Finding best fit memory location for the PhysicalFrameAllocator bitmap...");
         let bitmap_addr: PAddr = find_mmap_best_fit(response, bitmap_size).unwrap();
-        logln!("PhysicalFrameAllocator bitmap addr (physical): {:?}", bitmap_addr);
+        logln!(
+            "PhysicalFrameAllocator bitmap addr (physical): {:?}",
+            bitmap_addr
+        );
         let pfa = PhysicalFrameAllocator {
             bitmap_ptr: unsafe { bitmap_addr.into_hhdm_mut::<u8>() },
             bitmap_len: bitmap_size,
@@ -125,12 +138,12 @@ impl From<&MemoryMapResponse> for PhysicalFrameAllocator {
 }
 
 fn compute_bitmap_size(mmap: &MemoryMapResponse) -> usize {
-    let mut highest_address: PAddr = PAddr::from(0usize);
+    let mut highest_address: PAddr = unsafe { PAddr::from_unchecked(0usize) };
     // Find the highest address in the memory map.
     for entry in mmap.entries().iter() {
         let entry_end = entry.base + entry.length;
         if entry_end > <PAddr as Into<usize>>::into(highest_address) as u64 {
-            highest_address = PAddr::from(entry_end as usize);
+            highest_address = unsafe { PAddr::from_unchecked(entry_end as usize) };
         }
     }
 
@@ -140,16 +153,16 @@ fn compute_bitmap_size(mmap: &MemoryMapResponse) -> usize {
 // Helper functions
 
 fn find_mmap_best_fit(mmap: &MemoryMapResponse, size: usize) -> Result<PAddr, Error> {
-    let mut best_fit = PAddr::from(0usize);
+    let mut best_fit = PAddr::try_from(0usize)?;
     let mut best_fit_size = 0;
     for entry in mmap.entries().iter() {
         let entry_size = entry.length;
         if entry_size >= size as u64 && (best_fit_size == 0 || entry_size < best_fit_size) {
-            best_fit = PAddr::from(entry.base as usize);
+            best_fit = PAddr::try_from(entry.base as usize)?;
             best_fit_size = entry_size;
         }
     }
-    if best_fit == PAddr::from(0usize) {
+    if best_fit == PAddr::try_from(0usize)? {
         Err(Error::UnableToAllocateTrackingStructure)
     } else {
         Ok(best_fit)
@@ -161,7 +174,7 @@ fn addr_to_bitmap_index(addr: PAddr) -> Result<(usize, usize), Error> {
         return Err(Error::MisalignedPhysicalAddress);
     }
 
-    let bit_index = <PAddr as Into<usize>>::into(addr) / 4096;
+    let bit_index = <PAddr as Into<usize>>::into(addr) >> 12; // divide by 4096
 
     let byte_index = bit_index / 8;
     let bit_offset = bit_index % 8;
@@ -176,7 +189,8 @@ fn init_bitmap_from_mmap(bitmap_ptr: *mut u8, mmap: &MemoryMapResponse) {
             let end = entry.base + entry.length;
             for i in (start..end).step_by(4096) {
                 //logln!("Marking frame at physical address {:?} as available...", i);
-                let (byte_index, bit_offset) = addr_to_bitmap_index(PAddr::from(i as usize)).unwrap();
+                let (byte_index, bit_offset) =
+                    addr_to_bitmap_index(PAddr::try_from(i as usize).unwrap()).unwrap();
                 unsafe {
                     *(bitmap_ptr.offset(byte_index as isize)) &= !(1 << bit_offset);
                 }
@@ -193,8 +207,8 @@ fn mark_pfa_bitmap_unusable(bitmap_ptr: *mut u8, base: PAddr, length: usize) {
     };
 
     for i in 0..n_pages {
-        let pfa_index =
-            addr_to_bitmap_index(base + (i * 4096) as isize).expect("Failed to convert PAddr to bitmap index.");
+        let pfa_index = addr_to_bitmap_index(base + (i * 4096) as isize)
+            .expect("Failed to convert PAddr to bitmap index.");
         unsafe {
             *(bitmap_ptr.offset(pfa_index.0 as isize)) |= 1 << pfa_index.1;
         }

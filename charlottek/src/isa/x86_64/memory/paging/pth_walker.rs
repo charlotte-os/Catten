@@ -40,35 +40,39 @@ impl<'vas> PthWalker<'vas> {
         }
     }
 
-    pub fn walk(&mut self) -> Result<(), <super::MemoryInterfaceImpl as super::MemoryInterface>::Error> {
-        self.pml4_ptr = PAddr::from((self.address_space.cr3 & CR3_ADDRESS_MASK) as usize).into();
+    pub fn walk(
+        &mut self,
+    ) -> Result<(), <super::MemoryInterfaceImpl as super::MemoryInterface>::Error> {
+        self.pml4_ptr = PAddr::try_from((self.address_space.cr3 & CR3_ADDRESS_MASK) as usize)
+            .unwrap()
+            .into();
         self.pdpt_ptr = unsafe {
             let pml4e = &mut (*self.pml4_ptr)[self.vaddr.pml4_index()];
             if !pml4e.is_present() {
                 return Err(<super::MemoryInterfaceImpl as MemoryInterface>::Error::Unmapped);
             }
-            pml4e.get_frame().into()
+            pml4e.try_get_frame().unwrap().into()
         };
         self.pd_ptr = unsafe {
             let pdpte = &mut (*self.pdpt_ptr)[self.vaddr.pdpt_index()];
             if !pdpte.is_present() {
                 return Err(<super::MemoryInterfaceImpl as MemoryInterface>::Error::Unmapped);
             }
-            pdpte.get_frame().into()
+            pdpte.try_get_frame().unwrap().into()
         };
         self.pt_ptr = unsafe {
             let pde = &mut (*self.pd_ptr)[self.vaddr.pd_index()];
             if !pde.is_present() {
                 return Err(<super::MemoryInterfaceImpl as MemoryInterface>::Error::Unmapped);
             }
-            pde.get_frame().into()
+            pde.try_get_frame().unwrap().into()
         };
         self.page_frame_ptr = unsafe {
             let pte = &mut (*self.pt_ptr)[self.vaddr.pt_index()];
             if !pte.is_present() {
                 return Err(<super::MemoryInterfaceImpl as MemoryInterface>::Error::Unmapped);
             }
-            pte.get_frame().into()
+            pte.try_get_frame().unwrap().into()
         };
 
         Ok(())
@@ -89,18 +93,24 @@ impl<'vas> PthWalker<'vas> {
                     // table as they are all required to map the kernel and
                     // higher half memory.
                     if self.address_space.cr3 & CR3_ADDRESS_MASK == 0 {
-                        let new_pml4 = PHYSICAL_FRAME_ALLOCATOR.lock().allocate_frame()?;
-                        self.address_space.cr3 = <PAddr as Into<u64>>::into(new_pml4) & CR3_ADDRESS_MASK;
-                        self.address_space.load().expect("Error reloading the CR3 register");
+                        let new_pml4 = PHYSICAL_FRAME_ALLOCATOR.lock().allocate_frame().unwrap();
+                        self.address_space.cr3 =
+                            <PAddr as Into<u64>>::into(new_pml4) & CR3_ADDRESS_MASK;
+                        self.address_space
+                            .load()
+                            .expect("Error reloading the CR3 register");
                     }
-                    self.pml4_ptr = PAddr::from((self.address_space.cr3 & CR3_ADDRESS_MASK) as usize).into();
+                    self.pml4_ptr =
+                        PAddr::try_from((self.address_space.cr3 & CR3_ADDRESS_MASK) as usize)
+                            .unwrap()
+                            .into();
                     unsafe {
                         core::ptr::write_bytes(self.pml4_ptr, 0, PAGE_SIZE);
                     }
                 }
                 if self.pdpt_ptr.is_null() {
                     // Allocate a new page table for the PDPT
-                    let new_pdpt = PHYSICAL_FRAME_ALLOCATOR.lock().allocate_frame()?;
+                    let new_pdpt = PHYSICAL_FRAME_ALLOCATOR.lock().allocate_frame().unwrap();
                     unsafe {
                         (*self.pml4_ptr)[self.vaddr.pml4_index()]
                             .set_frame(new_pdpt)
@@ -116,7 +126,7 @@ impl<'vas> PthWalker<'vas> {
                 }
                 if self.pd_ptr.is_null() {
                     // Allocate a new page table for the PD
-                    let new_pd = PHYSICAL_FRAME_ALLOCATOR.lock().allocate_frame()?;
+                    let new_pd = PHYSICAL_FRAME_ALLOCATOR.lock().allocate_frame().unwrap();
                     unsafe {
                         (*self.pdpt_ptr)[self.vaddr.pdpt_index()]
                             .set_frame(new_pd)
@@ -132,7 +142,7 @@ impl<'vas> PthWalker<'vas> {
                 }
                 if self.pt_ptr.is_null() {
                     // Allocate a new page table for the PT
-                    let new_pt = PHYSICAL_FRAME_ALLOCATOR.lock().allocate_frame()?;
+                    let new_pt = PHYSICAL_FRAME_ALLOCATOR.lock().allocate_frame().unwrap();
                     unsafe {
                         (*self.pd_ptr)[self.vaddr.pd_index()]
                             .set_frame(new_pt)
@@ -156,7 +166,9 @@ impl<'vas> PthWalker<'vas> {
                         .set_execute_disabled(no_execute);
                     core::ptr::write_bytes(<PAddr as Into<*mut u8>>::into(frame), 0, PAGE_SIZE);
                 }
-                self.address_space.load().expect("Failed to reload the address space");
+                self.address_space
+                    .load()
+                    .expect("Failed to reload the address space");
                 unsafe {
                     core::arch::asm!("invlpg [{}]", in(reg) self.vaddr.into_ptr::<u8>());
                 }
@@ -167,20 +179,25 @@ impl<'vas> PthWalker<'vas> {
         }
     }
 
-    pub fn unmap_page(&mut self) -> Result<MemoryMapping, <super::MemoryInterfaceImpl as MemoryInterface>::Error> {
+    pub fn unmap_page(
+        &mut self,
+    ) -> Result<MemoryMapping, <super::MemoryInterfaceImpl as MemoryInterface>::Error> {
         match self.walk() {
             Ok(_) => {
                 unsafe {
                     let mapping = MemoryMapping {
                         vaddr: self.vaddr,
-                        paddr: (*self.pt_ptr)[self.vaddr.pt_index()].get_frame(),
+                        paddr: (*self.pt_ptr)[self.vaddr.pt_index()]
+                            .try_get_frame()
+                            .unwrap(),
                         page_type: PageType::try_new(
                             (*self.pt_ptr)[self.vaddr.pt_index()].is_writable(),
                             (*self.pt_ptr)[self.vaddr.pt_index()].is_user_accessible(),
                             (*self.pt_ptr)[self.vaddr.pt_index()].is_execute_disabled(),
                             (*self.pt_ptr)[self.vaddr.pt_index()].is_uncached(),
                             (*self.pt_ptr)[self.vaddr.pt_index()].is_write_combining(),
-                        )?,
+                        )
+                        .unwrap(),
                     };
                     let pte = addr_of_mut!((*self.pt_ptr)[self.vaddr.pt_index()]);
                     if (*pte).is_present() {
@@ -192,19 +209,28 @@ impl<'vas> PthWalker<'vas> {
 
                     let pde = addr_of_mut!((*self.pd_ptr)[self.vaddr.pd_index()]);
                     if is_pagetable_unused(self.pt_ptr) {
-                        PHYSICAL_FRAME_ALLOCATOR.lock().deallocate_frame((*pde).get_frame())?;
+                        PHYSICAL_FRAME_ALLOCATOR
+                            .lock()
+                            .deallocate_frame((*pde).try_get_frame().unwrap())
+                            .unwrap();
                         (*pde).set_present(false);
                     }
 
                     let pdpte = addr_of_mut!((*self.pdpt_ptr)[self.vaddr.pdpt_index()]);
                     if is_pagetable_unused(self.pd_ptr) {
-                        PHYSICAL_FRAME_ALLOCATOR.lock().deallocate_frame((*pdpte).get_frame())?;
+                        PHYSICAL_FRAME_ALLOCATOR
+                            .lock()
+                            .deallocate_frame((*pdpte).try_get_frame().unwrap())
+                            .unwrap();
                         (*pdpte).set_present(false);
                     }
 
                     let pml4e = addr_of_mut!((*self.pml4_ptr)[self.vaddr.pml4_index()]);
                     if is_pagetable_unused(self.pdpt_ptr) {
-                        PHYSICAL_FRAME_ALLOCATOR.lock().deallocate_frame((*pml4e).get_frame())?;
+                        PHYSICAL_FRAME_ALLOCATOR
+                            .lock()
+                            .deallocate_frame((*pml4e).try_get_frame().unwrap())
+                            .unwrap();
                         (*pml4e).set_present(false);
                     }
                     return Ok(mapping);
