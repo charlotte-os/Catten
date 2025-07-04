@@ -21,13 +21,9 @@ charlottek is still in early development, and core subsystems are actively being
 - Processor:
   - x86_64 (Primary ISA)
     - x2APIC LAPIC operating mode
-  - ARM64 (Best Efforts Basis)
 - Firmware:
   - Unified Extensible Firmware Interface (UEFI)
-    - [ARM64 Only] U-Boot UEFI is acceptable
-  - Advanced Configuration and Power Interface (ACPI) or Devicetree (DT)
-  - [ARM64 Only] Secure Monitor Calls (SMC)
-    - Power State Coordination Interface (PSCI)
+  - Advanced Configuration and Power Interface (ACPI)
 - Memory:
   - Recommended: >= 1 GiB
   - Required: 128 MiB
@@ -41,7 +37,6 @@ charlottek is still in early development, and core subsystems are actively being
   - Display Adapter: Any adapter capable of providing framebuffers via the UEFI Graphics Output Protocol
   - Serial
     - NS16550 compatible UART
-    - PL011 compatible UART
     - USB CDC ACM (Virtual UART)
 - Input:
   - Keyboard
@@ -49,7 +44,6 @@ charlottek is still in early development, and core subsystems are actively being
     - USB HID
   - Serial
     - NS16550 compatible UART
-    - PL011 compatible UART
     - USB CDC ACM (Virtual UART)
 - Networking:
   - USB CDC Network Control Model
