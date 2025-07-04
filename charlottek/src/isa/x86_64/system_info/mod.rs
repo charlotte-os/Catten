@@ -38,7 +38,11 @@ pub struct ModelString([u8; 48]);
 
 impl Display for ModelString {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", core::str::from_utf8(&self.0).expect("<Invalid Model String>"))
+        write!(
+            f,
+            "{}",
+            core::str::from_utf8(&self.0).expect("<Invalid Model String>")
+        )
     }
 }
 

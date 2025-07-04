@@ -58,7 +58,10 @@ impl<T: Debug> Vec<T> {
                 core::ptr::copy_nonoverlapping(self.data, new_arr, self.len);
                 KERNEL_ALLOCATOR.deallocate(
                     transmute(self.data),
-                    Layout::from_size_align(core::mem::size_of::<T>() * self.cap, core::mem::align_of::<T>())?,
+                    Layout::from_size_align(
+                        core::mem::size_of::<T>() * self.cap,
+                        core::mem::align_of::<T>(),
+                    )?,
                 );
             }
         }
@@ -137,7 +140,10 @@ impl<T: Clone + Debug> IntoIterator for Vec<T> {
     type Item = T;
 
     fn into_iter(self) -> Self::IntoIter {
-        VecIter { vec: &self, index: 0 }
+        VecIter {
+            vec: &self,
+            index: 0,
+        }
     }
 }
 
@@ -150,7 +156,11 @@ impl<T: Debug> Drop for Vec<T> {
                 }
                 KERNEL_ALLOCATOR.deallocate(
                     transmute(self.data),
-                    Layout::from_size_align(core::mem::size_of::<T>() * self.cap, core::mem::align_of::<T>()).unwrap(),
+                    Layout::from_size_align(
+                        core::mem::size_of::<T>() * self.cap,
+                        core::mem::align_of::<T>(),
+                    )
+                    .unwrap(),
                 );
             }
         }

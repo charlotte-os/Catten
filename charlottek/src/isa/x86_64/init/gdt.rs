@@ -89,7 +89,14 @@ impl Gdt {
         self.tss_desc.high = high;
     }
 
-    fn set_segment_desc(&mut self, index: usize, base: u32, limit: u32, access_byte: u8, flags: u8) {
+    fn set_segment_desc(
+        &mut self,
+        index: usize,
+        base: u32,
+        limit: u32,
+        access_byte: u8,
+        flags: u8,
+    ) {
         let dest_sd = &mut (self.segment_descs[index]);
 
         dest_sd.limit0 = (limit & 0xffff) as u16;

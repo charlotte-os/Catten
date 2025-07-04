@@ -1,8 +1,8 @@
+use crate::environment::boot_protocol::limine::MP;
 use crate::isa::current_isa::init::IsaInitializer;
 use crate::isa::interface::init::InitInterface;
 use crate::logln;
 use crate::memory::pmem::*;
-use crate::environment::boot_protocol::limine::MP;
 
 pub fn kernel_init() {
     logln!("Performing ISA specific initialization...");

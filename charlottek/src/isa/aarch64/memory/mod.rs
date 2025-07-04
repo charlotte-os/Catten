@@ -35,7 +35,10 @@ impl AddressSpaceInterface for AddressSpace {
             asm!("mrs {}, ttbr0_el1", out(reg) ttbr0_el1);
             asm!("mrs {}, ttbr1_el1", out(reg) ttbr1_el1);
         }
-        AddressSpace { ttbr0_el1, ttbr1_el1 }
+        AddressSpace {
+            ttbr0_el1,
+            ttbr1_el1,
+        }
     }
 
     fn load(&self) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error> {
@@ -53,12 +56,18 @@ impl AddressSpaceInterface for AddressSpace {
             <MemoryInterfaceImpl as MemoryInterface>::VAddr,
             <MemoryInterfaceImpl as MemoryInterface>::VAddr,
         ),
-    ) -> Result<<MemoryInterfaceImpl as MemoryInterface>::VAddr, <MemoryInterfaceImpl as MemoryInterface>::Error> {
+    ) -> Result<
+        <MemoryInterfaceImpl as MemoryInterface>::VAddr,
+        <MemoryInterfaceImpl as MemoryInterface>::Error,
+    > {
         // Use n_pages and range to implement the logic
         todo!()
     }
 
-    fn map_page(&mut self, mapping: MemoryMapping) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error> {
+    fn map_page(
+        &mut self,
+        mapping: MemoryMapping,
+    ) -> Result<(), <MemoryInterfaceImpl as MemoryInterface>::Error> {
         todo!()
     }
 
@@ -76,7 +85,10 @@ impl AddressSpaceInterface for AddressSpace {
         todo!()
     }
 
-    fn translate_address(&mut self, vaddr: VAddr) -> Result<PAddr, <MemoryInterfaceImpl as MemoryInterface>::Error> {
+    fn translate_address(
+        &mut self,
+        vaddr: VAddr,
+    ) -> Result<PAddr, <MemoryInterfaceImpl as MemoryInterface>::Error> {
         todo!("Implement the address translation logic for AArch64")
     }
 }

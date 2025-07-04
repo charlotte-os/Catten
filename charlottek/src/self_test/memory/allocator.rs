@@ -10,7 +10,10 @@ pub fn test_allocator() {
         .allocate(Layout::from_size_align(1050, 64).unwrap())
         .unwrap()
         .as_non_null_ptr();
-    logln!("Kernel allocator self-test: Allocated 1024 bytes at {:p}", ptr);
+    logln!(
+        "Kernel allocator self-test: Allocated 1024 bytes at {:p}",
+        ptr
+    );
     logln!("Kernel allocator self-test: Writing to allocated memory...");
     for i in 0..1050 {
         unsafe {

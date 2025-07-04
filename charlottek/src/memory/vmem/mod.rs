@@ -54,7 +54,9 @@ impl PageType {
 
     pub fn is_writable(&self) -> bool {
         match *self {
-            PageType::KernelData | PageType::UserData | PageType::Mmio | PageType::Framebuffer => true,
+            PageType::KernelData | PageType::UserData | PageType::Mmio | PageType::Framebuffer => {
+                true
+            }
             _ => false,
         }
     }
@@ -74,7 +76,11 @@ impl PageType {
     }
 
     pub fn should_combine_writes(&self) -> bool {
-        if *self == PageType::Framebuffer { true } else { false }
+        if *self == PageType::Framebuffer {
+            true
+        } else {
+            false
+        }
     }
 }
 

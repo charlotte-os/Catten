@@ -109,5 +109,7 @@ impl Idtr {
 
 #[inline(always)]
 unsafe fn asm_load_idt(idtr: *const Idtr) {
-    unsafe { asm!("lidt [rdi]", in("rdi") idtr); }
+    unsafe {
+        asm!("lidt [rdi]", in("rdi") idtr);
+    }
 }
