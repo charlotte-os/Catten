@@ -1,6 +1,7 @@
 #![no_std]
 #![no_main]
 #![feature(allocator_api)]
+#![feature(iter_advance_by)]
 #![feature(likely_unlikely)]
 #![feature(ptr_as_ref_unchecked)]
 #![feature(slice_ptr_get)]

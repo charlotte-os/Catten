@@ -7,6 +7,7 @@ use core::iter::Iterator;
 use super::MemoryInterfaceImpl;
 use super::address::vaddr::VAddr;
 use crate::isa::interface::memory::{AddressSpaceInterface, MemoryInterface, MemoryMapping};
+use crate::logln;
 
 pub const PAGE_SIZE: usize = 4096;
 pub const N_PAGE_TABLE_ENTRIES: usize = 512;
@@ -54,18 +55,32 @@ impl AddressSpaceInterface for AddressSpace {
         <MemoryInterfaceImpl as MemoryInterface>::VAddr,
         <MemoryInterfaceImpl as MemoryInterface>::Error,
     > {
-        let mut free_region_base = VAddr::from(range.0);
-        let mut free_region_size = 0isize;
-        for vaddr in (range.0..range.1).step_by(PAGE_SIZE) {
-            if ((range.1 - vaddr) as usize) < n_pages * PAGE_SIZE {
-                return Err(<MemoryInterfaceImpl as MemoryInterface>::Error::NoRequestedVAddrRegionAvailable);
-            } else if *&self.is_mapped(vaddr)? == false {
-                free_region_base = vaddr + PAGE_SIZE as isize;
-                free_region_size = 0;
-            } else {
-                free_region_size += PAGE_SIZE as isize;
-                if free_region_size == n_pages as isize * PAGE_SIZE as isize {
-                    return Ok(free_region_base);
+        logln!(
+            "Finding free region of {} pages in range {:?}...",
+            n_pages,
+            range
+        );
+        let mut page_iter = (range.0..range.1).step_by(PAGE_SIZE);
+        while let Some(base) = page_iter.next() {
+            logln!("Checking base address: {:?}", base);
+            for nth_page in 0..n_pages {
+                let curr_page = base + ((nth_page * PAGE_SIZE) as isize);
+                logln!("Checking page: {:?}", curr_page);
+                if range.1 - curr_page < (n_pages * PAGE_SIZE) as isize {
+                    return Err(<MemoryInterfaceImpl as MemoryInterface>::Error::NoRequestedVAddrRegionAvailable);
+                }
+                if self.is_mapped(curr_page)? {
+                    match page_iter.advance_by(nth_page) {
+                        Ok(_) => {
+                            logln!("Page {:?} is already mapped, skipping to next base address.", curr_page);
+                            break;
+                        }
+                        Err(_) => return Err(<MemoryInterfaceImpl as MemoryInterface>::Error::NoRequestedVAddrRegionAvailable),
+                    }
+                }
+                if nth_page == n_pages - 1 {
+                    logln!("Found free region starting at: {:?}", base);
+                    return Ok(base);
                 }
             }
         }

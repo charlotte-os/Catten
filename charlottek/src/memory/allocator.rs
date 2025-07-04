@@ -4,9 +4,11 @@ use talc::{ErrOnOom, Span, Talc, Talck};
 
 use super::pmem::PHYSICAL_FRAME_ALLOCATOR;
 use super::vmem::{MemoryMapping, VAddr};
+use crate::isa::current_isa::memory::MemoryInterfaceImpl;
 use crate::isa::current_isa::memory::paging::AddressSpace;
-use crate::isa::interface::memory::AddressSpaceInterface;
 use crate::isa::interface::memory::address::VirtualAddress;
+use crate::isa::interface::memory::{AddressSpaceInterface, MemoryInterface};
+use crate::isa::x86_64::memory::address::VADDR_SIG_BITS;
 use crate::isa::x86_64::memory::paging::PAGE_SIZE;
 use crate::klib::raw_mutex::RawMutex;
 
@@ -14,24 +16,25 @@ lazy_static! {
     pub static ref ALLOCATOR_SPAN: Mutex<Span> = Mutex::new(Span::empty());
     pub static ref KERNEL_ALLOCATOR: Talck<RawMutex, ErrOnOom> =
         Talc::new(ErrOnOom).lock::<RawMutex>();
+    static ref HIGHER_HALF_START: VAddr = VAddr::from(0xffff_ffff_8000_0000); // 64-bit higher half start address
+    static ref HIGHER_HALF_END: VAddr = VAddr::from(0xffff_ffff_ffff_ffff); // 64-bit higher half end address
 }
 
-const KERNEL_HEAP_START: VAddr = unsafe { VAddr::from_raw_unchecked(0xffff800000000000) };
-const KERNEL_HEAP_SIZE: usize = 64 * 1024 * PAGE_SIZE; // 64MiB
+const KERNEL_HEAP_N_PAGES: usize = 10; // 4 MiB kernel heap size
 
 pub fn init_allocator() -> Result<(), ()> {
-    let kernel_heap_start = KERNEL_HEAP_START.into_mut();
-    let kernel_heap_size = KERNEL_HEAP_SIZE;
+    let kernel_heap_start = <MemoryInterfaceImpl as MemoryInterface>::AddressSpace::get_current()
+        .find_free_region(KERNEL_HEAP_N_PAGES, (*HIGHER_HALF_START, *HIGHER_HALF_END))
+        .expect("Failed to find free region for kernel heap");
+    let kernel_heap_size = KERNEL_HEAP_N_PAGES * PAGE_SIZE;
 
     let kernel_heap_span = Span::new(
-        kernel_heap_start,
-        (KERNEL_HEAP_START + kernel_heap_size as isize).into_mut(),
+        kernel_heap_start.into_mut(),
+        (kernel_heap_start + kernel_heap_size as isize).into_mut(),
     );
 
     let mut address_space = AddressSpace::get_current();
-    for i in (VAddr::from_mut(kernel_heap_start)
-        ..VAddr::from_mut(kernel_heap_start.wrapping_add(kernel_heap_size)))
-        .step_by(PAGE_SIZE)
+    for i in (kernel_heap_start..(kernel_heap_start + kernel_heap_size as isize)).step_by(PAGE_SIZE)
     {
         let frame = PHYSICAL_FRAME_ALLOCATOR
             .lock()
