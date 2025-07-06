@@ -3,6 +3,7 @@
 #![feature(allocator_api)]
 #![feature(iter_advance_by)]
 #![feature(likely_unlikely)]
+#![feature(naked_functions)]
 #![feature(ptr_as_ref_unchecked)]
 #![feature(slice_ptr_get)]
 #![feature(step_trait)]
@@ -20,6 +21,8 @@
 //! developed as a component of CharlotteOS, it is designed to be modular and flexible, and thus
 //! useful in other operating systems, embedded firmware, and other types of software distributions
 //! as well.
+
+extern crate alloc;
 
 pub mod drivers;
 pub mod environment;

@@ -1,3 +1,5 @@
+use core::mem::MaybeUninit;
+
 use lazy_static::lazy_static;
 use spin::Mutex;
 use talc::{ErrOnOom, Span, Talc, Talck};
@@ -14,13 +16,14 @@ use crate::klib::raw_mutex::RawMutex;
 
 lazy_static! {
     pub static ref ALLOCATOR_SPAN: Mutex<Span> = Mutex::new(Span::empty());
-    pub static ref KERNEL_ALLOCATOR: Talck<RawMutex, ErrOnOom> =
-        Talc::new(ErrOnOom).lock::<RawMutex>();
     static ref HIGHER_HALF_START: VAddr = VAddr::from(0xffff_ffff_8000_0000); // 64-bit higher half start address
     static ref HIGHER_HALF_END: VAddr = VAddr::from(0xffff_ffff_ffff_ffff); // 64-bit higher half end address
 }
 
-const KERNEL_HEAP_N_PAGES: usize = 10; // 4 MiB kernel heap size
+#[global_allocator]
+pub static mut KERNEL_ALLOCATOR: Talck<RawMutex, ErrOnOom> = Talc::new(ErrOnOom).lock::<RawMutex>();
+
+const KERNEL_HEAP_N_PAGES: usize = 1024; // 4 MiB kernel heap size
 
 pub fn init_allocator() -> Result<(), ()> {
     let kernel_heap_start = <MemoryInterfaceImpl as MemoryInterface>::AddressSpace::get_current()
@@ -52,7 +55,7 @@ pub fn init_allocator() -> Result<(), ()> {
 
     match unsafe { KERNEL_ALLOCATOR.lock().claim(kernel_heap_span) } {
         Ok(alloc_span) => {
-            *ALLOCATOR_SPAN.lock() = alloc_span;
+            *ALLOCATOR_SPAN.lock() = kernel_heap_span;
             Ok(())
         }
         Err(_) => Err(()),

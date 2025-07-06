@@ -8,4 +8,3 @@
 pub mod bitwise;
 pub mod io;
 pub mod raw_mutex;
-pub mod vector;
