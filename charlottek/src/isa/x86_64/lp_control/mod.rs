@@ -8,6 +8,8 @@ pub struct LpControl;
 
 impl LpControlIfce for LpControl {
     type Error = Error;
+    // The logical processor ID is a 32-bit value on x86_64, representing the xAPIC ID in x2APIC
+    // mode.
     type LpId = u32;
     type LpState = LpState;
 
@@ -45,15 +47,15 @@ impl LpControlIfce for LpControl {
         }
         lp_id
     }
+
     #[unsafe(naked)]
     extern "C" fn save_lp_state() -> Result<(), Self::Error> {
-        naked_asm!(
-            ""
-        )
+        naked_asm!("")
     }
+
     #[unsafe(naked)]
     extern "C" fn load_lp_state() -> Result<(), Self::Error> {
-        todo!("Implement context loading");
+        naked_asm!("")
     }
 }
 
