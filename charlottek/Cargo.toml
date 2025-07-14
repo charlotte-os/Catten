@@ -24,8 +24,8 @@ talc = {version = ">=4.4.2"}
 debug = "full"
 debug-assertions = true
 panic = "abort"
-lto = false
-opt-level = 0
+lto = true
+opt-level = 3
 
 [profile.release]
 debug = "none"
