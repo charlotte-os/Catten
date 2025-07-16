@@ -2,7 +2,6 @@
 use core::mem::MaybeUninit;
 
 use limine::mp::Cpu;
-
 use spin::{Lazy, RwLock};
 
 use crate::environment::boot_protocol::limine::MP;

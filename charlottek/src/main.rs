@@ -3,11 +3,9 @@
 #![feature(allocator_api)]
 #![feature(iter_advance_by)]
 #![feature(likely_unlikely)]
-#![feature(naked_functions)]
 #![feature(ptr_as_ref_unchecked)]
 #![feature(slice_ptr_get)]
 #![feature(step_trait)]
-#![feature(sync_unsafe_cell)]
 #![allow(static_mut_refs)]
 
 //! # charlottek

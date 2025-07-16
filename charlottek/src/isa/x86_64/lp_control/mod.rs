@@ -1,6 +1,11 @@
+use alloc::boxed::Box;
+use alloc::collections::btree_map::BTreeMap;
+use alloc::collections::vec_deque::VecDeque;
 use core::arch::{asm, naked_asm};
 
 use crate::isa::interface::lp_control::LpControlIfce;
+
+static mut TEMP_STATE: BTreeMap<<LpControl as LpControlIfce>::LpId, LpState> = BTreeMap::new();
 
 pub enum Error {}
 
@@ -48,21 +53,39 @@ impl LpControlIfce for LpControl {
         }
         lp_id
     }
-
-    #[unsafe(naked)]
-    extern "C" fn save_lp_state() -> Result<(), Self::Error> {
-        unsafe { naked_asm!("") }
+    #[inline(always)]
+    fn save_lp_state() -> Box<LpState> {
+        unsafe {
+            asm_save_lp_state();
+            let lp_state = Box::new(temp_lp_state);
+            temp_lp_state_me = 1; // Indicate that the state has been saved.
+            lp_state
+        }
     }
 
-    #[unsafe(naked)]
-    extern "C" fn load_lp_state() -> Result<(), Self::Error> {
-        unsafe { naked_asm!("") }
-    }
+    #[inline(always)]
+    fn load_lp_state(state: Box<LpState>) {
+        unsafe {
+            // acquire the temporary state mutex
+            asm!("spin:",
+                "cmpxchg  temp_lp_state_me, 0, 1",
+                "jne spin"
+            );
+            temp_lp_state = *state;
+            asm_load_lp_state();
+            // release the temporary state mutex
+            temp_lp_state_me = 0;
+        }
 }
 
-const GPR_COUNT: usize = 16;
+unsafe extern "C" {
+    static temp_lp_state: LpState;
+    static mut temp_lp_state_me: u8;
+    fn asm_save_lp_state();
+}
 
-#[derive(Debug)]
+const GPR_COUNT: usize = 16; // Number of general-purpose registers on x86_64.
+#[derive(Debug, Clone, Copy)]
 #[repr(C, packed)]
 pub struct LpState {
     gprs: [u64; GPR_COUNT],
