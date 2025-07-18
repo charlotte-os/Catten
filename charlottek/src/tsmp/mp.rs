@@ -4,6 +4,7 @@ use core::mem::MaybeUninit;
 use limine::mp::Cpu;
 use spin::{Lazy, RwLock};
 
+use super::threading::ThreadId;
 use crate::environment::boot_protocol::limine::MP;
 use crate::{ap_main, logln};
 
@@ -44,4 +45,14 @@ pub fn start_secondary_lps() -> Result<(), MpControlError> {
     } else {
         Err(MpControlError::SecondaryLpStartupFailed)
     }
+}
+
+pub enum LpState {
+    Running(ThreadId),
+    Halted,
+}
+
+pub struct LogicalProcessor {
+    pub id: u32,
+    state:  LpState,
 }

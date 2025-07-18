@@ -1,7 +1,9 @@
 use alloc::boxed::Box;
 use alloc::collections::VecDeque;
 use alloc::collections::btree_map::BTreeMap;
+use alloc::collections::btree_set::BTreeSet;
 use alloc::vec::Vec;
+use core::mem::MaybeUninit;
 
 use spin::Mutex;
 
@@ -13,7 +15,7 @@ pub type ThreadId = u64;
 pub type LpState = <LpControl as LpControlIfce>::LpState;
 pub type LpId = <LpControl as LpControlIfce>::LpId;
 
-static THREADS_IN_FLIGHT: BTreeMap<LpId, Mutex<Option<Thread>>> = BTreeMap::new();
+static THREADS_IN_FLIGHT: BTreeMap<LpId, Mutex<MaybeUninit<Thread>>> = BTreeMap::new();
 static mut THREAD_TABLE: BTreeMap<ThreadId, Mutex<Thread>> = BTreeMap::new();
 
 pub enum ThreadingError {
@@ -35,7 +37,6 @@ pub fn get_current_tid() -> Result<Option<ThreadId>, ThreadingError> {
 #[repr(C, packed)]
 pub struct Thread {
     pub id: ThreadId,
-    lp_context: LpState,
-    flags: u64,
-    affinity_mask: VecDeque<u8>,
+    stack_ptr: Box<[u8]>,
+    lp_affinity_set: BTreeSet<LpId>,
 }
