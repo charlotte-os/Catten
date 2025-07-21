@@ -30,9 +30,10 @@ pub mod isa;
 pub mod klib;
 pub mod log;
 pub mod memory;
+pub mod multiprocessing;
 pub mod panic;
 pub mod self_test;
-pub mod tsmp;
+pub mod threading;
 
 use isa::current_isa::lp_control::LpControl;
 use isa::current_isa::system_info::CpuInfo;
@@ -64,7 +65,7 @@ pub unsafe extern "C" fn bsp_main() -> ! {
     );
 
     logln!("Starting secondary LPs...");
-    tsmp::mp::start_secondary_lps().expect("Failed to start secondary LPs");
+    multiprocessing::start_secondary_lps().expect("Failed to start secondary LPs");
 
     self_test::run_self_tests();
 

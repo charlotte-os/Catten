@@ -3,6 +3,7 @@ use core::ops::{Add, Sub};
 
 use crate::isa::interface::memory::address::{Address, VirtualAddress};
 
+#[repr(transparent)]
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct VAddr {
     raw: usize,

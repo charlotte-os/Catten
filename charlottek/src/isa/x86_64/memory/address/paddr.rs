@@ -8,8 +8,8 @@ pub enum PAddrError {
     OutOfCpuSupportedRange(usize),
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PAddr {
     addr: usize,
 }

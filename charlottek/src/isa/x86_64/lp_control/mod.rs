@@ -1,13 +1,6 @@
-use alloc::boxed::Box;
-use alloc::collections::btree_map::BTreeMap;
-use alloc::collections::vec_deque::VecDeque;
 use core::arch::{asm, naked_asm};
-use core::f64::RADIX;
 
 use crate::isa::interface::lp_control::LpControlIfce;
-use crate::tsmp::threading::{ThreadId, get_current_tid, get_thread_context};
-
-static mut TEMP_STATE: BTreeMap<<LpControl as LpControlIfce>::LpId, LpState> = BTreeMap::new();
 
 pub enum Error {}
 
@@ -18,7 +11,6 @@ impl LpControlIfce for LpControl {
     // The logical processor ID is a 32-bit value on x86_64, representing the xAPIC ID in x2APIC
     // mode.
     type LpId = u32;
-    type LpState = LpState;
 
     #[inline(always)]
     fn halt() -> ! {
@@ -57,56 +49,99 @@ impl LpControlIfce for LpControl {
     }
 
     #[unsafe(naked)]
-    extern "C" fn switch_context() -> ThreadId {
+    extern "C" fn switch_context() {
+        #[rustfmt::skip] // keep each instruction on a separate line
         naked_asm!(
+            // The invoking context is expected to have pushed RIP to the stack already.
+            // This routine should only ever be invoked via an interrupt as it returns via `iretq`.
+            /*Save the current thread's context*/
+            // Save the flags register
+            "pushfq",
+            // Save all general-purpose registers except for the stack pointer
             "push rax",
+            "push rbx",
+            "push rcx",
+            "push rdx",
+            "push rsi",
             "push rdi",
+            "push rbp",
+            "push r8",
+            "push r9",
+            "push r10",
+            "push r11",
+            "push r12",
+            "push r13",
+            "push r14",
+            "push r15",
+            // Save the page table base register (CR3)
+            "mov rax, cr3",
+            "push rax",
+            // save the stack pointer to the thread control block
             "call get_current_tid",
             "mov rdi, rax",
-            "call get_thread_context",
+            "mov rsi, rsp",
+            "call write_thread_stack_ptr",
+
+            /*Load the next thread's context*/
+            // load the stack pointer of the next thread to be executed
+            "call get_next_tid",
+            "mov rdi, rax",
+            "call read_thread_stack_ptr",
+            "mov rsp, rax",
+            // load the page table base register (CR3)
+            "pop rax",
+            "mov cr3, rax",
+            // load all of the other GPRs
+            "pop r15",
+            "pop r14",
+            "pop r13",
+            "pop r12",
+            "pop r11",
+            "pop r10",
+            "pop r9",
+            "pop r8",
+            "pop rbp",
             "pop rdi",
-            // a pointer to the thread context is now in rax
-            // write all GPRs to the thread context
-            "mov [rax + 1 * 8], rbx",
-            "mov [rax + 2 * 8], rcx",
-            "mov [rax + 3 * 8], rdx",
-            "mov [rax + 4 * 8], rsi",
-            "mov [rax + 5 * 8], rdi",
-            // The stack pointer must be restored to the value it had before this routine, saved,
-            // and then restored after the context is saved.
-            "add rsp, 8", // Adjust stack pointer to remove the pushed registers
-            "mov [rax + 6 * 8], rsp",
-            "sub rsp, 8", // Restore stack the pointer
-            "mov [rax + 7 * 8], rbp",
-            "mov [rax + 8 * 8], r8",
-            "mov [rax + 9 * 8], r9",
-            "mov [rax + 10 * 8], r10",
-            "mov [rax + 11 * 8], r11",
-            "mov [rax + 12 * 8], r12",
-            "mov [rax + 13 * 8], r13",
-            "mov [rax + 14 * 8], r14",
-            "mov [rax + 15 * 8], r15",
-            // save the original rax value from the stack
+            "pop rsi",
+            "pop rdx",
+            "pop rcx",
             "pop rbx",
-            "mov [rax + 0 * 8], rbx",
-            // Save the instruction pointer and flags
-            "pop rbx",                 // get the return address from the stack
-            "mov [rax + 16 * 8], rbx", // rip
-            "pushfq",                  // push the flags onto the stack
-            "pop rbx",                 // pop the flags into rbx
-            "mov [rax + 17 * 8], rbx", // rflags
-        )
+            "pop rax",
+            // Restore the flags register
+            "popfq",
+            // Return to the loaded thread's execution path
+            "iretq"
+        );
     }
 
-    extern "C" fn load_lp_state(tid: ThreadId);
-}
-
-const GPR_COUNT: usize = 16; // Number of general-purpose registers on x86_64.
-
-#[derive(Debug, Clone, Copy)]
-#[repr(C, packed)]
-pub struct LpState {
-    gprs: [u64; GPR_COUNT],
-    rip: u64,
-    rflags: u64,
+    #[unsafe(naked)]
+    extern "C" fn load_context() {
+        #[rustfmt::skip] // keep each instruction on a separate line
+        naked_asm!(
+            // load the stack pointer of the next thread to be executed
+            "call get_next_tid",
+            "mov rdi, rax",
+            "call read_thread_stack_ptr",
+            "mov rsp, rax",
+            // load all of the other GPRs
+            "pop r15",
+            "pop r14",
+            "pop r13",
+            "pop r12",
+            "pop r11",
+            "pop r10",
+            "pop r9",
+            "pop r8",
+            "pop rbp",
+            "pop rdi",
+            "pop rsi",
+            "pop rdx",
+            "pop rcx",
+            "pop rbx",
+            "pop rax",
+            // Restore the flags register
+            "popfq",
+            "retf"
+        );
+    }
 }
