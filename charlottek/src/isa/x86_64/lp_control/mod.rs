@@ -141,7 +141,8 @@ impl LpControlIfce for LpControl {
             "pop rax",
             // Restore the flags register
             "popfq",
-            "retf"
+            // Jump to the loaded thread's entry point at the correct privilege level
+            "iretq"
         );
     }
 }
