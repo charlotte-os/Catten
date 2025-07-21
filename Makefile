@@ -1,11 +1,3 @@
-#x86_64
-
-default: run-x86_64-debug
-
-install-requirements:
-	chmod +x ./tools/install-requirements.sh
-	./tools/install-requirements.sh
-
 limine:
 	@if [ ! -d "limine" ]; then \
 		git clone https://github.com/limine-bootloader/limine.git --branch=v8.x-binary --depth=1;\
@@ -189,4 +181,4 @@ clean:
 	rm -f log_x86_64.txt
 
 distclean: clean
-	rm -rf limine
+	rm -rf limine ovmf*
