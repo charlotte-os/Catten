@@ -16,7 +16,9 @@ use crate::klib::raw_mutex::RawMutex;
 
 lazy_static! {
     pub static ref ALLOCATOR_SPAN: Mutex<Span> = Mutex::new(Span::empty());
-    static ref HIGHER_HALF_START: VAddr = VAddr::from(0xffff_ffff_8000_0000); // 64-bit higher half start address
+    // The first address of the higher half has the MSB and all parity bits above it set to 1.
+    // We get this by using the LSH-decrement technique to set all bits before the MSB and then inverting the result.
+    static ref HIGHER_HALF_START: VAddr = VAddr::from(!((1 << (*VADDR_SIG_BITS - 1)) - 1)); // 64-bit higher half start address
     static ref HIGHER_HALF_END: VAddr = VAddr::from(0xffff_ffff_ffff_ffff); // 64-bit higher half end address
 }
 
