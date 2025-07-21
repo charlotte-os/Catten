@@ -26,23 +26,20 @@ build-x86_64-debug: limine
 run-x86_64-debug: ovmf-x86_64 build-x86_64-debug
 	qemu-system-x86_64 -enable-kvm -cpu host -M q35 -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom charlottek-x86_64-debug.iso -boot d -serial stdio
 
-run-x86_64-debug-nokvm: ovmf-x86_64 build-x86_64-debug
-	qemu-system-x86_64 -M q35 -m 12G -bios ovmf-x86_64/OVMF.fd -cdrom charlottek-x86_64-debug.iso -boot d -serial stdio
-
 run-x86_64-debug-multicore: ovmf-x86_64 build-x86_64-debug
 	qemu-system-x86_64 -enable-kvm -M q35 -smp 16 -cpu host -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom charlottek-x86_64-debug.iso -boot d -serial stdio
 
 run-x86_64-debug-numa: ovmf-x86_64 build-x86_64-debug
-	qemu-system-x86_64 -enable-kvm -M q35 -cpu host -m 8G -bios ovmf-x86_64/OVMF.fd -cdrom charlottek-x86_64-debug.iso -boot d -serial stdio -smp 4 -object memory-backend-ram,size=4G,id=m0 -object memory-backend-ram,size=4G,id=m1 -numa node,memdev=m0,cpus=0-1,nodeid=0 -numa node,memdev=m1,cpus=2-3,nodeid=1
+	qemu-system-x86_64 -enable-kvm -M q35 -cpu host -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom charlottek-x86_64-debug.iso -boot d -serial stdio -smp 4 -object memory-backend-ram,size=4G,id=m0 -object memory-backend-ram,size=4G,id=m1 -numa node,memdev=m0,cpus=0-1,nodeid=0 -numa node,memdev=m1,cpus=2-3,nodeid=1
 
 run-x86_64-extdb: ovmf-x86_64 build-x86_64-debug
-	qemu-system-x86_64 -s -S -M q35 -m 2G -bios ovmf-x86_64/OVMF.fd -cdrom charlottek-x86_64-debug.iso -boot d -serial stdio -d int -D log.txt -M smm=off
+	qemu-system-x86_64 -s -S -M q35 -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom charlottek-x86_64-debug.iso -boot d -serial stdio -d int -D log.txt -M smm=off
 
 run-x86_64-qdblog: ovmf-x86_64 build-x86_64-debug
-	qemu-system-x86_64 -M q35 -m 2G -bios ovmf-x86_64/OVMF.fd -cdrom charlottek-x86_64-debug.iso -boot d -serial stdio -d int -D log.txt -M smm=off
+	qemu-system-x86_64 -M q35 -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom charlottek-x86_64-debug.iso -boot d -serial stdio -d int -D log.txt -M smm=off
 
 run-x86_64-log: ovmf-x86_64 build-x86_64-debug
-	qemu-system-x86_64 -enable-kvm -M q35 -cpu host -m 12G -bios ovmf-x86_64/OVMF.fd -cdrom charlottek-x86_64-debug.iso -boot d -serial file:log_x86_64.txt
+	qemu-system-x86_64 -enable-kvm -M q35 -cpu host -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom charlottek-x86_64-debug.iso -boot d -serial file:log_x86_64.txt
 
 build-x86_64-release: limine
 	cd charlottek && cargo build --target x86_64-unknown-none --release
@@ -61,9 +58,6 @@ build-x86_64-release: limine
 
 run-x86_64-release: ovmf-x86_64 build-x86_64-release
 	qemu-system-x86_64 -enable-kvm -M q35 -cpu host -smp 16 -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom charlottek-x86_64-release.iso -boot d -serial stdio
-
-run-x86_64-release-nokvm: ovmf-x86_64 build-x86_64-release
-	qemu-system-x86_64 -M q35 -smp 16 -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom charlottek-x86_64-release.iso -boot d -serial stdio
 
 check-x86_64:
 	cd charlottek && cargo check --target x86_64-unknown-none

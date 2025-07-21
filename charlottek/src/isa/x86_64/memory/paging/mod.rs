@@ -65,7 +65,7 @@ impl AddressSpaceInterface for AddressSpace {
             logln!("Checking base address: {:?}", base);
             for nth_page in 0..n_pages {
                 let curr_page = base + ((nth_page * PAGE_SIZE) as isize);
-                logln!("Checking page: {:?}", curr_page);
+                //logln!("Checking page: {:?}", curr_page);
                 if range.1 - curr_page < (n_pages * PAGE_SIZE) as isize {
                     return Err(<MemoryInterfaceImpl as MemoryInterface>::Error::NoRequestedVAddrRegionAvailable);
                 }

@@ -33,7 +33,7 @@ pub fn start_secondary_lps() -> Result<(), MpControlError> {
             if res.flags().contains(limine::mp::ResponseFlags::X2APIC) {
                 logln!("Limine has set all LAPICs to x2APIC mode.")
             } else {
-                logln!("Limine has not set any LAPICs to x2APIC mode.")
+                panic!("Processor not supported: x2APIC mode is not available.");
             }
         }
         let lps = res.cpus();

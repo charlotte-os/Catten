@@ -48,13 +48,15 @@ use limine::mp::Cpu;
 pub unsafe extern "C" fn bsp_main() -> ! {
     logln!("charlottek Kernel Version 0.1.0");
     logln!("=========================");
-    logln!("Initializing system...");
-    init::kernel_init();
+    logln!("Initializing the system using the bootstrap processor...");
+    init::bsp_init();
     logln!("System initialized.");
+    logln!("Starting secondary LPs...");
+    multiprocessing::start_secondary_lps().expect("Failed to start secondary LPs");
+    self_test::run_self_tests();
     logln!("System Information:");
-    logln!("CPU Vendor: {:?}", (CpuInfo::get_vendor()));
-    // TODO: Root cause the reason the following line halts execution without output or a panic.
-    //logln!("CPU Model: {}", (CpuInfo::get_brand()));
+    logln!("CPU Vendor: {}", (CpuInfo::get_vendor()));
+    logln!("CPU Model: {}", (CpuInfo::get_model()));
     logln!(
         "Physical Address bits implmented: {}",
         (CpuInfo::get_paddr_sig_bits())
@@ -63,12 +65,6 @@ pub unsafe extern "C" fn bsp_main() -> ! {
         "Virtual Address bits implmented: {}",
         (CpuInfo::get_vaddr_sig_bits())
     );
-
-    logln!("Starting secondary LPs...");
-    multiprocessing::start_secondary_lps().expect("Failed to start secondary LPs");
-
-    self_test::run_self_tests();
-
     logln!("Nothing left to do. Waiting for interrupts...");
     LpControl::halt()
 }

@@ -25,13 +25,16 @@ lazy_static! {
 #[global_allocator]
 pub static mut KERNEL_ALLOCATOR: Talck<RawMutex, ErrOnOom> = Talc::new(ErrOnOom).lock::<RawMutex>();
 
-const KERNEL_HEAP_N_PAGES: usize = 1024; // 4 MiB kernel heap size
+const KERNEL_HEAP_PAGE_COUNT: usize = 1024; // 4 MiB kernel heap size
 
 pub fn init_allocator() -> Result<(), ()> {
     let kernel_heap_start = <MemoryInterfaceImpl as MemoryInterface>::AddressSpace::get_current()
-        .find_free_region(KERNEL_HEAP_N_PAGES, (*HIGHER_HALF_START, *HIGHER_HALF_END))
+        .find_free_region(
+            KERNEL_HEAP_PAGE_COUNT,
+            (*HIGHER_HALF_START, *HIGHER_HALF_END),
+        )
         .expect("Failed to find free region for kernel heap");
-    let kernel_heap_size = KERNEL_HEAP_N_PAGES * PAGE_SIZE;
+    let kernel_heap_size = KERNEL_HEAP_PAGE_COUNT * PAGE_SIZE;
 
     let kernel_heap_span = Span::new(
         kernel_heap_start.into_mut(),

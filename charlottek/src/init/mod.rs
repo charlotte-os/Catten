@@ -1,10 +1,11 @@
-use crate::environment::boot_protocol::limine::MP;
 use crate::isa::current_isa::init::IsaInitializer;
+use crate::isa::current_isa::lp_control::LpControl;
 use crate::isa::interface::init::InitInterface;
+use crate::isa::interface::lp_control::LpControlIfce;
 use crate::logln;
 use crate::memory::pmem::*;
 
-pub fn kernel_init() {
+pub fn bsp_init() {
     logln!("Performing ISA specific initialization...");
     match IsaInitializer::init() {
         Ok(_) => logln!("ISA specific initialization complete."),
@@ -32,4 +33,8 @@ pub fn kernel_init() {
     }
     logln!("Intialized kernel allocator.");
     logln!("Starting secondary processors...");
+}
+
+pub fn ap_init() {
+    logln!("Initializing LP {}...", (LpControl::get_lp_id()));
 }
