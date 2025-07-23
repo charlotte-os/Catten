@@ -73,6 +73,9 @@ pub static USER_CODE_SELECTOR: SegmentSelector = make_segment_selector(3, true);
 #[allow(unused)]
 #[unsafe(no_mangle)]
 pub static USER_DATA_SELECTOR: SegmentSelector = make_segment_selector(4, true);
+#[allow(unused)]
+#[unsafe(no_mangle)]
+pub static TSS_SELECTOR: SegmentSelector = make_segment_selector(5, false);
 
 #[derive(Debug)]
 #[repr(C, packed(1))]

@@ -5,6 +5,7 @@
 .extern KERNEL_DATA_SELECTOR
 .extern USER_CODE_SELECTOR
 .extern USER_DATA_SELECTOR
+.extern TSS_SELECTOR
 
 .data
 gdtr: 
@@ -37,7 +38,6 @@ reload_cs:
 
 .global asm_load_tss
 asm_load_tss:
-	mov ax, 5
-	shl ax, 3
+	mov ax, [rip + TSS_SELECTOR]
 	ltr ax
 	ret
