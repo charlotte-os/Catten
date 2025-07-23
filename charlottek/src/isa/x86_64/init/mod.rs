@@ -1,4 +1,4 @@
-mod gdt;
+pub mod gdt;
 
 use core::borrow::BorrowMut;
 // core

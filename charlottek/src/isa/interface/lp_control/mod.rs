@@ -9,4 +9,5 @@ pub trait LpControlIfce {
     fn get_lp_id() -> Self::LpId;
     extern "C" fn switch_context();
     extern "C" fn load_context();
+    fn init_new_thread_stack(stack: &mut [u8], entry_point: fn() -> !, user_mode: bool);
 }

@@ -57,6 +57,7 @@ pub extern "C" fn read_thread_stack_ptr(tid: ThreadId) -> VAddr {
 }
 
 pub struct ThreadControlBlock {
+    #[allow(unused)]
     user_mode: bool,
     #[allow(unused)]
     stack: Box<[u8]>,
@@ -66,13 +67,12 @@ pub struct ThreadControlBlock {
 
 impl ThreadControlBlock {
     pub fn new(entry_point: fn() -> !, stack_size: usize, user_mode: bool) -> Self {
-        let stack = alloc::vec![0u8; stack_size].into_boxed_slice();
+        let mut stack = alloc::vec![0u8; stack_size].into_boxed_slice();
         let stack_ptr = <VAddr as VirtualAddress>::from_ptr(unsafe {
             &*stack.as_ptr().byte_offset(stack_size as isize - 1)
         });
 
-        //TODO: Initialize the stack with the entry point function pointer in an ISA-specific
-        // manner.
+        LpControl::init_new_thread_stack(&mut *stack, entry_point, user_mode);
 
         ThreadControlBlock {
             user_mode,

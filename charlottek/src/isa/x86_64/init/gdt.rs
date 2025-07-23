@@ -39,6 +39,41 @@ impl TssDescriptor {
     }
 }
 
+type SegmentSelector = u16;
+/* Segment Selector Format:
+[15:3] Index of the segment descriptor in the GDT or LDT
+[2] Table Indicator (0 for GDT, 1 for LDT)
+[1:0] Requested Privilege Level (RPL) (0 for kernel, 3 for user)
+*/
+
+const SEGMENT_SELECTOR_INDEX_SHIFT: u16 = 3; // Shift for segment selector index
+const SEGMENT_SELECTOR_KERNEL_PRIVILEGE_LEVEL: u16 = 0b00; // Kernel privilege level
+const SEGMENT_SELECTOR_USER_PRIVILEGE_LEVEL: u16 = 0b11; // User privilege level
+
+const fn make_segment_selector(index: u16, is_user_mode: bool) -> SegmentSelector {
+    (index << SEGMENT_SELECTOR_INDEX_SHIFT)
+        | if is_user_mode {
+            SEGMENT_SELECTOR_USER_PRIVILEGE_LEVEL
+        } else {
+            SEGMENT_SELECTOR_KERNEL_PRIVILEGE_LEVEL
+        }
+}
+#[allow(unused)]
+#[unsafe(no_mangle)]
+pub static NULL_SELECTOR: SegmentSelector = make_segment_selector(0, false);
+#[allow(unused)]
+#[unsafe(no_mangle)]
+pub static KERNEL_CODE_SELECTOR: SegmentSelector = make_segment_selector(1, false);
+#[allow(unused)]
+#[unsafe(no_mangle)]
+pub static KERNEL_DATA_SELECTOR: SegmentSelector = make_segment_selector(2, false);
+#[allow(unused)]
+#[unsafe(no_mangle)]
+pub static USER_CODE_SELECTOR: SegmentSelector = make_segment_selector(3, true);
+#[allow(unused)]
+#[unsafe(no_mangle)]
+pub static USER_DATA_SELECTOR: SegmentSelector = make_segment_selector(4, true);
+
 #[derive(Debug)]
 #[repr(C, packed(1))]
 pub struct Gdt {

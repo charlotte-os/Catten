@@ -1,5 +1,3 @@
-use core::mem::MaybeUninit;
-
 use lazy_static::lazy_static;
 use spin::Mutex;
 use talc::{ErrOnOom, Span, Talc, Talck};
@@ -60,7 +58,7 @@ pub fn init_allocator() -> Result<(), ()> {
 
     match unsafe { KERNEL_ALLOCATOR.lock().claim(kernel_heap_span) } {
         Ok(alloc_span) => {
-            *ALLOCATOR_SPAN.lock() = kernel_heap_span;
+            *ALLOCATOR_SPAN.lock() = alloc_span;
             Ok(())
         }
         Err(_) => Err(()),

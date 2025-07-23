@@ -1,7 +1,4 @@
 //! # Multi-Processor Control
-use core::mem::MaybeUninit;
-
-use limine::mp::Cpu;
 use spin::{Lazy, RwLock};
 
 use super::threading::ThreadId;
@@ -54,5 +51,6 @@ pub enum LpState {
 
 pub struct LogicalProcessor {
     pub id: u32,
+    #[allow(unused)]
     state:  LpState,
 }

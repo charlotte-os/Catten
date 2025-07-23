@@ -1,6 +1,7 @@
 use core::arch::{asm, naked_asm};
 
 use crate::isa::interface::lp_control::LpControlIfce;
+use crate::isa::x86_64::init::gdt;
 
 pub enum Error {}
 
@@ -144,5 +145,53 @@ impl LpControlIfce for LpControl {
             // Jump to the loaded thread's entry point at the correct privilege level
             "iretq"
         );
+    }
+
+    fn init_new_thread_stack(stack: &mut [u8], entry_point: fn() -> !, user_mode: bool) {
+        let mut stack_ptr = unsafe { stack.as_mut_ptr().byte_offset(stack.len() as isize) };
+        stack_ptr = (stack_ptr as usize & !0xf) as *mut u8; // Align to 16 bytes as an AMD64 processor would when entering an interrupt
+        let stack_base = stack_ptr;
+        // Push the data segment selector for the stack segment
+        stack_ptr = stack_ptr.wrapping_byte_sub(8);
+        unsafe {
+            *(stack_ptr as *mut u64) = if user_mode {
+                gdt::USER_DATA_SELECTOR as u64
+            } else {
+                gdt::KERNEL_DATA_SELECTOR as u64
+            };
+        }
+        // Push the stack base address
+        stack_ptr = stack_ptr.wrapping_byte_sub(8);
+        unsafe {
+            *(stack_ptr as *mut *mut u8) = stack_base;
+        }
+        // Push RFLAGS
+        stack_ptr = stack_ptr.wrapping_byte_sub(8);
+        unsafe {
+            asm!(
+                "push rax", // Save RAX to avoid clobbering
+                "pushfq",
+                "pop rax",
+                "mov [{stack_ptr}], rax",
+                "pop rax", // Restore RAX
+                stack_ptr = in(reg) stack_ptr
+            );
+        }
+        // Push the code segment selector
+        stack_ptr = stack_ptr.wrapping_byte_sub(8);
+        unsafe {
+            if user_mode {
+                // User mode code segment selector (0x23)
+                *(stack_ptr as *mut u64) = gdt::USER_CODE_SELECTOR as u64;
+            } else {
+                // Kernel mode code segment selector (0x08)
+                *(stack_ptr as *mut u64) = gdt::KERNEL_CODE_SELECTOR as u64;
+            }
+        }
+        // Push the instruction pointer (entry point)
+        stack_ptr = stack_ptr.wrapping_byte_sub(8);
+        unsafe {
+            *(stack_ptr as *mut fn() -> !) = entry_point;
+        }
     }
 }

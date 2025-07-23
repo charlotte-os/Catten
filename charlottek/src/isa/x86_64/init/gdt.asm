@@ -1,9 +1,15 @@
 .code64
 
+.extern NULL_SELECTOR
+.extern KERNEL_CODE_SELECTOR
+.extern KERNEL_DATA_SELECTOR
+.extern USER_CODE_SELECTOR
+.extern USER_DATA_SELECTOR
+
 .data
 gdtr: 
-	.2byte 55 // Place 55 = (8 * 7) - 1 in the gdtr label
-	.8byte 0
+	.2byte 55 // The size of the GDT in bytes (55 bytes for 7 entries) less one byte
+	.8byte 0 // The address of the GDT is filled in by the asm_load_gdt function
 
 .text
 .global asm_load_gdt
@@ -14,16 +20,14 @@ asm_load_gdt:
 
 .global asm_reload_segment_regs
 asm_reload_segment_regs:
-	mov rax, 1 //segment descriptor 1 is the kernel code segment
-	shl rax, 3
+	movzx rax, word ptr [rip + KERNEL_CODE_SELECTOR]
 	push rax
 	lea rax, [rip + reload_cs]
 	push rax
 	retfq
 
 reload_cs:
-	mov ax, 2 //segment descriptor 2 is the kernel data segment
-	shl ax, 3
+	mov ax, [rip + KERNEL_DATA_SELECTOR]
 	mov ds, ax
 	mov es, ax
 	mov fs, ax
