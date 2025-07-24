@@ -7,6 +7,7 @@
 #![feature(slice_ptr_get)]
 #![feature(step_trait)]
 #![allow(static_mut_refs)]
+#![allow(named_asm_labels)]
 
 //! # charlottek
 //!
