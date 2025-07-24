@@ -45,4 +45,4 @@ This ensures a consistent and transparent legal foundation for the project, its 
 ## Effective Scope
 
 This interpretation applies to **all components of the kernel** covered under this project’s **GPLv3-or-later license**,  
-and represents the **consensus position of all contributors** as to how the license should be understood in this context.
+and represents the **unanimous position of all contributors** as to how the license should be understood in this context.
