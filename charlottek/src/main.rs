@@ -23,6 +23,7 @@
 
 extern crate alloc;
 
+pub mod capability;
 pub mod drivers;
 pub mod environment;
 pub mod framebuffer;
