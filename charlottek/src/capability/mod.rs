@@ -31,8 +31,6 @@
 //! ensures that capabilities cannot be used to access resources in other process contexts unless
 //! explicitly shared by the process that owns the capability.
 
-use bitflags::bitflags;
-
 type CapabilityKey = [u8; 16];
 pub enum CapabilityDescriptor {
     AddressSpace(AddressSpaceId, AddressSpacePerms),
