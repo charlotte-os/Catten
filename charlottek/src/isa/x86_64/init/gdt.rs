@@ -1,4 +1,4 @@
-use core::arch::{asm, global_asm};
+use core::arch::asm;
 use core::mem::size_of;
 use core::ptr;
 
@@ -204,19 +204,41 @@ pub static TSS_SELECTOR: SegmentSelector = make_segment_selector(5, false);
 #[derive(Debug)]
 #[repr(C, packed(1))]
 pub struct Tss {
-    res: u32,
+    res0: u32,
     rsp0: u64,
-    unused: [u8; 90],
+    rsp1: u64,
+    rsp2: u64,
+    res1: u64,
+    ist1: u64,
+    ist2: u64,
+    ist3: u64,
+    ist4: u64,
+    ist5: u64,
+    ist6: u64,
+    ist7: u64,
+    res2: u64,
     iopb: u16,
+    res3: u16,
 }
 
 impl Tss {
     pub fn new(rsp0: u64) -> Self {
         Tss {
-            res: 0,
-            rsp0,
-            unused: [0u8; 90],
+            res0: 0,
+            rsp0: rsp0,
+            rsp1: 0,
+            rsp2: 0,
+            res1: 0,
+            ist1: 0,
+            ist2: 0,
+            ist3: 0,
+            ist4: 0,
+            ist5: 0,
+            ist6: 0,
+            ist7: 0,
+            res2: 0,
             iopb: size_of::<Tss>() as u16,
+            res3: 0,
         }
     }
 }

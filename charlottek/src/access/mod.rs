@@ -31,18 +31,26 @@
 //! ensures that capabilities cannot be used to access resources in other process contexts unless
 //! explicitly shared by the process that owns the capability.
 
-type CapabilityKey = [u8; 16];
-pub enum CapabilityDescriptor {
-    AddressSpace(AddressSpaceId, AddressSpacePerms),
+use core::mem::MaybeUninit;
+
+use hashbrown::HashMap;
+use spin::RwLock;
+
+fn init() -> Result<(), Error> {}
+
+pub enum Error {
+    KeyNotFound,
+    KeyExpired,
+    CapabilityTypeMismatch,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u8)]
-pub enum AddressSpacePerms {
-    Map = 0b00000001,
-    Unmap = 0b00000010,
-    ModifyPermissions = 0b00000100,
-    Query = 0b00001000,
-    Copy = 0b00010000,
-    Delete = 0b00100000,
+type CapabilityKey = [u8; 16];
+
+static ACCESS_CONTROL_TABLE: RwLock<MaybeUninit<HashMap<CapabilityKey, AccessDescriptor>>> =
+    RwLock::new(MaybeUninit::uninit());
+
+pub enum AccessDescriptor {
+    PageFrameSet(FrameSetId, PageFramePerms),
+    AddressSpace(AddressSpaceId, AddressSpacePerms),
+    Thread(ThreadId, ThreadPerms),
 }

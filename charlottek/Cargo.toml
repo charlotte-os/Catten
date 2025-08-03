@@ -13,9 +13,11 @@ bench = false
 
 [dependencies]
 gcd = ">=2.3.0"
+hashbrown = ">=0.15.4"
 lazy_static = {version = ">=1.5.0", features = ["spin_no_std"]}
 limine = ">=0.5.0"
 lock_api = {version = ">=0.4.13"}
+pack_bools = "0.1.2"
 spin = {version = ">=0.10.0", features = ["ticket_mutex", "lock_api"]}
 talc = {version = ">=4.4.3"}
 
