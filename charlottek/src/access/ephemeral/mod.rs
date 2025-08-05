@@ -21,11 +21,15 @@
 //! ensures that capabilities cannot be used to access resources in other isolation domains unless
 //! explicitly shared by a thread running in the isolation domain that owns the capability.
 
+use spin::RwLock;
+
+use crate::memory::pmem::frame_set::{FrameSet, FrameSetPermissions};
+
 mod isolation_domain;
 
 pub type CapabilityKey = [u64; 2];
 
-pub enum CapabilityDescriptor {
-    FrameSet(FrameSetId, FrameSetPermissions),
-    AddressSpace(AddressSpaceId, AddressSpacePermissions),
+pub enum CapabilityDescriptor<'resource> {
+    FrameSet(&'resource RwLock<FrameSet>, FrameSetPermissions),
+    //AddressSpace(&'resource RwLock<AddressSpace>, AddressSpacePermissions),
 }

@@ -19,16 +19,13 @@ impl FrameSet {
         self.frames.len()
     }
 
-    pub fn iter(&self) -> AddrIter {
-        AddrIter {
-            index: 0,
-            raw_frame_set: &self.frames,
-        }
+    pub fn as_slice(&self) -> &[PAddr] {
+        &self.frames
     }
 }
-
-// 'fs is the lifetime of the FrameSet being iterated over
-pub struct AddrIter<'fs> {
-    index: usize,
-    raw_frame_set: &'fs [PAddr],
+#[repr(u8)]
+pub enum FrameSetPermissions {
+    MapRead = 1 << 0,
+    MapWrite = 1 << 1,
+    MapExecute = 1 << 2,
 }
