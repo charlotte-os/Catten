@@ -21,9 +21,9 @@ pub enum UserIndicator {
     Tag(UserTagId),
 }
 
-///A user is an actual person who uses the system. Unlike in Unix systems where users can also be
-/// used to represent other things services, the system, and the superuser, in charlottek a user is
-/// always  expected to be a real person. Users have a unique ID, a name, a full name (first,
+/// A user is an actual person who uses the system. Unlike in Unix systems where users can also be
+/// used to represent other things such as services, the system, and the superuser, in charlottek a
+/// user is always expected to be a real person. Users have a unique ID, a name, a full name (first,
 /// middle, last), a set of tags, and a set of persistent capabilities.
 pub struct User {
     id: UserId,
