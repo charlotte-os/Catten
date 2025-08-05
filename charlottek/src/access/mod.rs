@@ -36,15 +36,13 @@ use core::mem::MaybeUninit;
 use hashbrown::HashMap;
 use spin::RwLock;
 
-fn init() -> Result<(), Error> {}
-
 pub enum Error {
     KeyNotFound,
     KeyExpired,
     CapabilityTypeMismatch,
 }
 
-type CapabilityKey = [u8; 16];
+type CapabilityKey = u64;
 
 static ACCESS_CONTROL_TABLE: RwLock<MaybeUninit<HashMap<CapabilityKey, AccessDescriptor>>> =
     RwLock::new(MaybeUninit::uninit());
