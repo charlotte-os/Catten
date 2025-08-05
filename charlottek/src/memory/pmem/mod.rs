@@ -3,6 +3,8 @@
 //! This module is responsible for managing physical memory. It provides an interface for allocating
 //! and freeing physical memory frames.
 
+pub mod frame_set;
+
 use lazy_static::lazy_static;
 use limine::response::MemoryMapResponse;
 use spin::Mutex;
