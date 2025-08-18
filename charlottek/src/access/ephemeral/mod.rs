@@ -27,7 +27,7 @@ use crate::memory::pmem::frame_set::{FrameSet, FrameSetPermissions};
 
 mod isolation_domain;
 
-pub type CapabilityKey = [u64; 2];
+pub type CapabilityKey = u32;
 
 pub enum CapabilityDescriptor<'resource> {
     FrameSet(&'resource RwLock<FrameSet>, FrameSetPermissions),

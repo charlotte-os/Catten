@@ -12,21 +12,20 @@ bench = false
 [build-dependencies]
 
 [dependencies]
-gcd = ">=2.3.0"
 hashbrown = ">=0.15.4"
-lazy_static = {version = ">=1.5.0", features = ["spin_no_std"]}
+lazy_static = { version = ">=1.5.0", features = ["spin_no_std"] }
 limine = ">=0.5.0"
-lock_api = {version = ">=0.4.13"}
-pack_bools = "0.1.2"
-spin = {version = ">=0.10.0", features = ["ticket_mutex", "lock_api"]}
-talc = {version = ">=4.4.3"}
+lock_api = { version = ">=0.4.13" }
+spin = { version = ">=0.10.0", features = ["ticket_mutex", "lock_api"] }
+sha_256 = { version = ">=1.0.1" }
+talc = { version = ">=4.4.3" }
 
 [profile.dev]
 debug = "full"
 debug-assertions = true
 panic = "abort"
 lto = true
-opt-level = 3
+opt-level = 0
 
 [profile.release]
 debug = "none"

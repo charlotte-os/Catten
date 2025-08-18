@@ -181,25 +181,16 @@ impl<'vas> PthWalker<'vas> {
 
     pub fn unmap_page(
         &mut self,
-    ) -> Result<MemoryMapping, <super::MemoryInterfaceImpl as MemoryInterface>::Error> {
+    ) -> Result<PAddr, <super::MemoryInterfaceImpl as MemoryInterface>::Error> {
         match self.walk() {
             Ok(_) => {
                 unsafe {
-                    let mapping = MemoryMapping {
-                        vaddr: self.vaddr,
-                        paddr: (*self.pt_ptr)[self.vaddr.pt_index()]
-                            .try_get_frame()
-                            .unwrap(),
-                        page_type: PageType::try_new(
-                            (*self.pt_ptr)[self.vaddr.pt_index()].is_writable(),
-                            (*self.pt_ptr)[self.vaddr.pt_index()].is_user_accessible(),
-                            (*self.pt_ptr)[self.vaddr.pt_index()].is_execute_disabled(),
-                            (*self.pt_ptr)[self.vaddr.pt_index()].is_uncached(),
-                            (*self.pt_ptr)[self.vaddr.pt_index()].is_write_combining(),
-                        )
-                        .unwrap(),
-                    };
-                    let pte = addr_of_mut!((*self.pt_ptr)[self.vaddr.pt_index()]);
+                    // get the return value
+                    let paddr = (*self.pt_ptr)[self.vaddr.pt_index()]
+                        .try_get_frame()
+                        .unwrap();
+                    // deallocate all higher level tables that are now unused
+                    let pte = &raw mut (*self.pt_ptr)[self.vaddr.pt_index()];
                     if (*pte).is_present() {
                         // We do not deallocate the page frame here, as it is the responsibility of
                         // the VMM client calling this function to deallocate the frame if they need
@@ -207,7 +198,7 @@ impl<'vas> PthWalker<'vas> {
                         (*pte).set_present(false);
                     }
 
-                    let pde = addr_of_mut!((*self.pd_ptr)[self.vaddr.pd_index()]);
+                    let pde = &raw mut (*self.pd_ptr)[self.vaddr.pd_index()];
                     if is_pagetable_unused(self.pt_ptr) {
                         PHYSICAL_FRAME_ALLOCATOR
                             .lock()
@@ -216,7 +207,7 @@ impl<'vas> PthWalker<'vas> {
                         (*pde).set_present(false);
                     }
 
-                    let pdpte = addr_of_mut!((*self.pdpt_ptr)[self.vaddr.pdpt_index()]);
+                    let pdpte = &raw mut (*self.pdpt_ptr)[self.vaddr.pdpt_index()];
                     if is_pagetable_unused(self.pd_ptr) {
                         PHYSICAL_FRAME_ALLOCATOR
                             .lock()
@@ -225,7 +216,7 @@ impl<'vas> PthWalker<'vas> {
                         (*pdpte).set_present(false);
                     }
 
-                    let pml4e = addr_of_mut!((*self.pml4_ptr)[self.vaddr.pml4_index()]);
+                    let pml4e = &raw mut (*self.pml4_ptr)[self.vaddr.pml4_index()];
                     if is_pagetable_unused(self.pdpt_ptr) {
                         PHYSICAL_FRAME_ALLOCATOR
                             .lock()
@@ -233,7 +224,7 @@ impl<'vas> PthWalker<'vas> {
                             .unwrap();
                         (*pml4e).set_present(false);
                     }
-                    return Ok(mapping);
+                    return Ok(paddr);
                 }
             }
             Err(other) => Err(other),

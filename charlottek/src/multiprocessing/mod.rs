@@ -1,8 +1,13 @@
 //! # Multi-Processor Control
+use alloc::collections::btree_map::BTreeMap;
+
+use spin::mutex::Mutex;
 use spin::{Lazy, RwLock};
 
 use super::threading::ThreadId;
 use crate::environment::boot_protocol::limine::MP;
+use crate::isa::current_isa::lp_control::LpControl;
+use crate::isa::interface::lp_control::LpControlIfce;
 use crate::{ap_main, logln};
 
 static LP_COUNT: RwLock<Lazy<usize>> = RwLock::new(Lazy::new(|| {
@@ -16,6 +21,18 @@ static LP_COUNT: RwLock<Lazy<usize>> = RwLock::new(Lazy::new(|| {
 pub fn get_lp_count() -> usize {
     **LP_COUNT.read()
 }
+
+pub type LpId = <LpControl as LpControlIfce>::LpId;
+
+pub static LP_TABLE: spin::Lazy<BTreeMap<LpId, Mutex<LpState>>> = spin::Lazy::new(|| {
+    let mut lp_table = BTreeMap::new();
+    for i in 0..get_lp_count() {
+        lp_table.insert(i as LpId, Mutex::new(LpState::NotStarted));
+    }
+    *(lp_table.get(&LpControl::get_lp_id()).unwrap().lock()) = LpState::Uninitialized;
+
+    lp_table
+});
 
 #[derive(Debug)]
 pub enum MpControlError {
@@ -35,7 +52,7 @@ pub fn start_secondary_lps() -> Result<(), MpControlError> {
         }
         let lps = res.cpus();
         for lp in lps {
-            logln!("Writing entrypoint address for LP{}", (lp.id));
+            logln!("Writing entry point address for LP{}", (lp.id));
             lp.goto_address.write(ap_main);
         }
         Ok(())
@@ -45,6 +62,8 @@ pub fn start_secondary_lps() -> Result<(), MpControlError> {
 }
 
 pub enum LpState {
+    NotStarted,
+    Uninitialized,
     Running(ThreadId),
     Halted,
 }

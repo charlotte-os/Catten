@@ -29,7 +29,7 @@ pub trait AddressSpaceInterface {
     fn unmap_page(
         &mut self,
         vaddr: VAddr,
-    ) -> Result<MemoryMapping, <MemoryInterfaceImpl as MemoryInterface>::Error>;
+    ) -> Result<PAddr, <MemoryInterfaceImpl as MemoryInterface>::Error>;
     fn is_mapped(
         &mut self,
         vaddr: VAddr,
