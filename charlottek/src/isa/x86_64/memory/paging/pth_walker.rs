@@ -164,12 +164,18 @@ impl<'vas> PthWalker<'vas> {
                         .set_writable(writable)
                         .set_user_accessible(user_accessible)
                         .set_execute_disabled(no_execute);
+                    // for those who may not immediately see it, this is the Rust equivalent of
+                    // memset being used to clear the newly mapped page
                     core::ptr::write_bytes(<PAddr as Into<*mut u8>>::into(frame), 0, PAGE_SIZE);
                 }
                 self.address_space
                     .load()
                     .expect("Failed to reload the address space");
                 unsafe {
+                    // Get rid of any stale TLB entries referring to the linear address space
+                    // aperture into which the newly allocated page frame has been mapped
+                    // This works as is in the single LP world but to operate with multiple
+                    // processors we need a proper TLB shootdown here.
                     core::arch::asm!("invlpg [{}]", in(reg) self.vaddr.into_ptr::<u8>());
                 }
 

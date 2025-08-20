@@ -1,11 +1,12 @@
 pub mod pte;
 pub mod pth_walker;
+pub mod tlb;
 
+use alloc::collections::btree_map::BTreeMap;
 use alloc::vec::Vec;
 use core::arch::asm;
 use core::iter::Iterator;
 
-use hashbrown::HashMap;
 use spin::RwLock;
 
 use super::super::lp_control::LpControl;
@@ -34,10 +35,10 @@ pub fn is_pagetable_unused(table_ptr: *const PageTable) -> bool {
 }
 
 pub struct AddressSpace {
-    /* This is a map from Logical Processor IDs to their corresponding Process Context Identifiers for the
+    /* This is a map from Logical Processor IDs as assigned by this kernel to their corresponding Process Context Identifiers for the
     address space, if any. The lower 12 bits of the u16 for a given LP should be ANDed with
     the CR3 value before loading an address space on that LP */
-    pcids: HashMap<<LpControl as LpControlIfce>::LpId, u16>,
+    pcids: BTreeMap<<LpControl as LpControlIfce>::LpId, u16>,
     // control register 3 i.e. top level page table base register
     cr3: u64,
 }
@@ -49,7 +50,7 @@ impl AddressSpaceInterface for AddressSpace {
             asm!("mov {}, cr3", out(reg) cr3);
         }
         AddressSpace {
-            pcids: HashMap::new(),
+            pcids: BTreeMap::new(),
             cr3: cr3,
         }
     }

@@ -6,9 +6,11 @@ use core::mem::transmute;
 use crate::isa::interface::system_info::CpuInfoIfce;
 
 pub enum IsaExtension {
-    Avx2,
-    Avx512,
-    Pml5,
+    /* indicates support for 5-level paging i.e. 57 bit linear addresses */
+    La57,
+    /* indicates support for `invlpgb` (Invalidate Page with Broadcast) and `tlbsync`
+     * (TLB shootdown synchronization after `invlpgb`) */
+    Invlpgb,
 }
 
 pub struct CpuInfo;
@@ -77,17 +79,13 @@ impl CpuInfoIfce for CpuInfo {
 
     fn is_extension_supported(extension: Self::IsaExtension) -> bool {
         match extension {
-            IsaExtension::Avx2 => unsafe {
-                let cpuid_result = __cpuid_count(7, 0);
-                (cpuid_result.ebx & 0x20) != 0
+            IsaExtension::La57 => unsafe {
+                let cpuid_result = __cpuid_count(0x0000_0007, 0);
+                (cpuid_result.ecx & 1 << 16) != 0
             },
-            IsaExtension::Avx512 => unsafe {
-                let cpuid_result = __cpuid_count(7, 0);
-                (cpuid_result.ebx & 0x40000000) != 0
-            },
-            IsaExtension::Pml5 => unsafe {
-                let cpuid_result = __cpuid_count(0x80000008, 0);
-                (cpuid_result.ecx & 0x100) != 0
+            IsaExtension::Invlpgb => unsafe {
+                let cpuid_result = __cpuid_count(0x8000_0008, 0);
+                (cpuid_result.ebx & 1 << 5) != 0
             },
         }
     }

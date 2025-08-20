@@ -1,4 +1,4 @@
-use core::arch::asm;
+use core::arch::{asm, naked_asm};
 use core::mem::size_of;
 use core::ptr;
 
@@ -35,7 +35,10 @@ struct TssDescriptor {
 
 impl TssDescriptor {
     fn new() -> Self {
-        TssDescriptor { low: 0, high: 0 }
+        TssDescriptor {
+            low:  0,
+            high: 0,
+        }
     }
 }
 
@@ -129,13 +132,10 @@ impl Gdt {
         }
     }
 
-    pub fn load_tss() {
-        unsafe {
-            #[rustfmt::skip]
-            asm!(
-                "ltr [rip + TSS_SELECTOR]"
-            );
-        }
+    #[inline(always)]
+    fn load_tss() {
+    unsafe {
+        asm!("ltr [rip + TSS_SELECTOR]");
     }
 }
 

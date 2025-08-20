@@ -13,45 +13,36 @@ impl LpControlIfce for LpControl {
     // mode.
     type LpId = u32;
 
-    #[inline(always)]
-    fn halt() -> ! {
-        unsafe {
-            asm!("hlt");
-        }
-        loop {}
+    #[unsafe(naked)]
+    #[unsafe(no_mangle)]
+    extern "C" fn halt() -> ! {
+        naked_asm!(
+            "hlt",
+            "jmp halt"
+        );
     }
 
-    #[inline(always)]
-    fn mask_interrupts() {
-        unsafe {
-            asm!("cli");
-        }
+    #[unsafe(naked)]
+    extern "C" fn mask_interrupts() {
+        naked_asm!("cli");
     }
 
-    #[inline(always)]
-    fn unmask_interrupts() {
-        unsafe {
-            asm!("sti");
-        }
+    #[unsafe(naked)]
+    extern "C" fn unmask_interrupts() {
+        naked_asm!("sti");
     }
 
-    #[inline(always)]
-    fn get_lp_id() -> Self::LpId {
-        let lp_id: Self::LpId;
+    #[unsafe(naked)]
+    extern "C" fn get_lp_id() -> Self::LpId {
         // Read the LAPIC ID using the x2APIC MSR interface.
-        unsafe {
-            asm!(
-                "mov ecx, 0x802",
-                "rdmsr",
-                out("eax") lp_id
-            );
-        }
-        lp_id
+        naked_asm!(
+            "mov ecx, 0x802",
+            "rdmsr"
+        );
     }
 
     #[unsafe(naked)]
     extern "C" fn switch_context() {
-        #[rustfmt::skip] // keep each instruction on a separate line
         naked_asm!(
             // The invoking context is expected to have pushed RIP to the stack already.
             // This routine should only ever be invoked via an interrupt as it returns via `iretq`.
@@ -90,7 +81,8 @@ impl LpControlIfce for LpControl {
             "call read_thread_stack_ptr",
             "mov rsp, rax",
             // load the page table base register (CR3)
-            "pop rax",
+            "sub rsp, 8",
+            "mov rax, [rsp]",
             "mov cr3, rax",
             // load all of the other GPRs
             "pop r15",
@@ -117,7 +109,6 @@ impl LpControlIfce for LpControl {
 
     #[unsafe(naked)]
     extern "C" fn load_context() {
-        #[rustfmt::skip] // keep each instruction on a separate line
         naked_asm!(
             // load the stack pointer of the next thread to be executed
             "call get_next_tid",
