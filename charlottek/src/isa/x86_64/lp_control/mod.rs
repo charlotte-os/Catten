@@ -1,6 +1,8 @@
+pub mod lp_global;
+
 use core::arch::{asm, naked_asm};
 
-use crate::isa::interface::lp_control::LpControlIfce;
+pub use crate::isa::interface::lp_control::LpControlIfce;
 use crate::isa::x86_64::init::gdt;
 
 pub enum Error {}

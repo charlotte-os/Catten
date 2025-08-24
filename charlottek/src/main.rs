@@ -23,9 +23,9 @@
 
 extern crate alloc;
 
-pub mod access;
 pub mod drivers;
 pub mod environment;
+pub mod event;
 pub mod framebuffer;
 pub mod init;
 pub mod isa;
@@ -34,6 +34,7 @@ pub mod log;
 pub mod memory;
 pub mod multiprocessing;
 pub mod panic;
+pub mod process_mgmt;
 pub mod self_test;
 pub mod threading;
 
@@ -59,14 +60,8 @@ pub unsafe extern "C" fn bsp_main() -> ! {
     logln!("System Information:");
     logln!("CPU Vendor: {}", (CpuInfo::get_vendor()));
     logln!("CPU Model: {}", (CpuInfo::get_model()));
-    logln!(
-        "Physical Address bits implmented: {}",
-        (CpuInfo::get_paddr_sig_bits())
-    );
-    logln!(
-        "Virtual Address bits implmented: {}",
-        (CpuInfo::get_vaddr_sig_bits())
-    );
+    logln!("Physical Address bits implmented: {}", (CpuInfo::get_paddr_sig_bits()));
+    logln!("Virtual Address bits implmented: {}", (CpuInfo::get_vaddr_sig_bits()));
     logln!("Nothing left to do. Waiting for interrupts...");
     LpControl::halt()
 }

@@ -5,7 +5,7 @@
 //! addresses, mapping pages, and unmapping pages as well as adding and removing page table entries
 //! and page tables as needed.
 
-use core::ptr::addr_of_mut;
+use core::ptr::NonNull;
 
 use super::{PAGE_SIZE, is_pagetable_unused};
 use crate::isa::interface::memory::address::VirtualAddress;
@@ -13,7 +13,6 @@ use crate::isa::interface::memory::{AddressSpaceInterface, MemoryInterface};
 use crate::isa::x86_64::memory::address::paddr::PAddr;
 use crate::isa::x86_64::memory::address::vaddr::VAddr;
 use crate::memory::pmem::PHYSICAL_FRAME_ALLOCATOR;
-use crate::memory::vmem::{MemoryMapping, PageType};
 
 const CR3_ADDRESS_MASK: u64 = 0x000ffffffffff000;
 
@@ -43,9 +42,8 @@ impl<'vas> PthWalker<'vas> {
     pub fn walk(
         &mut self,
     ) -> Result<(), <super::MemoryInterfaceImpl as super::MemoryInterface>::Error> {
-        self.pml4_ptr = PAddr::try_from((self.address_space.cr3 & CR3_ADDRESS_MASK) as usize)
-            .unwrap()
-            .into();
+        self.pml4_ptr =
+            PAddr::try_from((self.address_space.cr3 & CR3_ADDRESS_MASK) as usize).unwrap().into();
         self.pdpt_ptr = unsafe {
             let pml4e = &mut (*self.pml4_ptr)[self.vaddr.pml4_index()];
             if !pml4e.is_present() {
@@ -96,9 +94,7 @@ impl<'vas> PthWalker<'vas> {
                         let new_pml4 = PHYSICAL_FRAME_ALLOCATOR.lock().allocate_frame().unwrap();
                         self.address_space.cr3 =
                             <PAddr as Into<u64>>::into(new_pml4) & CR3_ADDRESS_MASK;
-                        self.address_space
-                            .load()
-                            .expect("Error reloading the CR3 register");
+                        self.address_space.load().expect("Error reloading the CR3 register");
                     }
                     self.pml4_ptr =
                         PAddr::try_from((self.address_space.cr3 & CR3_ADDRESS_MASK) as usize)
@@ -168,9 +164,7 @@ impl<'vas> PthWalker<'vas> {
                     // memset being used to clear the newly mapped page
                     core::ptr::write_bytes(<PAddr as Into<*mut u8>>::into(frame), 0, PAGE_SIZE);
                 }
-                self.address_space
-                    .load()
-                    .expect("Failed to reload the address space");
+                self.address_space.load().expect("Failed to reload the address space");
                 unsafe {
                     // Get rid of any stale TLB entries referring to the linear address space
                     // aperture into which the newly allocated page frame has been mapped
@@ -192,9 +186,7 @@ impl<'vas> PthWalker<'vas> {
             Ok(_) => {
                 unsafe {
                     // get the return value
-                    let paddr = (*self.pt_ptr)[self.vaddr.pt_index()]
-                        .try_get_frame()
-                        .unwrap();
+                    let paddr = (*self.pt_ptr)[self.vaddr.pt_index()].try_get_frame().unwrap();
                     // deallocate all higher level tables that are now unused
                     let pte = &raw mut (*self.pt_ptr)[self.vaddr.pt_index()];
                     if (*pte).is_present() {
@@ -205,7 +197,7 @@ impl<'vas> PthWalker<'vas> {
                     }
 
                     let pde = &raw mut (*self.pd_ptr)[self.vaddr.pd_index()];
-                    if is_pagetable_unused(self.pt_ptr) {
+                    if is_pagetable_unused(NonNull::new_unchecked(self.pt_ptr)) {
                         PHYSICAL_FRAME_ALLOCATOR
                             .lock()
                             .deallocate_frame((*pde).try_get_frame().unwrap())
@@ -214,7 +206,7 @@ impl<'vas> PthWalker<'vas> {
                     }
 
                     let pdpte = &raw mut (*self.pdpt_ptr)[self.vaddr.pdpt_index()];
-                    if is_pagetable_unused(self.pd_ptr) {
+                    if is_pagetable_unused(NonNull::new_unchecked(self.pd_ptr)) {
                         PHYSICAL_FRAME_ALLOCATOR
                             .lock()
                             .deallocate_frame((*pdpte).try_get_frame().unwrap())
@@ -223,14 +215,15 @@ impl<'vas> PthWalker<'vas> {
                     }
 
                     let pml4e = &raw mut (*self.pml4_ptr)[self.vaddr.pml4_index()];
-                    if is_pagetable_unused(self.pdpt_ptr) {
+                    if is_pagetable_unused(NonNull::new_unchecked(self.pdpt_ptr)) {
                         PHYSICAL_FRAME_ALLOCATOR
                             .lock()
                             .deallocate_frame((*pml4e).try_get_frame().unwrap())
                             .unwrap();
                         (*pml4e).set_present(false);
                     }
-                    return Ok(paddr);
+                    super::tlb::invalidate_page(self.address_space, self.vaddr);
+                    Ok(paddr)
                 }
             }
             Err(other) => Err(other),

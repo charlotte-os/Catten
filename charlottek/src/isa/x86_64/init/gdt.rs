@@ -1,4 +1,4 @@
-use core::arch::{asm, naked_asm};
+use core::arch::asm;
 use core::mem::size_of;
 use core::ptr;
 
@@ -110,6 +110,10 @@ impl Gdt {
 
     pub fn load(&self) {
         GdtRegister::new(self).load();
+        /* load the tss */
+        unsafe {
+            asm!("ltr [rip + TSS_SELECTOR]");
+        }
     }
 
     pub fn reload_segment_regs() {
@@ -130,12 +134,6 @@ impl Gdt {
                 options(nomem, nostack, preserves_flags),
             );
         }
-    }
-
-    #[inline(always)]
-    fn load_tss() {
-    unsafe {
-        asm!("ltr [rip + TSS_SELECTOR]");
     }
 }
 

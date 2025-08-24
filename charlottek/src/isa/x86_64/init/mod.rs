@@ -54,12 +54,9 @@ impl InitInterface for IsaInitializer {
     fn init() -> Result<(), Self::Error> {
         // load the GDT and reload the segment registers
         BSP_GDT.lock().load();
-        logln!("Loaded GDT");
+        logln!("Loaded GDT and TSS");
         Gdt::reload_segment_regs();
         logln!("Segment registers reloaded");
-        // load the TSS
-        Gdt::load_tss();
-        logln!("Loaded TSS");
         // register the exception handlers in the IDT
         load_exceptions(IDT.lock().borrow_mut());
         logln!("Registered exceptions ISRs");

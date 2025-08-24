@@ -6,6 +6,7 @@ use alloc::collections::btree_map::BTreeMap;
 use alloc::vec::Vec;
 use core::arch::asm;
 use core::iter::Iterator;
+use core::ptr::NonNull;
 
 use spin::RwLock;
 
@@ -16,17 +17,18 @@ use crate::isa::interface::lp_control::LpControlIfce;
 use crate::isa::interface::memory::{AddressSpaceInterface, MemoryInterface, MemoryMapping};
 use crate::logln;
 use crate::memory::pmem::PAddr;
+use crate::memory::vmem::AddressSpaceId;
 
-pub static ADDRESS_SPACE_TABLE: Vec<RwLock<AddressSpace>> = Vec::new();
+pub static ADDRESS_SPACE_TABLE: RwLock<Vec<RwLock<Option<AddressSpace>>>> = RwLock::new(Vec::new());
 
 pub const PAGE_SIZE: usize = 4096;
 pub const N_PAGE_TABLE_ENTRIES: usize = 512;
 pub type PageTable = [pte::PageTableEntry; N_PAGE_TABLE_ENTRIES];
 
-pub fn is_pagetable_unused(table_ptr: *const PageTable) -> bool {
+pub fn is_pagetable_unused(table_ptr: NonNull<PageTable>) -> bool {
     unsafe {
         for i in 0..N_PAGE_TABLE_ENTRIES {
-            if (*table_ptr)[i].is_present() {
+            if (table_ptr.as_ref())[i].is_present() {
                 return false;
             }
         }
@@ -34,11 +36,21 @@ pub fn is_pagetable_unused(table_ptr: *const PageTable) -> bool {
     true
 }
 
+/*
+ * bool is_pagetable_unused(page_table_t *const table_ptr)
+ * {
+ *     assert(table_ptr != NULL);
+ *     for(size_t i = 0; i < N_PAGE_TABLE_ENTRIES; i++) {
+ *         if (pt_is_present(table_ptr[i])) {
+ *             return false;
+ *         }
+ *     }
+ *     return true;
+ * }
+ */
+
 pub struct AddressSpace {
-    /* This is a map from Logical Processor IDs as assigned by this kernel to their corresponding Process Context Identifiers for the
-    address space, if any. The lower 12 bits of the u16 for a given LP should be ANDed with
-    the CR3 value before loading an address space on that LP */
-    pcids: BTreeMap<<LpControl as LpControlIfce>::LpId, u16>,
+    id:  AddressSpaceId,
     // control register 3 i.e. top level page table base register
     cr3: u64,
 }
@@ -50,7 +62,7 @@ impl AddressSpaceInterface for AddressSpace {
             asm!("mov {}, cr3", out(reg) cr3);
         }
         AddressSpace {
-            pcids: BTreeMap::new(),
+            id:  0,
             cr3: cr3,
         }
     }
@@ -71,11 +83,7 @@ impl AddressSpaceInterface for AddressSpace {
         <MemoryInterfaceImpl as MemoryInterface>::VAddr,
         <MemoryInterfaceImpl as MemoryInterface>::Error,
     > {
-        logln!(
-            "Finding free region of {} pages in range {:?}...",
-            n_pages,
-            range
-        );
+        logln!("Finding free region of {} pages in range {:?}...", n_pages, range);
         let mut page_iter = (range.0..range.1).step_by(PAGE_SIZE);
         while let Some(base) = page_iter.next() {
             logln!("Checking base address: {:?}", base);

@@ -4,7 +4,7 @@ use alloc::collections::btree_map::BTreeMap;
 use spin::mutex::Mutex;
 use spin::{Lazy, RwLock};
 
-use super::threading::ThreadId;
+use super::threading::thread::ThreadId;
 use crate::environment::boot_protocol::limine::MP;
 use crate::isa::current_isa::lp_control::LpControl;
 use crate::isa::interface::lp_control::LpControlIfce;
