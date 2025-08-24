@@ -222,7 +222,7 @@ impl<'vas> PthWalker<'vas> {
                             .unwrap();
                         (*pml4e).set_present(false);
                     }
-                    super::tlb::invalidate_page(self.address_space, self.vaddr);
+                    //super::tlb::invalidate_page(self.address_space, self.vaddr);
                     Ok(paddr)
                 }
             }

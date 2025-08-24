@@ -9,11 +9,11 @@
 #[macro_export]
 macro_rules! log {
     ($text:expr $(, $arg:tt)*) => ({
-/*         if cfg! (target_arch = "x86_64") {
+        if cfg!(all(target_arch = "x86_64", debug_assertions)) {
             use core::fmt::Write;
             use crate::drivers::uart::ns16550::LOG_PORT;
             let _ = write!(LOG_PORT.lock(), $text $(, $arg)*);
-        } */
+        }
         use crate::print;
         print!($text $(, $arg)*);
     })
@@ -21,11 +21,11 @@ macro_rules! log {
 #[macro_export]
 macro_rules! logln {
     ($text:expr $(, $arg:tt)*) => ({
-/*         if cfg! (target_arch = "x86_64") {
+         if cfg!(all(target_arch = "x86_64", debug_assertions)) {
             use core::fmt::Write;
             use crate::drivers::uart::ns16550::LOG_PORT;
             let _ = writeln!(LOG_PORT.lock(), $text $(, $arg)*);
-        } */
+        }
         use crate::println;
         println!($text $(, $arg)*);
     })

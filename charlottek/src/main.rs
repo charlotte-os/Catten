@@ -68,6 +68,7 @@ pub unsafe extern "C" fn bsp_main() -> ! {
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ap_main(_cpuinfo: &Cpu) -> ! {
+    logln!("Getting LP ID...");
     let lp_identifier = LpControl::get_lp_id();
     logln!(
         "Logical Processor with x2APIC ID = {} has entered charlottek via ap_main",

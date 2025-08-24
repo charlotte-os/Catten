@@ -78,7 +78,7 @@ isr_general_protection_fault:
 
 	call ih_general_protection_fault
 	hlt
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -106,7 +106,7 @@ isr_page_fault:
 
 	pop rdi //pop the error code
 	call ih_page_fault
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -135,7 +135,7 @@ isr_segment_not_present:
 	pop rdi // Pop the error code into RDI for the handler
 	call ih_segment_not_present
 	push rdi // Push the error code back onto the stack for restoring context
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -163,7 +163,7 @@ isr_debug:
 	push r11
 
 	call ih_debug
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -190,7 +190,7 @@ isr_non_maskable_interrupt:
 	push r11
 
 	call ih_non_maskable_interrupt
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -217,7 +217,7 @@ isr_breakpoint:
 	push r11
 
 	call ih_breakpoint
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -245,7 +245,7 @@ isr_overflow:
 	push r11
 
 	call ih_overflow
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -272,7 +272,7 @@ isr_bound_range_exceeded:
 	push r11
 
 	call ih_bound_range_exceeded
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -299,7 +299,7 @@ isr_invalid_opcode:
 	push r11
 
 	call ih_invalid_opcode
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -326,7 +326,7 @@ isr_device_not_available:
 	push r11
 
 	call ih_device_not_available
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -355,7 +355,7 @@ isr_invalid_tss:
 	pop rdi
 	call ih_invalid_tss
 	push rdi
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -385,7 +385,7 @@ isr_stack_segment_fault:
 	pop rdi
 	call ih_stack_segment_fault
 	push rdi
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -414,7 +414,7 @@ isr_reserved:
 
 	// No error code to pop for this vector, as it's not used
 	call ih_reserved
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -441,7 +441,7 @@ isr_x87_floating_point:
 	push r11
 
 	call ih_x87_floating_point
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -470,7 +470,7 @@ isr_alignment_check:
 	pop rdi
 	call ih_alignment_check
 	push rdi
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -505,7 +505,7 @@ isr_simd_floating_point:
 	push r11
 
 	call ih_simd_floating_point
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -532,7 +532,7 @@ isr_virtualization:
 	push r11
 
 	call ih_virtualization
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -561,7 +561,7 @@ isr_control_protection:
 	pop rdi
 	call ih_control_protection
 	push rdi
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -589,7 +589,7 @@ isr_hypervisor_injection:
 	push r11
 
 	call ih_hypervisor_injection
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -618,7 +618,7 @@ isr_vmm_communication:
 	pop rdi // Pop the error code into RDI for the handler
 	call ih_vmm_communication
 	push rdi // Push the error code back onto the stack for correct stack alignment
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10
@@ -648,7 +648,7 @@ isr_security_exception:
 	pop rdi // Pop the error code into RDI for the handler
 	call ih_security_exception
 	push rdi // Push the error code back onto the stack for correct stack alignment
-	
+
 	// restore the caller saved registers
 	pop r11
 	pop r10

@@ -26,12 +26,18 @@ impl LpControlIfce for LpControl {
 
     #[unsafe(naked)]
     extern "C" fn mask_interrupts() {
-        naked_asm!("cli");
+        naked_asm!{
+            "cli",
+            "ret"
+        };
     }
 
     #[unsafe(naked)]
     extern "C" fn unmask_interrupts() {
-        naked_asm!("sti");
+        naked_asm!{
+            "sti",
+            "ret"
+        };
     }
 
     #[unsafe(naked)]
@@ -39,7 +45,8 @@ impl LpControlIfce for LpControl {
         // Read the LAPIC ID using the x2APIC MSR interface.
         naked_asm!(
             "mov ecx, 0x802",
-            "rdmsr"
+            "rdmsr",
+            "ret"
         );
     }
 
