@@ -9,6 +9,15 @@
 //! accessed via MSR instructions. Consequently, rather than being placed in the top level device
 //! driver module it makes more sense for it to reside here.
 
-fn send_broadcast_ipis(lps: u32, vector: u8) {
+use core::sync::atomic::{AtomicU64, Ordering};
+
+use crate::memory::vmem::{AddressSpaceId, VAddr};
+
+pub struct IpiInfo {
+    task: &'static dyn Fn(),
+    barrier: AtomicU64,
+}
+
+fn send_broadcast_ipis(lps: u32, task: &'static dyn Fn()) {
     todo!("Implement broadcast IPI sending");
 }

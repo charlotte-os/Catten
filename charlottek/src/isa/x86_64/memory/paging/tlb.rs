@@ -3,11 +3,10 @@
 use core::arch::asm;
 
 use crate::isa::interface::system_info::CpuInfoIfce;
-use crate::isa::x86_64::memory::paging::AddressSpace;
 use crate::isa::x86_64::system_info::{CpuInfo, IsaExtension};
 use crate::memory::vmem::{AddressSpaceId, VAddr};
 
-pub fn invalidate_page(address_space: &AddressSpace, vaddr: VAddr) {
+pub fn invalidate_page(address_space: AddressSpaceId, vaddr: VAddr, page_count: u16) {
     todo!()
 }
 

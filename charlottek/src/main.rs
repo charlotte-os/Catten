@@ -1,6 +1,7 @@
 #![no_std]
 #![no_main]
 #![feature(allocator_api)]
+#![feature(atomic_try_update)]
 #![feature(iter_advance_by)]
 #![feature(likely_unlikely)]
 #![feature(ptr_as_ref_unchecked)]
@@ -36,7 +37,6 @@ pub mod multiprocessing;
 pub mod panic;
 pub mod process_mgmt;
 pub mod self_test;
-pub mod threading;
 
 use isa::current_isa::lp_control::LpControl;
 use isa::current_isa::system_info::CpuInfo;

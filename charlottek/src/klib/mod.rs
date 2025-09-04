@@ -6,5 +6,6 @@
 //! there is a compelling reason to do so.
 
 pub mod bitwise;
+pub mod constants;
 pub mod io;
 pub mod raw_mutex;
