@@ -35,7 +35,7 @@ pub mod log;
 pub mod memory;
 pub mod multiprocessing;
 pub mod panic;
-pub mod process_mgmt;
+pub mod scheduler;
 pub mod self_test;
 
 use isa::current_isa::lp_control::LpControl;
