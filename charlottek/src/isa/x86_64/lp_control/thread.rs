@@ -1,15 +1,15 @@
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 
-use spin::RwLock;
+use hashbrown::HashMap;
+use spin::{Lazy, RwLock};
 
 use crate::isa::x86_64::lp_control::{LpControl, LpControlIfce};
 use crate::memory::pmem::PAddr;
-use crate::process_mgmt::ProcessId;
 
 type ThreadId = u64;
 
-static THREAD_LIST: RwLock<Vec<Option<Arc<RwLock<Thread>>>>> = RwLock::new(Vec::new());
+static mut THREAD_LIST: Lazy<HashMap<ThreadId, RwLock<Thread>>> = Lazy::new(HashMap::new);
 
 pub enum Error {
     InvalidLp,
