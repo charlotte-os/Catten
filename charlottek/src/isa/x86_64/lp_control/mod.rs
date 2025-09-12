@@ -1,11 +1,9 @@
 pub mod lp_local;
-pub mod lp_mask;
 pub mod thread;
 
-use core::arch::{asm, naked_asm};
+use core::arch::naked_asm;
 
 pub use crate::isa::interface::lp_control::LpControlIfce;
-use crate::isa::x86_64::init::gdt;
 
 pub enum Error {}
 
