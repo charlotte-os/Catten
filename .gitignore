@@ -4,5 +4,5 @@ ovmf-riscv64
 ovmf-x86_64
 charlottek/target/**
 log.txt
-limine
+Limine
 .vscode/**

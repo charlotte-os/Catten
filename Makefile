@@ -1,24 +1,24 @@
-limine:
-	@if [ ! -d "limine" ]; then \
-		git clone https://github.com/limine-bootloader/limine.git --branch=v8.x-binary --depth=1;\
+Limine:
+	@if [ ! -d "Limine" ]; then \
+		git clone https://codeberg.org/Limine/Limine.git --branch=v9.x-binary --depth=1;\
 	fi
-	make -C limine
+	make -C Limine
 
 ovmf-x86_64:
 	mkdir -p ovmf-x86_64
 	cd ovmf-x86_64 && curl -o OVMF.fd https://retrage.github.io/edk2-nightly/bin/RELEASEX64_OVMF.fd
 
-build-x86_64-debug: limine
+build-x86_64-debug: Limine
 	cd charlottek && cargo build --target x86_64-unknown-none
 	rm -rf iso_root
 	mkdir -p iso_root
 	cp -v charlottek/target/x86_64-unknown-none/debug/charlottek \
-		limine.conf limine/limine-uefi-cd.bin iso_root/
+		Limine.conf Limine/Limine-uefi-cd.bin iso_root/
 	mkdir -p iso_root/EFI/BOOT
-	cp -v limine/BOOTX64.EFI iso_root/EFI/BOOT/
+	cp -v Limine/BOOTX64.EFI iso_root/EFI/BOOT/
 	xorriso -as mkisofs \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot limine-uefi-cd.bin \
+		--efi-boot Limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o charlottek-x86_64-debug.iso
 	rm -rf iso_root
@@ -41,17 +41,17 @@ run-x86_64-qdblog: ovmf-x86_64 build-x86_64-debug
 run-x86_64-log: ovmf-x86_64 build-x86_64-debug
 	qemu-system-x86_64 -enable-kvm -M q35 -cpu host -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom charlottek-x86_64-debug.iso -boot d -serial file:log_x86_64.txt
 
-build-x86_64-release: limine
+build-x86_64-release: Limine
 	cd charlottek && cargo build --target x86_64-unknown-none --release
 	rm -rf iso_root
 	mkdir -p iso_root
 	cp -v charlottek/target/x86_64-unknown-none/release/charlottek \
-		limine.conf limine/limine-uefi-cd.bin iso_root/
+		Limine.conf Limine/Limine-uefi-cd.bin iso_root/
 	mkdir -p iso_root/EFI/BOOT
-	cp -v limine/BOOTX64.EFI iso_root/EFI/BOOT/
+	cp -v Limine/BOOTX64.EFI iso_root/EFI/BOOT/
 	xorriso -as mkisofs \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot limine-uefi-cd.bin \
+		--efi-boot Limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o charlottek-x86_64-release.iso
 	rm -rf iso_root
@@ -67,18 +67,18 @@ check-x86_64:
 ovmf-aarch64:
 	mkdir -p ovmf-aarch64
 	cd ovmf-aarch64 && curl -o OVMF.fd https://retrage.github.io/edk2-nightly/bin/RELEASEAARCH64_QEMU_EFI.fd
-build-aarch64-debug: limine
+build-aarch64-debug: Limine
 	cd charlottek && cargo build --target aarch64-unknown-none
 charlottek-aarch64-debug.iso: build-aarch64-debug
 	rm -rf iso_root
 	mkdir -p iso_root
 	cp -v charlottek/target/aarch64-unknown-none/debug/charlottek \
-		limine.conf limine/limine-uefi-cd.bin iso_root/
+		Limine.conf Limine/Limine-uefi-cd.bin iso_root/
 	mkdir -p iso_root/EFI/BOOT
-	cp -v limine/BOOTAA64.EFI iso_root/EFI/BOOT/
+	cp -v Limine/BOOTAA64.EFI iso_root/EFI/BOOT/
 	xorriso -as mkisofs \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot limine-uefi-cd.bin \
+		--efi-boot Limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o charlottek-aarch64-debug.iso
 	rm -rf iso_root
@@ -89,18 +89,18 @@ run-aarch64-log: ovmf-aarch64 charlottek-aarch64-debug.iso
 		-serial file:log_aarch64.txt
 
 
-build-aarch64-release: limine
+build-aarch64-release: Limine
 	cd charlottek && cargo build --target aarch64-unknown-none --release
 charlottek-aarch64-release.iso: build-aarch64-release
 	rm -rf iso_root
 	mkdir -p iso_root
 	cp -v charlottek/target/aarch64-unknown-none/release/charlottek \
-		limine.conf limine/limine-uefi-cd.bin iso_root/
+		Limine.conf Limine/Limine-uefi-cd.bin iso_root/
 	mkdir -p iso_root/EFI/BOOT
-	cp -v limine/BOOTAA64.EFI iso_root/EFI/BOOT/
+	cp -v Limine/BOOTAA64.EFI iso_root/EFI/BOOT/
 	xorriso -as mkisofs \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot limine-uefi-cd.bin \
+		--efi-boot Limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o charlottek-aarch64-release.iso
 	rm -rf iso_root
@@ -118,12 +118,12 @@ charlottek-riscv64-debug.iso: build-riscv64-debug
 	rm -rf iso_root
 	mkdir -p iso_root
 	cp -v charlottek/target/riscv64gc-unknown-none-elf/debug/charlottek \
-		limine.conf limine/limine-uefi-cd.bin iso_root/
+		Limine.conf Limine/Limine-uefi-cd.bin iso_root/
 	mkdir -p iso_root/EFI/BOOT
-	cp -v limine/BOOTRISCV64.EFI iso_root/EFI/BOOT/
+	cp -v Limine/BOOTRISCV64.EFI iso_root/EFI/BOOT/
 	xorriso -as mkisofs \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot limine-uefi-cd.bin \
+		--efi-boot Limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o charlottek-riscv64-debug.iso
 	rm -rf iso_root
@@ -143,12 +143,12 @@ charlottek-riscv64-release.iso: build-riscv64-release
 	rm -rf iso_root
 	mkdir -p iso_root
 	cp -v charlottek/target/riscv64gc-unknown-none-elf/release/charlottek \
-		limine.conf limine/limine-uefi-cd.bin iso_root/
+		Limine.conf Limine/Limine-uefi-cd.bin iso_root/
 	mkdir -p iso_root/EFI/BOOT
-	cp -v limine/BOOTRISCV64.EFI iso_root/EFI/BOOT/
+	cp -v Limine/BOOTRISCV64.EFI iso_root/EFI/BOOT/
 	xorriso -as mkisofs \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot limine-uefi-cd.bin \
+		--efi-boot Limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o charlottek-riscv64-release.iso
 	rm -rf iso_root
@@ -175,4 +175,4 @@ clean:
 	rm -f log_x86_64.txt
 
 distclean: clean
-	rm -rf limine ovmf*
+	rm -rf Limine ovmf*
