@@ -3,8 +3,8 @@ use core::ops::Add;
 
 use spin::RwLock;
 
+use super::thread::ThreadId;
 use crate::event::{Completion, Event};
-use crate::isa::current_isa::lp_control::thread::ThreadId;
 use crate::isa::interface::memory::address::Address;
 use crate::isa::x86_64::lp_control::{LpControl, LpControlIfce};
 use crate::memory::vmem::AddressSpaceId;

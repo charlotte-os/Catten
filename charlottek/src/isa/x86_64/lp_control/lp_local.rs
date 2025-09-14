@@ -1,7 +1,7 @@
 use alloc::boxed::Box;
 use core::mem::MaybeUninit;
 
-use crate::scheduler::local::LocalScheduler;
+use crate::scheduler::local::{LocalScheduler, ThreadId};
 
 /* This structure contains the global variables that are local to the current logical processor */
 struct LpLocal {
@@ -13,5 +13,16 @@ impl LpLocal {
         LpLocal {
             local_scheduler: lsched,
         }
+    }
+}
+
+pub extern "C" fn get_current_tid() -> ThreadId {
+    unsafe {
+        let lp_local: *const LpLocal;
+        core::arch::asm!(
+            "mov {}, gs:0",
+            out(reg) lp_local,
+        );
+        (*lp_local).local_scheduler.get_current_thread()
     }
 }

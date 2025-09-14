@@ -1,6 +1,6 @@
 mod simple_rr;
 
-pub use crate::isa::current_isa::lp_control::thread::Thread;
+pub use super::thread::{Thread, ThreadId};
 use crate::memory::vmem::AddressSpaceId;
 pub enum Error {
     RingOutOfMemory,
@@ -9,7 +9,7 @@ pub enum Error {
 pub type Duration = u64;
 
 pub trait LocalScheduler {
-    extern "C" fn get_current_thread(&self) -> *mut Thread;
+    extern "C" fn get_current_thread(&self) -> ThreadId;
     extern "C" fn get_current_thread_quantum(&self) -> Duration;
     extern "C" fn advance_thread_iter(&self);
     fn assign_thread(&mut self, thread: Thread) -> Result<(), Error>;

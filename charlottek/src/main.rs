@@ -1,5 +1,6 @@
 #![no_std]
 #![no_main]
+#![feature(abi_custom)]
 #![feature(allocator_api)]
 #![feature(atomic_try_update)]
 #![feature(iter_advance_by)]
