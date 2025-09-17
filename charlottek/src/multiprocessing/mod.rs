@@ -6,7 +6,7 @@ use spin::{Lazy, RwLock};
 
 use crate::environment::boot_protocol::limine::MP;
 use crate::isa::current_isa::lp_control::LpControl;
-use crate::isa::interface::lp_control::LpControlIfce;
+use crate::isa::interface::lp::LpControlIfce;
 use crate::{ap_main, logln};
 
 static LP_COUNT: RwLock<Lazy<u32>> = RwLock::new(Lazy::new(|| {

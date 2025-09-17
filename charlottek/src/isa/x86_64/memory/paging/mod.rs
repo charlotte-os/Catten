@@ -2,7 +2,6 @@ pub mod pte;
 pub mod pth_walker;
 pub mod tlb;
 
-use alloc::collections::btree_map::BTreeMap;
 use alloc::vec::Vec;
 use core::arch::asm;
 use core::iter::Iterator;
@@ -10,10 +9,8 @@ use core::ptr::NonNull;
 
 use spin::RwLock;
 
-use super::super::lp_control::LpControl;
 use super::MemoryInterfaceImpl;
 use super::address::vaddr::VAddr;
-use crate::isa::interface::lp_control::LpControlIfce;
 use crate::isa::interface::memory::AddressSpaceInterface;
 use crate::isa::interface::memory::MemoryInterface;
 use crate::isa::interface::memory::MemoryMapping;

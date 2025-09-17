@@ -41,7 +41,7 @@ pub mod self_test;
 
 use isa::current_isa::lp_control::LpControl;
 use isa::current_isa::system_info::CpuInfo;
-use isa::interface::lp_control::LpControlIfce;
+use isa::interface::lp::LpControlIfce;
 use isa::interface::system_info::CpuInfoIfce;
 use limine::mp::Cpu;
 

@@ -1,7 +1,7 @@
 use crate::isa::current_isa::init::IsaInitializer;
 use crate::isa::current_isa::lp_control::LpControl;
 use crate::isa::interface::init::InitInterface;
-use crate::isa::interface::lp_control::LpControlIfce;
+use crate::isa::interface::lp::LpControlIfce;
 use crate::logln;
 use crate::memory::pmem::*;
 
