@@ -4,7 +4,7 @@
 //! functionality needed by the kernel:
 //! - [`Initialization`](init): ISA specific system initialization and deinitialization
 //! - [`Input/Output`](io): wrappers over MMIO and Port IO
-//! - [`Logical Processor Control`](lp_control): logical processor operating state control
+//! - [`Logical Processor Control`](lp): logical processor operating state control
 //! - [`Memory`](memory): wrappers over ISA specific memory management structures
 //! - [`System Information`](system_info): ISA specific system information
 

@@ -13,12 +13,12 @@ build-x86_64-debug: Limine
 	rm -rf iso_root
 	mkdir -p iso_root
 	cp -v charlottek/target/x86_64-unknown-none/debug/charlottek \
-		Limine.conf Limine/Limine-uefi-cd.bin iso_root/
+		limine.conf Limine/limine-uefi-cd.bin iso_root/
 	mkdir -p iso_root/EFI/BOOT
 	cp -v Limine/BOOTX64.EFI iso_root/EFI/BOOT/
 	xorriso -as mkisofs \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot Limine-uefi-cd.bin \
+		--efi-boot limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o charlottek-x86_64-debug.iso
 	rm -rf iso_root
@@ -46,12 +46,12 @@ build-x86_64-release: Limine
 	rm -rf iso_root
 	mkdir -p iso_root
 	cp -v charlottek/target/x86_64-unknown-none/release/charlottek \
-		Limine.conf Limine/Limine-uefi-cd.bin iso_root/
+		limine.conf Limine/limine-uefi-cd.bin iso_root/
 	mkdir -p iso_root/EFI/BOOT
 	cp -v Limine/BOOTX64.EFI iso_root/EFI/BOOT/
 	xorriso -as mkisofs \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot Limine-uefi-cd.bin \
+		--efi-boot limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o charlottek-x86_64-release.iso
 	rm -rf iso_root
@@ -73,12 +73,12 @@ charlottek-aarch64-debug.iso: build-aarch64-debug
 	rm -rf iso_root
 	mkdir -p iso_root
 	cp -v charlottek/target/aarch64-unknown-none/debug/charlottek \
-		Limine.conf Limine/Limine-uefi-cd.bin iso_root/
+		limine.conf Limine/limine-uefi-cd.bin iso_root/
 	mkdir -p iso_root/EFI/BOOT
 	cp -v Limine/BOOTAA64.EFI iso_root/EFI/BOOT/
 	xorriso -as mkisofs \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot Limine-uefi-cd.bin \
+		--efi-boot limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o charlottek-aarch64-debug.iso
 	rm -rf iso_root
@@ -95,12 +95,12 @@ charlottek-aarch64-release.iso: build-aarch64-release
 	rm -rf iso_root
 	mkdir -p iso_root
 	cp -v charlottek/target/aarch64-unknown-none/release/charlottek \
-		Limine.conf Limine/Limine-uefi-cd.bin iso_root/
+		limine.conf Limine/limine-uefi-cd.bin iso_root/
 	mkdir -p iso_root/EFI/BOOT
 	cp -v Limine/BOOTAA64.EFI iso_root/EFI/BOOT/
 	xorriso -as mkisofs \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot Limine-uefi-cd.bin \
+		--efi-boot limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o charlottek-aarch64-release.iso
 	rm -rf iso_root
@@ -118,12 +118,12 @@ charlottek-riscv64-debug.iso: build-riscv64-debug
 	rm -rf iso_root
 	mkdir -p iso_root
 	cp -v charlottek/target/riscv64gc-unknown-none-elf/debug/charlottek \
-		Limine.conf Limine/Limine-uefi-cd.bin iso_root/
+		limine.conf Limine/limine-uefi-cd.bin iso_root/
 	mkdir -p iso_root/EFI/BOOT
 	cp -v Limine/BOOTRISCV64.EFI iso_root/EFI/BOOT/
 	xorriso -as mkisofs \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot Limine-uefi-cd.bin \
+		--efi-boot limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o charlottek-riscv64-debug.iso
 	rm -rf iso_root
@@ -143,12 +143,12 @@ charlottek-riscv64-release.iso: build-riscv64-release
 	rm -rf iso_root
 	mkdir -p iso_root
 	cp -v charlottek/target/riscv64gc-unknown-none-elf/release/charlottek \
-		Limine.conf Limine/Limine-uefi-cd.bin iso_root/
+		limine.conf Limine/limine-uefi-cd.bin iso_root/
 	mkdir -p iso_root/EFI/BOOT
 	cp -v Limine/BOOTRISCV64.EFI iso_root/EFI/BOOT/
 	xorriso -as mkisofs \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot Limine-uefi-cd.bin \
+		--efi-boot limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o charlottek-riscv64-release.iso
 	rm -rf iso_root

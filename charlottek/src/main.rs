@@ -39,9 +39,8 @@ pub mod panic;
 pub mod scheduler;
 pub mod self_test;
 
-use isa::current_isa::lp_control::LpControl;
+use isa::current_isa::lp;
 use isa::current_isa::system_info::CpuInfo;
-use isa::interface::lp::LpControlIfce;
 use isa::interface::system_info::CpuInfoIfce;
 use limine::mp::Cpu;
 
@@ -64,16 +63,20 @@ pub unsafe extern "C" fn bsp_main() -> ! {
     logln!("Physical Address bits implmented: {}", (CpuInfo::get_paddr_sig_bits()));
     logln!("Virtual Address bits implmented: {}", (CpuInfo::get_vaddr_sig_bits()));
     logln!("Nothing left to do. Waiting for interrupts...");
-    LpControl::halt()
+    lp::halt!()
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ap_main(_cpuinfo: &Cpu) -> ! {
-    logln!("Getting LP ID...");
-    let lp_identifier = LpControl::get_lp_id();
+    let mut id_ctr_lock = multiprocessing::id_counter.lock();
+    let lp_id = *id_ctr_lock;
+    *id_ctr_lock += 1;
+    drop(id_ctr_lock);
+    lp::store_lp_id(lp_id);
     logln!(
-        "Logical Processor with x2APIC ID = {} has entered charlottek via ap_main",
-        lp_identifier
+        "Logical Processor {} with local interrupt controller ID = {} has entered charlottek via ap_main",
+        (lp::get_lp_id()),
+        (lp::curr_lic_id!())
     );
-    LpControl::halt()
+    lp::halt!()
 }

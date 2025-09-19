@@ -42,17 +42,19 @@ impl TssDescriptor {
     }
 }
 
+const GDT_NORMAL_ENTRY_COUNT: usize = 5; // Null, Kernel Code, Kernel Data, User Code, User Data
+
 #[derive(Debug)]
 #[repr(C, packed(1))]
 pub struct Gdt {
-    segment_descs: [SegmentDescriptor; 4],
+    segment_descs: [SegmentDescriptor; GDT_NORMAL_ENTRY_COUNT],
     tss_desc: TssDescriptor,
 }
 
 impl Gdt {
     pub fn new(tss: &Tss) -> Self {
         let mut gdt = Gdt {
-            segment_descs: [SegmentDescriptor::new(); 4],
+            segment_descs: [SegmentDescriptor::new(); GDT_NORMAL_ENTRY_COUNT],
             tss_desc: TssDescriptor::new(),
         };
 
@@ -60,10 +62,12 @@ impl Gdt {
         gdt.set_segment_desc(0, 0, 0, 0, 0);
         //Kernel Mode Code Segment
         gdt.set_segment_desc(1, 0, 0xfffff, 0x9a, 0xa);
+        //Kernel Mode Data Segment
+        gdt.set_segment_desc(2, 0, 0xfffff, 0x92, 0x0);
         //User Mode Code Segment
-        gdt.set_segment_desc(2, 0, 0xfffff, 0xfa, 0xa);
-        //All Mode Data Segment
-        gdt.set_segment_desc(3, 0, 0xfffff, 0b1000_0000, 0x0);
+        gdt.set_segment_desc(3, 0, 0xfffff, 0xfa, 0xa);
+        //User Mode Data Segment
+        gdt.set_segment_desc(4, 0, 0xfffff, 0xf2, 0x0);
         //Task State Segment
         gdt.set_tss_desc(ptr::addr_of!(*tss) as u64, size_of::<Tss>() as u32);
 
@@ -129,7 +133,7 @@ impl Gdt {
                 "mov fs, ax",
                 "mov gs, ax",
                 "mov ss, ax",
-                options(nomem, nostack, preserves_flags),
+                out("rax") _,
             );
         }
     }
@@ -186,13 +190,16 @@ pub static NULL_SELECTOR: SegmentSelector = make_segment_selector(0, false);
 pub static KERNEL_CODE_SELECTOR: SegmentSelector = make_segment_selector(1, false);
 #[allow(unused)]
 #[unsafe(no_mangle)]
-pub static USER_CODE_SELECTOR: SegmentSelector = make_segment_selector(2, true);
+pub static KERNEL_DATA_SELECTOR: SegmentSelector = make_segment_selector(2, false);
 #[allow(unused)]
 #[unsafe(no_mangle)]
-pub static DATA_SELECTOR: SegmentSelector = make_segment_selector(3, false);
+pub static USER_CODE_SELECTOR: SegmentSelector = make_segment_selector(3, true);
 #[allow(unused)]
 #[unsafe(no_mangle)]
-pub static TSS_SELECTOR: SegmentSelector = make_segment_selector(4, false);
+pub static USER_DATA_SELECTOR: SegmentSelector = make_segment_selector(4, true);
+#[allow(unused)]
+#[unsafe(no_mangle)]
+pub static TSS_SELECTOR: SegmentSelector = make_segment_selector(5, false);
 
 #[derive(Debug)]
 #[repr(C, packed(1))]

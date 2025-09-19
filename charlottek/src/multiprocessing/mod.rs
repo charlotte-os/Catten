@@ -1,13 +1,14 @@
 //! # Multi-Processor Control
 use alloc::collections::btree_map::BTreeMap;
 
+use spin::Lazy;
+use spin::RwLock;
 use spin::mutex::Mutex;
-use spin::{Lazy, RwLock};
 
+use crate::ap_main;
 use crate::environment::boot_protocol::limine::MP;
-use crate::isa::current_isa::lp_control::LpControl;
-use crate::isa::interface::lp::LpControlIfce;
-use crate::{ap_main, logln};
+use crate::isa::current_isa::lp;
+use crate::logln;
 
 static LP_COUNT: RwLock<Lazy<u32>> = RwLock::new(Lazy::new(|| {
     if let Some(mp_res) = MP.get_response() {
@@ -17,16 +18,18 @@ static LP_COUNT: RwLock<Lazy<u32>> = RwLock::new(Lazy::new(|| {
     }
 }));
 
+pub static id_counter: Mutex<u32> = Mutex::new(1);
+
 pub fn get_lp_count() -> u32 {
     **LP_COUNT.read()
 }
 
 #[derive(Debug)]
-pub enum MpControlError {
+pub enum MpError {
     SecondaryLpStartupFailed,
 }
 
-pub fn start_secondary_lps() -> Result<(), MpControlError> {
+pub fn start_secondary_lps() -> Result<(), MpError> {
     logln!("Starting Secondary LPs...");
     if let Some(res) = MP.get_response() {
         logln!("Obtained multiprocessor response from Limine");
@@ -44,6 +47,6 @@ pub fn start_secondary_lps() -> Result<(), MpControlError> {
         }
         Ok(())
     } else {
-        Err(MpControlError::SecondaryLpStartupFailed)
+        Err(MpError::SecondaryLpStartupFailed)
     }
 }

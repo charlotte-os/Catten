@@ -1,7 +1,6 @@
 use crate::isa::current_isa::init::IsaInitializer;
-use crate::isa::current_isa::lp_control::LpControl;
+use crate::isa::current_isa::lp;
 use crate::isa::interface::init::InitInterface;
-use crate::isa::interface::lp::LpControlIfce;
 use crate::logln;
 use crate::memory::pmem::*;
 
@@ -36,5 +35,5 @@ pub fn bsp_init() {
 }
 
 pub fn ap_init() {
-    logln!("Initializing LP {}...", (LpControl::get_lp_id()));
+    logln!("Initializing LP {}...", (lp::get_lp_id()));
 }

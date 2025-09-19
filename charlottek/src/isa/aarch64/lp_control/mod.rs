@@ -1,4 +1,4 @@
-use crate::isa::interface::lp_control::LpControlIfce;
+use crate::isa::interface::lp;
 
 pub struct LpControl;
 
