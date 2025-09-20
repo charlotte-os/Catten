@@ -8,7 +8,7 @@ pub mod ns16550;
 use core::fmt::Write;
 use core::marker::Sized;
 
-use crate::isa::current_isa::io::IoReg8;
+use crate::isa::target::io::IoReg8;
 
 pub trait Uart: Write + Sized {
     type Error: Sized;

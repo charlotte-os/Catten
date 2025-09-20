@@ -1,8 +1,8 @@
 pub mod address;
 
-use crate::isa::current_isa::memory::MemoryInterfaceImpl;
-use crate::isa::current_isa::memory::address::paddr::PAddr;
-use crate::isa::current_isa::memory::address::vaddr::VAddr;
+use crate::isa::target::memory::MemoryInterfaceImpl;
+use crate::isa::target::memory::address::paddr::PAddr;
+use crate::isa::target::memory::address::vaddr::VAddr;
 pub use crate::memory::vmem::{MemoryMapping, PageType};
 
 pub trait MemoryInterface {

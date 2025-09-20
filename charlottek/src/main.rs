@@ -39,16 +39,16 @@ pub mod panic;
 pub mod scheduler;
 pub mod self_test;
 
-use isa::current_isa::lp;
-use isa::current_isa::system_info::CpuInfo;
 use isa::interface::system_info::CpuInfoIfce;
+use isa::target::lp;
+use isa::target::system_info::CpuInfo;
 use limine::mp::Cpu;
 
 /// This is the bootstrap processor's entry point into the kernel. The `bsp_main` function is
 /// called by the bootloader after setting up the environment. It is made C ABI compatible so
 /// that it can be called by Limine or any other Limine Boot Protocol compliant bootloader.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn bsp_main() -> ! {
+pub extern "C" fn bsp_main() -> ! {
     logln!("charlottek Kernel Version 0.1.0");
     logln!("=========================");
     logln!("Initializing the system using the bootstrap processor...");
@@ -76,7 +76,7 @@ pub unsafe extern "C" fn ap_main(_cpuinfo: &Cpu) -> ! {
     logln!(
         "Logical Processor {} with local interrupt controller ID = {} has entered charlottek via ap_main",
         (lp::get_lp_id()),
-        (lp::curr_lic_id!())
+        (lp::get_lic_id!())
     );
     lp::halt!()
 }

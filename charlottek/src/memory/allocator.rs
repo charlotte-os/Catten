@@ -4,8 +4,8 @@ use talc::{ErrOnOom, Span, Talc, Talck};
 
 use super::pmem::PHYSICAL_FRAME_ALLOCATOR;
 use super::vmem::{MemoryMapping, VAddr};
-use crate::isa::current_isa::memory::MemoryInterfaceImpl;
-use crate::isa::current_isa::memory::paging::AddressSpace;
+use crate::isa::target::memory::MemoryInterfaceImpl;
+use crate::isa::target::memory::paging::AddressSpace;
 use crate::isa::interface::memory::address::VirtualAddress;
 use crate::isa::interface::memory::{AddressSpaceInterface, MemoryInterface};
 use crate::isa::x86_64::memory::address::VADDR_SIG_BITS;

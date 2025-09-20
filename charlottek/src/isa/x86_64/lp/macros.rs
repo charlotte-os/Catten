@@ -1,0 +1,86 @@
+#[rustfmt::skip]
+#[macro_export]
+macro_rules! halt {
+    () => {
+        loop {
+            unsafe {
+                core::arch::asm!("hlt", options(nomem, nostack, preserves_flags));
+            }
+        }
+    };
+}
+pub use halt;
+
+#[rustfmt::skip]
+#[macro_export]
+macro_rules! mask_interrupts {
+    () => {
+        unsafe {
+            asm!("cli", options(nomem, nostack));
+        }
+    };
+}
+pub use mask_interrupts;
+
+#[rustfmt::skip]
+#[macro_export]
+macro_rules! unmask_interrupts {
+    () => {
+        unsafe {
+            asm!("sti", options(nomem, nostack));
+        }
+    };
+}
+pub use unmask_interrupts;
+
+pub const LAPIC_ID_MSR: u32 = 0x802;
+
+#[rustfmt::skip]
+#[macro_export]
+macro_rules! get_lic_id {
+    () => {{
+        let apic_id: u32;
+        use crate::isa::x86_64::lp::LAPIC_ID_MSR;
+        unsafe {
+            core::arch::asm!(
+                "rdmsr",
+                inlateout("ecx") LAPIC_ID_MSR => _,
+                lateout("eax") apic_id,
+                lateout("edx") _,
+                options(nostack, preserves_flags)
+            );
+        }
+        apic_id
+    }};
+}
+pub use get_lic_id;
+
+pub const TSC_AUX_MSR: u32 = 0xc000_0103;
+
+pub fn store_lp_id(id: LpId) {
+    let id_upper = ((id as u64) >> 32) as u32;
+    let id_lower = ((id as u64) & (1 << 32) - 1) as u32;
+    unsafe {
+        asm!(
+            "wrmsr",
+            in("eax") id_lower,
+            in("edx") id_upper,
+            in("ecx") TSC_AUX_MSR,
+            options(nostack, preserves_flags)
+        );
+    }
+}
+
+pub fn get_lp_id() -> LpId {
+    let id: u32;
+    unsafe {
+        asm!(
+            "rdtscp",
+            out("eax") _,
+            out("edx") _,
+            out("ecx") id,
+            options(nomem, nostack, preserves_flags)
+        );
+    }
+    id
+}

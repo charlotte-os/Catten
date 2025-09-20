@@ -8,8 +8,8 @@ use limine::response::MemoryMapResponse;
 use spin::Mutex;
 
 use crate::environment::boot_protocol::limine::{HHDM_REQUEST, MEMEORY_MAP_REQUEST};
-pub use crate::isa::current_isa::memory::MemoryInterfaceImpl;
-pub use crate::isa::current_isa::memory::address::paddr::{PAddr, PAddrError};
+pub use crate::isa::target::memory::MemoryInterfaceImpl;
+pub use crate::isa::target::memory::address::paddr::{PAddr, PAddrError};
 pub use crate::isa::interface::memory::MemoryInterface;
 use crate::isa::interface::memory::address::Address;
 pub use crate::isa::interface::memory::address::PhysicalAddress;

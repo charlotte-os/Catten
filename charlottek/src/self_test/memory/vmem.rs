@@ -1,4 +1,4 @@
-use crate::isa::current_isa::memory::paging::AddressSpace;
+use crate::isa::target::memory::paging::AddressSpace;
 use crate::isa::interface::memory::AddressSpaceInterface;
 use crate::isa::interface::memory::address::VirtualAddress;
 use crate::logln;

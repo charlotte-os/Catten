@@ -9,7 +9,7 @@ Concise, action-focused context to make high-quality changes rapidly. Keep respo
 - Kernel is `#![no_std]`, uses `alloc` + custom global allocator built atop physical + virtual memory layers.
 
 ## 2. Key Subsystem Layout
-- `isa/` – Architectural abstraction. `isa::interface/*` defines traits (memory, lp_control, system_info, io, interrupts). Concrete per-arch modules live under `isa/x86_64`, `isa/aarch64`, etc. Use `isa::current_isa` for arch-selected reexports.
+- `isa/` – Architectural abstraction. `isa::interface/*` defines traits (memory, lp_control, system_info, io, interrupts). Concrete per-arch modules live under `isa/x86_64`, `isa/aarch64`, etc. Use `isa::target` for arch-selected reexports.
 - `memory/` – Layered memory mgmt: `pmem` (physical frame allocator), `vmem` (address space + paging abstraction), `allocator.rs` (heap init using Talc). Kernel heap region is dynamically found in higher half; page size & significant VA bits come from ISA module.
 - `drivers/` – Early basic drivers (keyboard ps/2, uart ns16550). Pattern: each driver in its own submodule, minimal global state guarded by spin or custom raw mutex.
 - `multiprocessing/` – Brings up secondary logical processors (x2APIC requirement noted in README). Uses Limine SMP info.
@@ -23,7 +23,7 @@ Concise, action-focused context to make high-quality changes rapidly. Keep respo
 - Avoid introducing non-Rust dependencies unless justified (only Rust/C/asm allowed; prefer Rust crates like existing Talc allocator usage).
 - Global resources: guard with `spin::Mutex` or custom `klib::raw_mutex::RawMutex` (wraps `lock_api`). Follow existing allocator initialization style.
 - Memory mapping: use `AddressSpaceInterface::map_page` with a `MemoryMapping { vaddr, paddr, page_type }`. Do NOT handcraft page tables in new code; route through the ISA abstraction.
-- Architecture selection: gate new ISA code with `#[cfg(target_arch = "x86_64")]` etc and expose via `current_isa` reexport for call sites.
+- Architecture selection: gate new ISA code with `#[cfg(target_arch = "x86_64")]` etc and expose via `target` reexport for call sites.
 - Logging & panics: always prefer `logln!` before halting. Panic path must remain minimal (no allocations assumed safe).
 
 ## 4. Build & Run Workflows (Do These, Don’t Recreate)

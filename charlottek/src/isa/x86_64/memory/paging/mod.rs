@@ -2,23 +2,22 @@ pub mod pte;
 pub mod pth_walker;
 pub mod tlb;
 
-use alloc::vec::Vec;
+use alloc::collections::btree_map::BTreeMap;
 use core::arch::asm;
 use core::iter::Iterator;
 use core::ptr::NonNull;
 
-use spin::RwLock;
+use spin::Mutex;
 
 use super::MemoryInterfaceImpl;
 use super::address::vaddr::VAddr;
-use crate::isa::interface::memory::AddressSpaceInterface;
-use crate::isa::interface::memory::MemoryInterface;
-use crate::isa::interface::memory::MemoryMapping;
+use crate::isa::interface::memory::{AddressSpaceInterface, MemoryInterface, MemoryMapping};
 use crate::logln;
 use crate::memory::pmem::PAddr;
 use crate::memory::vmem::AddressSpaceId;
 
-pub static ADDRESS_SPACE_TABLE: RwLock<Vec<RwLock<Option<AddressSpace>>>> = RwLock::new(Vec::new());
+pub static ADDRESS_SPACE_TABLE: Mutex<BTreeMap<AddressSpaceId, AddressSpace>> =
+    Mutex::new(BTreeMap::new());
 
 pub const PAGE_SIZE: usize = 4096;
 pub const N_PAGE_TABLE_ENTRIES: usize = 512;
@@ -47,11 +46,16 @@ pub fn is_pagetable_unused(table_ptr: NonNull<PageTable>) -> bool {
  *     return true;
  * }
  */
-
+#[repr(transparent)]
 pub struct AddressSpace {
-    id:  AddressSpaceId,
     // control register 3 i.e. top level page table base register
     cr3: u64,
+}
+
+impl AddressSpace {
+    pub fn get_cr3(&self) -> u64 {
+        self.cr3
+    }
 }
 
 impl AddressSpaceInterface for AddressSpace {

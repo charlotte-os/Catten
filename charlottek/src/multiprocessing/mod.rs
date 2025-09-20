@@ -7,7 +7,7 @@ use spin::mutex::Mutex;
 
 use crate::ap_main;
 use crate::environment::boot_protocol::limine::MP;
-use crate::isa::current_isa::lp;
+use crate::isa::target::lp;
 use crate::logln;
 
 static LP_COUNT: RwLock<Lazy<u32>> = RwLock::new(Lazy::new(|| {

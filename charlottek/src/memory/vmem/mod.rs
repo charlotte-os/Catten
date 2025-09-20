@@ -1,5 +1,5 @@
-pub use crate::isa::current_isa::memory::address::paddr::PAddr;
-pub use crate::isa::current_isa::memory::address::vaddr::VAddr;
+pub use crate::isa::target::memory::address::paddr::PAddr;
+pub use crate::isa::target::memory::address::vaddr::VAddr;
 
 pub type AddressSpaceId = usize;
 

@@ -1,6 +1,6 @@
 use core::panic::PanicInfo;
 
-use crate::isa::current_isa::lp;
+use crate::isa::target::lp;
 use crate::logln;
 
 #[panic_handler]
