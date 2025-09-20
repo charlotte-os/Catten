@@ -5,8 +5,6 @@ use spin::Lazy;
 
 use crate::isa::x86_64::memory::paging::ADDRESS_SPACE_TABLE;
 
-pub type LpId = u32;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 #[repr(C)]
 pub struct CoreState {

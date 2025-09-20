@@ -14,8 +14,8 @@ pub struct Thread {
 pub trait Scheduler {
     type Config;
 
-    fn current_thread(&self) -> ThreadId;
-    fn next_thread(&self) -> Option<ThreadId>;
+    fn init(&mut self);
+    extern "C" fn advance(&self);
     fn add_thread(&mut self, thread: Thread);
     fn terminate_thread(&mut self, thread_id: ThreadId);
     fn abort_thread(&mut self, thread_id: ThreadId);

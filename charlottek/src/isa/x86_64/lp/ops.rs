@@ -9,6 +9,7 @@ macro_rules! halt {
         }
     };
 }
+#[rustfmt::skip]
 pub use halt;
 
 #[rustfmt::skip]
@@ -20,6 +21,7 @@ macro_rules! mask_interrupts {
         }
     };
 }
+#[rustfmt::skip]
 pub use mask_interrupts;
 
 #[rustfmt::skip]
@@ -31,6 +33,7 @@ macro_rules! unmask_interrupts {
         }
     };
 }
+#[rustfmt::skip]
 pub use unmask_interrupts;
 
 pub const LAPIC_ID_MSR: u32 = 0x802;
@@ -53,7 +56,12 @@ macro_rules! get_lic_id {
         apic_id
     }};
 }
+#[rustfmt::skip]
 pub use get_lic_id;
+
+use core::arch::asm;
+
+use super::LpId;
 
 pub const TSC_AUX_MSR: u32 = 0xc000_0103;
 
