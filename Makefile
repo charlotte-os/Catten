@@ -1,6 +1,6 @@
 Limine:
 	@if [ ! -d "Limine" ]; then \
-		git clone https://codeberg.org/Limine/Limine.git --branch=v9.x-binary --depth=1;\
+		git clone https://codeberg.org/Limine/Limine.git --branch=v10.x-binary --depth=1;\
 	fi
 	make -C Limine
 

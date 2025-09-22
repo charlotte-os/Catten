@@ -34,18 +34,6 @@ pub fn is_pagetable_unused(table_ptr: NonNull<PageTable>) -> bool {
     true
 }
 
-/*
- * bool is_pagetable_unused(page_table_t *const table_ptr)
- * {
- *     assert(table_ptr != NULL);
- *     for(size_t i = 0; i < N_PAGE_TABLE_ENTRIES; i++) {
- *         if (pt_is_present(table_ptr[i])) {
- *             return false;
- *         }
- *     }
- *     return true;
- * }
- */
 #[repr(transparent)]
 pub struct AddressSpace {
     // control register 3 i.e. top level page table base register
@@ -65,7 +53,6 @@ impl AddressSpaceInterface for AddressSpace {
             asm!("mov {}, cr3", out(reg) cr3);
         }
         AddressSpace {
-            id:  0,
             cr3: cr3,
         }
     }

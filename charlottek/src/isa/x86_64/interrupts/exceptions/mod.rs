@@ -16,7 +16,6 @@ pub fn load_exceptions(idt: &mut Idt) {
     idt.set_gate(12, isr_stack_segment_fault, 1 << 3, true, false);
     idt.set_gate(13, isr_general_protection_fault, 1 << 3, true, true);
     idt.set_gate(14, isr_page_fault, 1 << 3, true, true);
-    idt.set_gate(15, isr_reserved, 1 << 3, true, false);
     idt.set_gate(16, isr_x87_floating_point, 1 << 3, true, false);
     idt.set_gate(17, isr_alignment_check, 1 << 3, true, false);
     idt.set_gate(18, isr_machine_check, 1 << 3, true, true);
@@ -46,7 +45,6 @@ unsafe extern "C" {
     fn isr_general_protection_fault();
     fn isr_segment_not_present();
     fn isr_page_fault();
-    fn isr_reserved();
     fn isr_x87_floating_point();
     fn isr_alignment_check();
     fn isr_machine_check();
@@ -145,12 +143,6 @@ extern "C" fn ih_page_fault(error_code: u64) {
     }
     logln!("Page fault address: {:x}", pf_addr);
     panic!("Page fault");
-}
-
-#[unsafe(no_mangle)]
-extern "C" fn ih_reserved() {
-    logln!("Reserved exception occurred!");
-    panic!("Reserved exception");
 }
 
 #[unsafe(no_mangle)]
