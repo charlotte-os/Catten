@@ -7,6 +7,7 @@ charlottek is still in early development, and core subsystems are actively being
 |[Discord](https://discord.gg/vE7bCCKx4X)|
 |-----------------------------------------------------|
 |[Matrix](https://matrix.to/#/#charlotteos:matrix.org)|
+|-----------------------------------------------------|
 
 ## Programming Languages
 
