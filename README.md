@@ -4,10 +4,10 @@
 
 charlottek is still in early development, and core subsystems are actively being built. We welcome contributions—feel free to grab an issue from the tracker, suggest features, or participate in discussions on our repository, Discord server or Matrix instance.
 
+|Find us on:|
+|-----------|
 |[Discord](https://discord.gg/vE7bCCKx4X)|
-|-----------------------------------------------------|
 |[Matrix](https://matrix.to/#/#charlotteos:matrix.org)|
-|-----------------------------------------------------|
 
 ## Programming Languages
 
