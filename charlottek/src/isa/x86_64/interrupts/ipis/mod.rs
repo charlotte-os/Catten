@@ -14,14 +14,22 @@
 //! the requested operation before any of them return from the ISR.
 
 use alloc::vec::Vec;
+use core::arch::global_asm;
 
+use crate::cpu::scheduler::GLOBAL_SCHEDULER;
 use crate::cpu::threads::ThreadId;
-use crate::isa::lp::lp_local::LpLocal;
 use crate::isa::memory::tlb;
 use crate::memory::vmem::VAddr;
 use crate::memory::{AddressSpaceId, KERNEL_ASID};
 
-enum Ipi {
+global_asm!(include_str!("ipis.asm"));
+
+unsafe extern "C" {
+    pub fn isr_ipi();
+}
+
+#[derive(Clone, Debug)]
+pub enum Ipi {
     VMemInval(AddressSpaceId, VAddr, usize),
     AsidInval(AddressSpaceId),
     TerminateThreads(Vec<ThreadId>),
@@ -44,15 +52,15 @@ pub extern "C" fn ih_ipi(mailbox: &'static mut Option<Ipi>) {
                 }
             }
             Ipi::AsidInval(asid) => tlb::inval_asid(asid),
-            Ipi::TerminateThreads(tids) => unsafe {
-                (*LpLocal::get()).local_scheduler.terminate_threads(tids)
-            },
-            Ipi::AbortThreads(tids) => unsafe {
-                (*LpLocal::get()).local_scheduler.abort_threads(tids)
-            },
-            Ipi::AbortAsThreads(asid) => unsafe {
-                (*LpLocal::get()).local_scheduler.abort_as_threads(asid)
-            },
+            Ipi::TerminateThreads(tids) => {
+                GLOBAL_SCHEDULER.get_local_lp_scheduler().lock().terminate_threads(tids)
+            }
+            Ipi::AbortThreads(tids) => {
+                GLOBAL_SCHEDULER.get_local_lp_scheduler().lock().abort_threads(tids)
+            }
+            Ipi::AbortAsThreads(asid) => {
+                GLOBAL_SCHEDULER.get_local_lp_scheduler().lock().abort_as_threads(asid)
+            }
         }
     }
 }

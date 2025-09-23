@@ -1,7 +1,8 @@
-.code 64
+.code64
 
 .section .text
 .global isr_ipi
-mov rdi, gs:[GS_IPI_MAILBOX_OFFSET]
+isr_ipi:
+mov rdi, gs:[rip + GS_OFFSET_IPI_MAILBOX]
 call ih_ipi
 iretq
