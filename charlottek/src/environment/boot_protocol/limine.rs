@@ -13,7 +13,7 @@ use crate::isa::memory::MemoryInterfaceImpl;
 use crate::memory::MemoryInterface as _;
 
 pub static BASE_REVISION: BaseRevision = BaseRevision::new();
-pub static MEMEORY_MAP_REQUEST: MemoryMapRequest = MemoryMapRequest::new();
+pub static MEMORY_MAP_REQUEST: MemoryMapRequest = MemoryMapRequest::new();
 pub static HHDM_REQUEST: HhdmRequest = HhdmRequest::new();
 pub static EXECUTABLE_ADDRESS_REQUEST: ExecutableAddressRequest = ExecutableAddressRequest::new();
 pub static FRAMEBUFFER_REQUEST: FramebufferRequest = FramebufferRequest::new();

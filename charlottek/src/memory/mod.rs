@@ -6,7 +6,7 @@ pub use pmem::{MemoryInterface, PAddr, PhysicalFrameAllocator};
 pub use spin::{Lazy, Mutex, RwLock};
 pub use vmem::VAddr;
 
-use crate::environment::boot_protocol::limine::{HHDM_REQUEST, MEMEORY_MAP_REQUEST};
+use crate::environment::boot_protocol::limine::{HHDM_REQUEST, MEMORY_MAP_REQUEST};
 pub use crate::isa::interface::memory::AddressSpaceInterface;
 pub use crate::isa::memory::paging::AddressSpace;
 pub use crate::klib::collections::id_table::IdTable;
@@ -27,6 +27,6 @@ pub static HHDM_BASE: Lazy<VAddr> = Lazy::new(|| {
 });
 pub static PHYSICAL_FRAME_ALLOCATOR: Lazy<Mutex<PhysicalFrameAllocator>> = Lazy::new(|| {
     Mutex::new(PhysicalFrameAllocator::from(
-        MEMEORY_MAP_REQUEST.get_response().expect("Limine failed to provide a memory map."),
+        MEMORY_MAP_REQUEST.get_response().expect("Limine failed to provide a memory map."),
     ))
 });

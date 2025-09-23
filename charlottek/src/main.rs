@@ -60,8 +60,8 @@ pub extern "C" fn bsp_main() -> ! {
     logln!("System Information:");
     logln!("CPU Vendor: {}", (CpuInfo::get_vendor()));
     logln!("CPU Model: {}", (CpuInfo::get_model()));
-    logln!("Physical Address bits implmented: {}", (CpuInfo::get_paddr_sig_bits()));
-    logln!("Virtual Address bits implmented: {}", (CpuInfo::get_vaddr_sig_bits()));
+    logln!("Physical Address bits implemented: {}", (CpuInfo::get_paddr_sig_bits()));
+    logln!("Virtual Address bits implemented: {}", (CpuInfo::get_vaddr_sig_bits()));
     logln!("Nothing left to do. Waiting for interrupts...");
     halt!()
 }

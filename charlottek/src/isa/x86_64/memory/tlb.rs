@@ -41,9 +41,10 @@ pub fn inval_asid(asid: AddressSpaceId) {
     }
 }
 
-pub fn inval_range_kernel(base: VAddr, size: usize) {
+pub fn inval_range_kernel(base: VAddr, num_pages: usize) {
     let raw_base = <VAddr as Into<usize>>::into(base);
-    for page in (raw_base..raw_base + size * PAGE_SIZE).step_by(PAGE_SIZE) {
+    let len_bytes = num_pages * PAGE_SIZE;
+    for page in (raw_base..raw_base + len_bytes).step_by(PAGE_SIZE) {
         unsafe {
             asm!(
                 "invlpg [{page}]",
