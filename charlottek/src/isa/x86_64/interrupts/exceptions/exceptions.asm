@@ -16,7 +16,6 @@
 .extern ih_device_not_available
 .extern ih_invalid_tss
 .extern ih_stack_segment_fault
-.extern ih_reserved
 .extern ih_x87_floating_point
 .extern ih_alignment_check
 .extern ih_machine_check
@@ -397,34 +396,6 @@ isr_stack_segment_fault:
 	pop rax
 
 	add rsp, 8
-	iretq
-
-.global isr_reserved
-isr_reserved:
-		// save the caller saved registers
-	push rax
-	push rdi
-	push rsi
-	push rdx
-	push rcx
-	push r8
-	push r9
-	push r10
-	push r11
-
-	// No error code to pop for this vector, as it's not used
-	call ih_reserved
-
-	// restore the caller saved registers
-	pop r11
-	pop r10
-	pop r9
-	pop r8
-	pop rcx
-	pop rdi
-	pop rsi
-	pop rax
-
 	iretq
 
 .global isr_x87_floating_point
