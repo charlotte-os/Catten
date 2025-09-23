@@ -1,6 +1,5 @@
 pub mod pte;
 pub mod pth_walker;
-pub mod tlb;
 
 use alloc::collections::btree_map::BTreeMap;
 use core::arch::asm;
