@@ -65,7 +65,10 @@ pub extern "C" fn bsp_main() -> ! {
     logln!("Nothing left to do. Waiting for interrupts...");
     lp::halt!()
 }
-
+/// This is the application processor's entry point into the kernel. The `ap_main` function is
+/// called by each application processor upon entering the kernel. It initializes the processor and
+/// then hands it off to the scheduler. It is made C ABI compatible so that it can work with the
+/// Limine Boot Protocol MP feature.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ap_main(_cpuinfo: &Cpu) -> ! {
     let mut id_ctr_lock = multiprocessing::id_counter.lock();
