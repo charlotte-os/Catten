@@ -1,4 +1,4 @@
-use crate::isa::target::lp;
+use crate::isa::lp;
 pub trait InterruptManagerIfce {
     type Error;
     type Ipi;

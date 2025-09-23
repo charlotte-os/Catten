@@ -25,6 +25,7 @@
 
 extern crate alloc;
 
+pub mod cpu;
 pub mod drivers;
 pub mod environment;
 pub mod event;
@@ -34,14 +35,13 @@ pub mod isa;
 pub mod klib;
 pub mod log;
 pub mod memory;
-pub mod multiprocessing;
 pub mod panic;
-pub mod scheduler;
 pub mod self_test;
 
+use cpu::multiprocessor;
 use isa::interface::system_info::CpuInfoIfce;
-use isa::target::lp;
-use isa::target::system_info::CpuInfo;
+use isa::lp::ops::*;
+use isa::system_info::CpuInfo;
 use limine::mp::Cpu;
 
 /// This is the bootstrap processor's entry point into the kernel. The `bsp_main` function is
@@ -55,7 +55,7 @@ pub extern "C" fn bsp_main() -> ! {
     init::bsp_init();
     logln!("System initialized.");
     logln!("Starting secondary LPs...");
-    multiprocessing::start_secondary_lps().expect("Failed to start secondary LPs");
+    multiprocessor::start_secondary_lps().expect("Failed to start secondary LPs");
     self_test::run_self_tests();
     logln!("System Information:");
     logln!("CPU Vendor: {}", (CpuInfo::get_vendor()));
@@ -63,7 +63,7 @@ pub extern "C" fn bsp_main() -> ! {
     logln!("Physical Address bits implmented: {}", (CpuInfo::get_paddr_sig_bits()));
     logln!("Virtual Address bits implmented: {}", (CpuInfo::get_vaddr_sig_bits()));
     logln!("Nothing left to do. Waiting for interrupts...");
-    lp::halt!()
+    halt!()
 }
 /// This is the application processor's entry point into the kernel. The `ap_main` function is
 /// called by each application processor upon entering the kernel. It initializes the processor and
@@ -71,15 +71,15 @@ pub extern "C" fn bsp_main() -> ! {
 /// Limine Boot Protocol MP feature.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ap_main(_cpuinfo: &Cpu) -> ! {
-    let mut id_ctr_lock = multiprocessing::id_counter.lock();
+    let mut id_ctr_lock = multiprocessor::id_counter.lock();
     let lp_id = *id_ctr_lock;
     *id_ctr_lock += 1;
     drop(id_ctr_lock);
-    lp::store_lp_id(lp_id);
+    store_lp_id(lp_id);
     logln!(
         "Logical Processor {} with local interrupt controller ID = {} has entered charlottek via ap_main",
-        (lp::get_lp_id()),
-        (lp::get_lic_id!())
+        (get_lp_id()),
+        (get_lic_id!())
     );
-    lp::halt!()
+    halt!()
 }

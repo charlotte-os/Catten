@@ -32,7 +32,11 @@ impl Idt {
         gate.addr0 = u16::try_from(isr_addr & 0xffff).unwrap();
         gate.segment_selector = segment_selector;
         gate.reserved_ist_index = 0u8; // the IST is not used
-        gate.flags = if is_trap { 0b1111u8 } else { 0b1110u8 }; //gate type
+        gate.flags = if is_trap {
+            0b1111u8
+        } else {
+            0b1110u8
+        }; //gate type
         gate.flags &= !(0b1u8 << 4); //reserved bit
         gate.flags &= !(0b11u8 << 5); //privilege ring required to use gate
         if is_present {
@@ -103,7 +107,10 @@ struct Idtr {
 
 impl Idtr {
     fn new(size: u16, base: u64) -> Self {
-        Idtr { size, base }
+        Idtr {
+            size,
+            base,
+        }
     }
 }
 

@@ -3,34 +3,14 @@
 //! This module is responsible for managing physical memory. It provides an interface for allocating
 //! and freeing physical memory frames.
 
-use lazy_static::lazy_static;
-use limine::response::MemoryMapResponse;
-use spin::Mutex;
+pub use limine::response::MemoryMapResponse;
 
-use crate::environment::boot_protocol::limine::{HHDM_REQUEST, MEMEORY_MAP_REQUEST};
-pub use crate::isa::target::memory::MemoryInterfaceImpl;
-pub use crate::isa::target::memory::address::paddr::{PAddr, PAddrError};
 pub use crate::isa::interface::memory::MemoryInterface;
 use crate::isa::interface::memory::address::Address;
 pub use crate::isa::interface::memory::address::PhysicalAddress;
+pub use crate::isa::memory::MemoryInterfaceImpl;
+pub use crate::isa::memory::address::paddr::{PAddr, PAddrError};
 use crate::logln;
-
-pub type VAddr = <MemoryInterfaceImpl as MemoryInterface>::VAddr;
-
-lazy_static! {
-    pub static ref HHDM_BASE: VAddr = VAddr::from(
-        HHDM_REQUEST
-            .get_response()
-            .expect("Limine failed to provide a higher half direct mapping region.")
-            .offset() as usize,
-    );
-    pub static ref PHYSICAL_FRAME_ALLOCATOR: Mutex<PhysicalFrameAllocator> =
-        Mutex::new(PhysicalFrameAllocator::from(
-            MEMEORY_MAP_REQUEST
-                .get_response()
-                .expect("Limine failed to provide a memory map.")
-        ));
-}
 
 #[derive(Debug, Clone, Copy)]
 pub enum Error {
@@ -109,10 +89,7 @@ impl From<&MemoryMapResponse> for PhysicalFrameAllocator {
         logln!("PhysicalFrameAllocator bitmap size: {:?}", bitmap_size);
         logln!("Finding best fit memory location for the PhysicalFrameAllocator bitmap...");
         let bitmap_addr: PAddr = find_mmap_best_fit(response, bitmap_size).unwrap();
-        logln!(
-            "PhysicalFrameAllocator bitmap addr (physical): {:?}",
-            bitmap_addr
-        );
+        logln!("PhysicalFrameAllocator bitmap addr (physical): {:?}", bitmap_addr);
         let pfa = PhysicalFrameAllocator {
             bitmap_ptr: unsafe { bitmap_addr.into_hhdm_mut::<u8>() },
             bitmap_len: bitmap_size,

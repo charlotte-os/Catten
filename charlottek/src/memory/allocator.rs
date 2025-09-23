@@ -2,14 +2,13 @@ use lazy_static::lazy_static;
 use spin::Mutex;
 use talc::{ErrOnOom, Span, Talc, Talck};
 
-use super::pmem::PHYSICAL_FRAME_ALLOCATOR;
+use super::PHYSICAL_FRAME_ALLOCATOR;
 use super::vmem::{MemoryMapping, VAddr};
-use crate::isa::target::memory::MemoryInterfaceImpl;
-use crate::isa::target::memory::paging::AddressSpace;
 use crate::isa::interface::memory::address::VirtualAddress;
 use crate::isa::interface::memory::{AddressSpaceInterface, MemoryInterface};
-use crate::isa::x86_64::memory::address::VADDR_SIG_BITS;
-use crate::isa::x86_64::memory::paging::PAGE_SIZE;
+use crate::isa::memory::MemoryInterfaceImpl;
+use crate::isa::memory::address::VADDR_SIG_BITS;
+use crate::isa::memory::paging::{AddressSpace, PAGE_SIZE};
 use crate::klib::raw_mutex::RawMutex;
 
 lazy_static! {
@@ -27,10 +26,7 @@ const KERNEL_HEAP_PAGE_COUNT: usize = 1024; // 4 MiB kernel heap size
 
 pub fn init_allocator() -> Result<(), ()> {
     let kernel_heap_start = <MemoryInterfaceImpl as MemoryInterface>::AddressSpace::get_current()
-        .find_free_region(
-            KERNEL_HEAP_PAGE_COUNT,
-            (*HIGHER_HALF_START, *HIGHER_HALF_END),
-        )
+        .find_free_region(KERNEL_HEAP_PAGE_COUNT, (*HIGHER_HALF_START, *HIGHER_HALF_END))
         .expect("Failed to find free region for kernel heap");
     let kernel_heap_size = KERNEL_HEAP_PAGE_COUNT * PAGE_SIZE;
 

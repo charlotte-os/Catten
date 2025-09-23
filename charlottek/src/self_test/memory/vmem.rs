@@ -1,8 +1,8 @@
-use crate::isa::target::memory::paging::AddressSpace;
 use crate::isa::interface::memory::AddressSpaceInterface;
 use crate::isa::interface::memory::address::VirtualAddress;
+use crate::isa::memory::paging::AddressSpace;
 use crate::logln;
-use crate::memory::pmem::PHYSICAL_FRAME_ALLOCATOR;
+use crate::memory::PHYSICAL_FRAME_ALLOCATOR;
 use crate::memory::vmem::{MemoryMapping, PageType, VAddr};
 
 pub fn test_vmem() {
@@ -43,9 +43,7 @@ pub fn test_vmem() {
         logln!("Magic number matches.");
         logln!("Test completed successfully.");
         logln!("Unmapping test page.");
-        current_as
-            .unmap_page(higher_half_start)
-            .expect("Error unmapping page.");
+        current_as.unmap_page(higher_half_start).expect("Error unmapping page.");
         logln!("Test page successfully unmapped.");
         logln!("All virtual memory tests passed!");
     }

@@ -13,11 +13,7 @@ use super::MemoryInterfaceImpl;
 use super::address::vaddr::VAddr;
 use crate::isa::interface::memory::{AddressSpaceInterface, MemoryInterface, MemoryMapping};
 use crate::logln;
-use crate::memory::pmem::PAddr;
-use crate::memory::vmem::AddressSpaceId;
-
-pub static ADDRESS_SPACE_TABLE: Mutex<BTreeMap<AddressSpaceId, AddressSpace>> =
-    Mutex::new(BTreeMap::new());
+use crate::memory::{AddressSpaceId, PAddr};
 
 pub const PAGE_SIZE: usize = 4096;
 pub const N_PAGE_TABLE_ENTRIES: usize = 512;

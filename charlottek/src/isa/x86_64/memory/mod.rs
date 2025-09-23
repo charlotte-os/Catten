@@ -1,8 +1,9 @@
 pub mod address;
 pub mod paging;
+pub mod tlb;
 
-use crate::isa::target::memory::address::paddr::PAddrError;
 pub use crate::isa::interface::memory::MemoryInterface;
+use crate::isa::memory::address::paddr::PAddrError;
 use crate::memory::pmem::Error as PMemError;
 use crate::memory::vmem::Error as VMemError;
 

@@ -1,14 +1,9 @@
-//! # Multi-Processor Control
-use alloc::collections::btree_map::BTreeMap;
-
-use spin::Lazy;
-use spin::RwLock;
+//! # Multi-Processor Management
 use spin::mutex::Mutex;
+use spin::{Lazy, RwLock};
 
-use crate::ap_main;
 use crate::environment::boot_protocol::limine::MP;
-use crate::isa::target::lp;
-use crate::logln;
+use crate::{ap_main, logln};
 
 static LP_COUNT: RwLock<Lazy<u32>> = RwLock::new(Lazy::new(|| {
     if let Some(mp_res) = MP.get_response() {

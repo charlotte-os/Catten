@@ -12,7 +12,7 @@ use crate::isa::interface::memory::address::VirtualAddress;
 use crate::isa::interface::memory::{AddressSpaceInterface, MemoryInterface};
 use crate::isa::x86_64::memory::address::paddr::PAddr;
 use crate::isa::x86_64::memory::address::vaddr::VAddr;
-use crate::memory::pmem::PHYSICAL_FRAME_ALLOCATOR;
+use crate::memory::PHYSICAL_FRAME_ALLOCATOR;
 
 const CR3_ADDRESS_MASK: u64 = 0x000ffffffffff000;
 

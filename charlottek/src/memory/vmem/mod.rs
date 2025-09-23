@@ -1,7 +1,5 @@
-pub use crate::isa::target::memory::address::paddr::PAddr;
-pub use crate::isa::target::memory::address::vaddr::VAddr;
-
-pub type AddressSpaceId = usize;
+pub use crate::isa::memory::address::paddr::PAddr;
+pub use crate::isa::memory::address::vaddr::VAddr;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Error {

@@ -1,6 +1,6 @@
 use crate::isa::interface::memory::address::PhysicalAddress;
 use crate::logln;
-use crate::memory::pmem::PHYSICAL_FRAME_ALLOCATOR;
+use crate::memory::PHYSICAL_FRAME_ALLOCATOR;
 
 pub fn test_pmem() {
     logln!("Starting physical memory subsystem tests...");
@@ -12,17 +12,11 @@ pub fn test_pmem() {
         Ok(ref frame) => {
             logln!("Allocated a frame at {:?}.", frame);
             let magic_number = 0xcafebabeu32;
-            logln!(
-                "Writing magic number 0x{:X} to the beginning of the frame.",
-                magic_number
-            );
+            logln!("Writing magic number 0x{:X} to the beginning of the frame.", magic_number);
             unsafe {
                 let frame_ptr = frame.into_hhdm_mut::<u32>();
                 frame_ptr.write(magic_number);
-                logln!(
-                    "Reading back magic number from the frame: {:X}",
-                    (frame_ptr.read())
-                );
+                logln!("Reading back magic number from the frame: {:X}", (frame_ptr.read()));
             }
             match pfa_lock.deallocate_frame(*frame) {
                 Ok(()) => {

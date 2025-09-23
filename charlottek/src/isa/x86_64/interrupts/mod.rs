@@ -1,6 +1,6 @@
 pub mod exceptions;
 pub mod idt;
-pub mod ipi;
+pub mod ipis;
 
 use idt::*;
 use spin::Mutex;

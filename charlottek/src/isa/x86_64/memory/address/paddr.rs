@@ -1,9 +1,7 @@
 use core::ops::Add;
 
-use crate::isa::interface::memory::address::Address;
-use crate::isa::interface::memory::address::PhysicalAddress;
-use crate::isa::interface::memory::address::VirtualAddress;
-use crate::memory::pmem::HHDM_BASE;
+use crate::isa::interface::memory::address::{Address, PhysicalAddress, VirtualAddress};
+use crate::memory::HHDM_BASE;
 
 #[derive(Debug, Clone, Copy)]
 pub enum PAddrError {

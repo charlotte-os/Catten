@@ -43,7 +43,7 @@ pub const LAPIC_ID_MSR: u32 = 0x802;
 macro_rules! get_lic_id {
     () => {{
         let apic_id: u32;
-        use crate::isa::x86_64::lp::LAPIC_ID_MSR;
+        use crate::isa::lp::ops::LAPIC_ID_MSR;
         unsafe {
             core::arch::asm!(
                 "rdmsr",

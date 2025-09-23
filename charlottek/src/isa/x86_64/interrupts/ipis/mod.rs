@@ -13,18 +13,46 @@
 //! completed handling the IPI. This is important for ensuring that all target LPs have completed
 //! the requested operation before any of them return from the ISR.
 
-enum UnicastIpi {
-    // Halt the target processor in a loop such that it handles interrupts but does not execute
-    // any threads until it is woken up by a Wake IPI.
-    SoftSleep,
-    // Wake up and call the scheduler to start executing threads.
-    Wake,
+use alloc::vec::Vec;
+
+use crate::cpu::threads::ThreadId;
+use crate::isa::lp::lp_local::LpLocal;
+use crate::isa::memory::tlb;
+use crate::memory::vmem::VAddr;
+use crate::memory::{AddressSpaceId, KERNEL_ASID};
+
+enum Ipi {
+    VMemInval(AddressSpaceId, VAddr, usize),
+    AsidInval(AddressSpaceId),
+    TerminateThreads(Vec<ThreadId>),
+    AbortThreads(Vec<ThreadId>),
+    AbortAsThreads(AddressSpaceId),
 }
 
-#[unsafe_(no_mangle)]
-pub extern "C" fn ih_unicast_ipi() {}
-
-enum MulticastIpi {
-    VMemInval(usize, usize, usize),
-    AsidInval(usize),
+#[unsafe(no_mangle)]
+pub extern "C" fn ih_ipi(mailbox: &'static mut Option<Ipi>) {
+    if let Some(ipi) = mailbox.take() {
+        match ipi {
+            Ipi::VMemInval(asid, base, size) => {
+                if asid == KERNEL_ASID {
+                    tlb::inval_range_kernel(base, size);
+                } else {
+                    // SAFETY: This is safe because we are executing in an interrupt context where
+                    // preemption is disabled, and we are not modifying any data structures that
+                    // could be accessed by other threads.
+                    tlb::inval_range_user(asid, base, size);
+                }
+            }
+            Ipi::AsidInval(asid) => tlb::inval_asid(asid),
+            Ipi::TerminateThreads(tids) => unsafe {
+                (*LpLocal::get()).local_scheduler.terminate_threads(tids)
+            },
+            Ipi::AbortThreads(tids) => unsafe {
+                (*LpLocal::get()).local_scheduler.abort_threads(tids)
+            },
+            Ipi::AbortAsThreads(asid) => unsafe {
+                (*LpLocal::get()).local_scheduler.abort_as_threads(asid)
+            },
+        }
+    }
 }

@@ -1,8 +1,8 @@
-use crate::isa::target::init::IsaInitializer;
-use crate::isa::target::lp;
+use crate::isa::init::IsaInitializer;
 use crate::isa::interface::init::InitInterface;
+use crate::isa::lp;
 use crate::logln;
-use crate::memory::pmem::*;
+use crate::memory::PHYSICAL_FRAME_ALLOCATOR;
 
 pub fn bsp_init() {
     logln!("Performing ISA specific initialization...");
@@ -35,5 +35,5 @@ pub fn bsp_init() {
 }
 
 pub fn ap_init() {
-    logln!("Initializing LP {}...", (lp::get_lp_id()));
+    logln!("Initializing LP {}...", (lp::ops::get_lp_id()));
 }

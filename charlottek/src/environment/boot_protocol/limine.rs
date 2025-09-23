@@ -9,8 +9,8 @@ use limine::request::{
     StackSizeRequest,
 };
 
-use crate::isa::target::memory::MemoryInterfaceImpl;
-use crate::memory::pmem::MemoryInterface as _;
+use crate::isa::memory::MemoryInterfaceImpl;
+use crate::memory::MemoryInterface as _;
 
 pub static BASE_REVISION: BaseRevision = BaseRevision::new();
 pub static MEMEORY_MAP_REQUEST: MemoryMapRequest = MemoryMapRequest::new();
