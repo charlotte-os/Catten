@@ -12,6 +12,7 @@ use lazy_static::lazy_static;
 use spin::Mutex;
 
 use crate::isa::interface::init::InitInterface;
+use crate::isa::lp::ops::get_lp_id;
 use crate::isa::x86_64::interrupts::*;
 use crate::logln;
 
@@ -54,15 +55,15 @@ impl InitInterface for IsaInitializer {
     fn init() -> Result<(), Self::Error> {
         // load the GDT and reload the segment registers
         BSP_GDT.lock().load();
-        logln!("Loaded GDT and TSS");
+        logln!("LP{}: Loaded GDT and TSS", (get_lp_id()));
         Gdt::reload_segment_regs();
-        logln!("Segment registers reloaded");
+        logln!("LP{}: Segment registers reloaded", (get_lp_id()));
         // register the exception handlers in the IDT
-        load_exceptions(IDT.lock().borrow_mut());
-        logln!("Registered exceptions ISRs");
+        load_fixed_isr_gates(IDT.lock().borrow_mut());
+        logln!("LP{}: Fixed ISR gates loaded", (get_lp_id()));
         // load the IDT
         IDT.lock().load();
-        logln!("Loaded IDT");
+        logln!("LP{}: Loaded IDT", (get_lp_id()));
         // return success
         Ok(())
     }

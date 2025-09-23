@@ -1,28 +1,38 @@
+use alloc::boxed::Box;
+use alloc::collections::BTreeSet;
 use alloc::collections::vec_deque::VecDeque;
 use alloc::vec::Vec;
 
-use hashbrown::HashSet;
 use spin::Mutex;
+use spin::rwlock::RwLock;
 
 use crate::cpu::threads::{Thread, ThreadId};
+use crate::isa::lp::ops::get_lp_id;
 use crate::memory::AddressSpaceId;
 
-pub static GLOBAL_SCHEDULER: spin::Lazy<Mutex<GlobalScheduler>> =
-    spin::Lazy::new(|| Mutex::new(GlobalScheduler::new()));
+pub static GLOBAL_SCHEDULER: GlobalScheduler = GlobalScheduler::new();
 
 pub struct GlobalScheduler {
-    blocked_threads:  HashSet<ThreadId>,
-    ready_unassigned: VecDeque<ThreadId>,
+    blocked_threads: RwLock<BTreeSet<ThreadId>>,
+    ready_unassigned: Mutex<VecDeque<ThreadId>>,
+    lp_schedulers: Vec<Mutex<Box<dyn LpScheduler>>>,
 }
 
 impl GlobalScheduler {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
-            blocked_threads:  HashSet::new(),
-            ready_unassigned: VecDeque::new(),
+            blocked_threads: RwLock::new(BTreeSet::new()),
+            ready_unassigned: Mutex::new(VecDeque::new()),
+            lp_schedulers: Vec::new(),
         }
     }
+
+    pub fn get_local_lp_scheduler(&self) -> &Mutex<Box<dyn LpScheduler>> {
+        &self.lp_schedulers[get_lp_id() as usize]
+    }
 }
+
+unsafe impl Sync for GlobalScheduler {}
 
 pub trait LpScheduler {
     extern "C" fn advance(&self);
