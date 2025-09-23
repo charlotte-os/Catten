@@ -14,11 +14,8 @@ pub use crate::klib::collections::id_table::IdTable;
 pub type AddressSpaceId = usize;
 
 pub const KERNEL_ASID: AddressSpaceId = 0;
-
-pub static ADDRESS_SPACE_TABLE: Lazy<RwLock<AddressSpaceTable>> =
-    Lazy::new(|| RwLock::new(AddressSpaceTable::new()));
-
 type AddressSpaceTable = IdTable<AddressSpaceId, AddressSpace>;
+pub static ADDRESS_SPACE_TABLE: Lazy<AddressSpaceTable> = Lazy::new(|| AddressSpaceTable::new());
 
 pub static HHDM_BASE: Lazy<VAddr> = Lazy::new(|| {
     VAddr::from(

@@ -7,7 +7,7 @@ use spin::{Lazy, Mutex, RwLock, RwLockReadGuard};
 use crate::isa::lp::thread_state::ThreadState;
 use crate::klib::collections::id_table::IdTable;
 
-static mut ThreadTable: Lazy<Mutex<ThreadTable>> = Lazy::new(|| Mutex::new(ThreadTable::new()));
+static mut THREAD_TABLE: Lazy<ThreadTable> = Lazy::new(ThreadTable::new);
 
 type ThreadTable = IdTable<ThreadId, Thread>;
 
