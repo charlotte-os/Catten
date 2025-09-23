@@ -52,14 +52,22 @@ impl VAddr {
 
     /// Safety: The address must be in canonical form
     pub const unsafe fn from_raw_unchecked(raw: usize) -> Self {
-        VAddr { raw }
+        VAddr {
+            raw,
+        }
     }
 }
 
 impl Address for VAddr {
-    const MAX: Self = VAddr { raw: usize::MAX };
-    const MIN: Self = VAddr { raw: 0 };
-    const NULL: Self = VAddr { raw: 0 };
+    const MAX: Self = VAddr {
+        raw: usize::MAX,
+    };
+    const MIN: Self = VAddr {
+        raw: 0,
+    };
+    const NULL: Self = VAddr {
+        raw: 0,
+    };
 
     fn is_aligned_to(&self, alignment: usize) -> bool {
         self.raw % alignment == 0
@@ -80,17 +88,23 @@ impl Address for VAddr {
     }
 
     unsafe fn from_unchecked(addr: usize) -> Self {
-        VAddr { raw: addr }
+        VAddr {
+            raw: addr,
+        }
     }
 }
 
 impl VirtualAddress for VAddr {
     fn from_ptr<T>(ptr: *const T) -> Self {
-        VAddr { raw: ptr as usize }
+        VAddr {
+            raw: ptr as usize,
+        }
     }
 
     fn from_mut<T>(ptr: *mut T) -> Self {
-        VAddr { raw: ptr as usize }
+        VAddr {
+            raw: ptr as usize,
+        }
     }
 
     fn into_ptr<T>(self) -> *const T {
@@ -104,14 +118,15 @@ impl VirtualAddress for VAddr {
 
 impl From<usize> for VAddr {
     fn from(value: usize) -> Self {
-        crate::logln!("VADDR_SIG_BITS = {}", (*super::VADDR_SIG_BITS));
         let mask = (1 << *super::VADDR_SIG_BITS) - 1;
         let sign_extended = if value & (1 << (*super::VADDR_SIG_BITS - 1)) != 0 {
             value | (!mask)
         } else {
             value & mask
         };
-        VAddr { raw: sign_extended }
+        VAddr {
+            raw: sign_extended,
+        }
     }
 }
 
