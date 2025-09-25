@@ -7,8 +7,8 @@ use lazy_static::lazy_static;
 use spin::Mutex;
 
 use crate::drivers::uart::Uart;
-use crate::isa::io::{self, IoReg8};
 use crate::isa::interface::io::{IReg8Ifce, OReg8Ifce};
+use crate::isa::io::{self, IoReg8};
 use crate::klib::io::Read;
 
 #[cfg(target_arch = "x86_64")]
@@ -17,7 +17,13 @@ lazy_static! {
         Mutex::new(Uart16550::try_new(io::IoReg8::IoPort(COM1)).unwrap());
 }
 
-// standard PC COM port base addresses
+/*
+ * Standard PC COM port base addresses
+ *
+ * These won't work on modern hardware as it no longer uses the ISA bus however they are useful
+ * for logging when running under hypervisors like QEMU or Bochs which emulate ISA hardware.
+ * Typically modern hardware exposes UARTs via MMIO or PCIe.
+ */
 #[allow(unused)]
 static COM1: u16 = 0x3f8;
 #[allow(unused)]
@@ -64,7 +70,9 @@ impl Uart for Uart16550 {
     type Error = Error;
 
     fn try_new(base: IoReg8) -> Result<Self, Error> {
-        let port = Uart16550 { base: base };
+        let port = Uart16550 {
+            base: base,
+        };
         (port.base + 1).write(0x00); // Disable all interrupts
         (port.base + 3).write(0x80); // Enable DLAB (set baud rate divisor)
         (port.base + 0).write(0x01); // Set divisor to 1 (lo byte) 115200 baud
