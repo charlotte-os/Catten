@@ -51,9 +51,6 @@ pub extern "C" fn ih_interprocessor_interrupt(ipi_queue: &'static mut Mutex<VecD
                 if asid == KERNEL_ASID {
                     tlb::inval_range_kernel(base, size);
                 } else {
-                    // SAFETY: This is safe because we are executing in an interrupt context where
-                    // preemption is disabled, and we are not modifying any data structures that
-                    // could be accessed by other threads.
                     tlb::inval_range_user(asid, base, size);
                 }
             }
