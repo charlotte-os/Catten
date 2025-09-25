@@ -13,8 +13,11 @@
 //! completed handling the IPI. This is important for ensuring that all target LPs have completed
 //! the requested operation before any of them return from the ISR.
 
+use alloc::collections::vec_deque::VecDeque;
 use alloc::vec::Vec;
 use core::arch::global_asm;
+
+use spin::Mutex;
 
 use crate::cpu::scheduler::GLOBAL_SCHEDULER;
 use crate::cpu::threads::ThreadId;
@@ -22,10 +25,13 @@ use crate::isa::memory::tlb;
 use crate::memory::vmem::VAddr;
 use crate::memory::{AddressSpaceId, KERNEL_ASID};
 
+#[unsafe(no_mangle)]
+pub static GS_OFFSET_IPI_QUEUE: usize = 16;
+
 global_asm!(include_str!("ipis.asm"));
 
 unsafe extern "C" {
-    pub fn isr_ipi();
+    pub fn isr_interprocessor_interrupt();
 }
 
 #[derive(Clone, Debug)]
@@ -38,8 +44,8 @@ pub enum Ipi {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn ih_ipi(mailbox: &'static mut Option<Ipi>) {
-    if let Some(ipi) = mailbox.take() {
+pub extern "C" fn ih_interprocessor_interrupt(ipi_queue: &'static mut Mutex<VecDeque<Ipi>>) {
+    while let Some(ipi) = ipi_queue.lock().pop_front() {
         match ipi {
             Ipi::VMemInval(asid, base, size) => {
                 if asid == KERNEL_ASID {
