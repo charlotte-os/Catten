@@ -1,5 +1,7 @@
 pub mod gdt;
 
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::borrow::BorrowMut;
 // core
 use core::ptr;
@@ -12,59 +14,33 @@ use lazy_static::lazy_static;
 use spin::Mutex;
 
 use crate::isa::interface::init::InitInterface;
+use crate::isa::interface::lp;
 use crate::isa::lp::ops::get_lp_id;
+use crate::isa::lp::{INTERRUPT_STACK_SIZE, LP_TABLE, LogicalProcessor};
+use crate::isa::memory::paging::PAGE_SIZE;
 use crate::isa::x86_64::interrupts::*;
 use crate::logln;
 
-/// The BSP stack size is 4 pages by default.
-const BSP_STACK_SIZE: usize = 4096 * 4;
-
-/// The BSP stack for the kernel.
-/// DO NOT TOUCH THIS, IT IS USED BY THE CPU AS THE KERNEL STACK
-/// UNTIL THE DYNAMIC ALLOCATOR IS INITIALIZED
-#[used]
-static BSP_STACK: [u8; BSP_STACK_SIZE] = [0u8; BSP_STACK_SIZE];
-lazy_static! {
-        /// The Task State Segment for the BSP.
-        /// In long mode, the TSS is used to store the stack pointer for the kernel
-        /// for each privilege level and for interrupts. It also contains the I/O
-        /// permission bitmap which is used to expose or block I/O ports to user-space
-        /// applications.
-
-        static ref BSP_TSS: Mutex<Tss> = Mutex::new(Tss::new(ptr::addr_of!(BSP_STACK) as u64));
-        /// The Global Descriptor Table for the BSP.
-        /// The GDT is used to store the segment descriptors for the kernel and
-        /// user-space applications. In long mode, the GDT is used to store the segment
-        /// descriptors for the kernel and user-space applications. It is largely just a
-        /// leftover in long mode, as segmentation is no longer supported.
-        /// It also contains a system segment descriptor pointing to the TSS which is
-        /// mandatory for interrupts to work.
-        static ref BSP_GDT: Mutex<Gdt> = Mutex::new(Gdt::new(&BSP_TSS.lock()));
-}
 pub struct IsaInitializer;
 
-#[derive(Debug)]
-pub enum Error {
-    InvalidGdt,
-    InvalidTss,
-}
-
 impl InitInterface for IsaInitializer {
-    type Error = Error;
+    type Error = core::convert::Infallible;
 
-    fn init() -> Result<(), Self::Error> {
-        // load the GDT and reload the segment registers
-        BSP_GDT.lock().load();
-        logln!("LP{}: Loaded GDT and TSS", (get_lp_id()));
-        Gdt::reload_segment_regs();
-        logln!("LP{}: Segment registers reloaded", (get_lp_id()));
-        // register the exception handlers in the IDT
-        load_fixed_isr_gates(IDT.lock().borrow_mut());
-        logln!("LP{}: Fixed ISR gates loaded", (get_lp_id()));
-        // load the IDT
-        IDT.lock().load();
-        logln!("LP{}: Loaded IDT", (get_lp_id()));
+    fn init_bsp() -> Result<(), Self::Error> {
         // return success
+        Ok(())
+    }
+
+    fn init_ap() -> Result<(), Self::Error> {
+        let lp_id = get_lp_id();
+        logln!("LP{}: Starting x86-64 logical processor initialization", lp_id);
+        let mut lp_table = LP_TABLE.lock();
+        let lp = lp_table[lp_id as usize].borrow_mut();
+        *lp = LogicalProcessor::new(
+            Vec::<u8>::with_capacity(INTERRUPT_STACK_SIZE).into_boxed_slice(),
+        );
+        lp.init();
+        logln!("LP{}: x86-64 logical processor initialization complete", lp_id);
         Ok(())
     }
 

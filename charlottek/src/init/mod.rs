@@ -6,7 +6,7 @@ use crate::memory::PHYSICAL_FRAME_ALLOCATOR;
 
 pub fn bsp_init() {
     logln!("Performing ISA specific initialization...");
-    match IsaInitializer::init() {
+    match IsaInitializer::init_bsp() {
         Ok(_) => logln!("ISA specific initialization complete."),
         Err(e) => {
             // initialization failure is irrecoverable
@@ -31,9 +31,19 @@ pub fn bsp_init() {
         }
     }
     logln!("Intialized kernel allocator.");
-    logln!("Starting secondary processors...");
+    logln!("ISA independent initialization complete.");
+    logln!("BSP initialization complete.");
 }
 
 pub fn ap_init() {
-    logln!("Initializing LP {}...", (lp::ops::get_lp_id()));
+    let lp_id = lp::ops::get_lp_id();
+    logln!("Initializing LP {}...", lp_id);
+    logln!("LP {}: Performing ISA specific initialization...", lp_id);
+    match IsaInitializer::init_ap() {
+        Ok(_) => logln!("LP {}: ISA specific initialization complete.", lp_id),
+        Err(e) => {
+            // initialization failure is irrecoverable
+            panic!("LP {}: ISA specific initialization failed: {:?}", lp_id, e);
+        }
+    }
 }
