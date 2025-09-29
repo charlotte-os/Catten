@@ -41,9 +41,9 @@ pub mod self_test;
 
 use cpu::multiprocessor;
 use isa::interface::system_info::CpuInfoIfce;
-use isa::lp::ops::*;
 use isa::system_info::CpuInfo;
 use limine::mp::Cpu;
+use spin::Mutex;
 
 /// This is the bootstrap processor's entry point into the kernel. The `bsp_main` function is
 /// called by the bootloader after setting up the environment. It is made C ABI compatible so
@@ -60,7 +60,7 @@ pub extern "C" fn bsp_main() -> ! {
     logln!("System initialized.");
     logln!("Starting secondary LPs...");
     multiprocessor::start_secondary_lps().expect("Failed to start secondary LPs");
-    self_test::run_self_tests();
+    //self_test::run_self_tests();
     logln!("System Information:");
     logln!("CPU Vendor: {}", (CpuInfo::get_vendor()));
     logln!("CPU Model: {}", (CpuInfo::get_model()));

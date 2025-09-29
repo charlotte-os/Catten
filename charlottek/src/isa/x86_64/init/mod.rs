@@ -1,9 +1,13 @@
+mod ap;
+mod bsp;
 pub mod gdt;
 
 use crate::isa::interface::init::InitInterface;
 use crate::isa::lp::ops::get_lp_id;
-use crate::isa::lp::{init_ap, init_bsp};
+use crate::isa::memory::paging::PAGE_SIZE;
 use crate::logln;
+
+const INTERRUPT_STACK_SIZE: usize = PAGE_SIZE * 4;
 
 pub struct IsaInitializer;
 
@@ -14,7 +18,7 @@ impl InitInterface for IsaInitializer {
         let lp_id = get_lp_id();
         logln!("LP{}: Starting x86-64 bootstrap processor initialization", lp_id);
         // Initialize TSS, GDT, and IDT
-        init_bsp();
+        bsp::init_bsp();
         logln!("LP{}: x86-64 bootstrap processor initialization complete", lp_id);
         // return success
         Ok(())
@@ -24,7 +28,7 @@ impl InitInterface for IsaInitializer {
         let lp_id = get_lp_id();
         logln!("LP{}: Starting x86-64 application processor initialization", lp_id);
         // Initialize TSS, GDT, and IDT
-        init_ap();
+        ap::init_ap();
         logln!("LP{}: x86-64 logical processor initialization complete", lp_id);
         Ok(())
     }
