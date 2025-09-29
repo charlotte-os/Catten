@@ -6,3 +6,4 @@ charlottek/target/**
 log.txt
 Limine
 .vscode/**
+log_*.txt
