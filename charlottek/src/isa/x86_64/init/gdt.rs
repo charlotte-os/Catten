@@ -222,14 +222,14 @@ pub struct Tss {
 }
 
 impl Tss {
-    pub fn new(rsp0: u64) -> Self {
+    pub fn new(rsp0: u64, ist1: u64) -> Self {
         Tss {
             res0: 0,
             rsp0: rsp0,
             rsp1: 0,
             rsp2: 0,
             res1: 0,
-            ist1: 0,
+            ist1: ist1,
             ist2: 0,
             ist3: 0,
             ist4: 0,

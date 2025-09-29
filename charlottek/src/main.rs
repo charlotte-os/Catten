@@ -3,6 +3,7 @@
 #![feature(abi_custom)]
 #![feature(allocator_api)]
 #![feature(atomic_try_update)]
+#![feature(exclusive_wrapper)]
 #![feature(iter_advance_by)]
 #![feature(likely_unlikely)]
 #![feature(ptr_as_ref_unchecked)]
