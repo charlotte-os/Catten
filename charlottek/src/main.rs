@@ -52,6 +52,9 @@ pub extern "C" fn bsp_main() -> ! {
     logln!("charlottek Kernel Version 0.1.0");
     logln!("=========================");
     logln!("Initializing the system using the bootstrap processor...");
+    unsafe {
+        multiprocessor::assign_id();
+    }
     init::bsp_init();
     logln!("System initialized.");
     logln!("Starting secondary LPs...");
@@ -71,15 +74,8 @@ pub extern "C" fn bsp_main() -> ! {
 /// Limine Boot Protocol MP feature.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ap_main(_cpuinfo: &Cpu) -> ! {
-    let mut id_ctr_lock = multiprocessor::id_counter.lock();
-    let lp_id = *id_ctr_lock;
-    *id_ctr_lock += 1;
-    drop(id_ctr_lock);
-    store_lp_id(lp_id);
-    logln!(
-        "Logical Processor {} with local interrupt controller ID = {} has entered charlottek via ap_main",
-        (get_lp_id()),
-        (get_lic_id!())
-    );
+    unsafe {
+        multiprocessor::assign_id();
+    }
     halt!()
 }

@@ -14,9 +14,8 @@ use crate::isa::interrupts::register_fixed_isr_gates;
 use crate::isa::memory::paging::PAGE_SIZE;
 use crate::logln;
 
-
 pub const INTERRUPT_STACK_SIZE: usize = PAGE_SIZE * 4;
-pub static BSP_INTERRUPT_STACK: [u8; INTERRUPT_STACK_SIZE]
+pub static BSP_INTERRUPT_STACK: [u8; INTERRUPT_STACK_SIZE] = [0u8; INTERRUPT_STACK_SIZE];
 pub static mut BSP_LP_TEMP: MaybeUninit<LogicalProcessor> = MaybeUninit::uninit();
 pub static LP_TABLE: Mutex<Vec<LogicalProcessor>> = Mutex::new(Vec::new());
 

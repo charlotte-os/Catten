@@ -1,5 +1,4 @@
 //! # Multi-Processor Management
-use spin::mutex::Mutex;
 use spin::{Lazy, RwLock};
 
 use crate::environment::boot_protocol::limine::MP;
@@ -12,8 +11,6 @@ static LP_COUNT: RwLock<Lazy<u32>> = RwLock::new(Lazy::new(|| {
         panic!("Limine was not able to start the secondary logical processors!")
     }
 }));
-
-pub static id_counter: Mutex<u32> = Mutex::new(1);
 
 pub fn get_lp_count() -> u32 {
     **LP_COUNT.read()
@@ -44,4 +41,20 @@ pub fn start_secondary_lps() -> Result<(), MpError> {
     } else {
         Err(MpError::SecondaryLpStartupFailed)
     }
+}
+
+use core::sync::atomic::{AtomicU32, Ordering};
+
+use crate::isa::lp::ops::*;
+
+pub static ID_COUNTER: AtomicU32 = AtomicU32::new(0);
+
+pub unsafe fn assign_id() {
+    let lp_id = ID_COUNTER.fetch_add(1, Ordering::SeqCst);
+    store_lp_id(lp_id);
+    logln!(
+        "Logical Processor with local interrupt controller ID = {} has been designated LP{}.",
+        (get_lic_id!()),
+        (get_lp_id())
+    );
 }
