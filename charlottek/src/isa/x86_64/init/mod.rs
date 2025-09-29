@@ -22,7 +22,7 @@ impl InitInterface for IsaInitializer {
 
     fn init_ap() -> Result<(), Self::Error> {
         let lp_id = get_lp_id();
-        logln!("LP{}: Starting x86-64 logical processor initialization", lp_id);
+        logln!("LP{}: Starting x86-64 application processor initialization", lp_id);
         // Initialize TSS, GDT, and IDT
         init_ap();
         logln!("LP{}: x86-64 logical processor initialization complete", lp_id);

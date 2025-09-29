@@ -1,5 +1,6 @@
 use lazy_static::lazy_static;
 use spin::Mutex;
+use spinning_top::RawSpinlock;
 use talc::{ErrOnOom, Span, Talc, Talck};
 
 use super::PHYSICAL_FRAME_ALLOCATOR;
@@ -9,7 +10,6 @@ use crate::isa::interface::memory::{AddressSpaceInterface, MemoryInterface};
 use crate::isa::memory::MemoryInterfaceImpl;
 use crate::isa::memory::address::VADDR_SIG_BITS;
 use crate::isa::memory::paging::{AddressSpace, PAGE_SIZE};
-use crate::klib::raw_mutex::RawMutex;
 
 lazy_static! {
     pub static ref ALLOCATOR_SPAN: Mutex<Span> = Mutex::new(Span::empty());
@@ -20,9 +20,10 @@ lazy_static! {
 }
 
 #[global_allocator]
-pub static mut KERNEL_ALLOCATOR: Talck<RawMutex, ErrOnOom> = Talc::new(ErrOnOom).lock::<RawMutex>();
+pub static mut KERNEL_ALLOCATOR: Talck<RawSpinlock, ErrOnOom> =
+    Talc::new(ErrOnOom).lock::<RawSpinlock>();
 
-const KERNEL_HEAP_PAGE_COUNT: usize = 1024; // 4 MiB kernel heap size
+const KERNEL_HEAP_PAGE_COUNT: usize = 8192; // 32 MiB kernel heap size
 
 pub fn init_allocator() -> Result<(), ()> {
     let kernel_heap_start = <MemoryInterfaceImpl as MemoryInterface>::AddressSpace::get_current()

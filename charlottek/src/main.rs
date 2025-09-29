@@ -78,5 +78,6 @@ pub unsafe extern "C" fn ap_main(_cpuinfo: &Cpu) -> ! {
     unsafe {
         multiprocessor::assign_id();
     }
+    init::ap_init();
     halt!()
 }
