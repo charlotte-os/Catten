@@ -66,7 +66,7 @@ pub extern "C" fn bsp_main() -> ! {
     logln!("System initialized.");
     logln!("Starting secondary LPs...");
     multiprocessor::start_secondary_lps().expect("Failed to start secondary LPs");
-    //self_test::run_self_tests();
+    self_test::run_self_tests();
     logln!("System Information:");
     logln!("CPU Vendor: {}", (CpuInfo::get_vendor()));
     logln!("CPU Model: {}", (CpuInfo::get_model()));
