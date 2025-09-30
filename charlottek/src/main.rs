@@ -49,7 +49,7 @@ use limine::mp::Cpu;
 /// that it can be called by Limine or any other Limine Boot Protocol compliant bootloader.
 #[unsafe(no_mangle)]
 pub extern "C" fn bsp_main() -> ! {
-    logln!("charlottek Kernel Version 0.1.0");
+    logln!("charlottek Kernel Version 0.2.0");
     logln!("=========================");
     logln!("Initializing the system using the bootstrap processor...");
     unsafe {
