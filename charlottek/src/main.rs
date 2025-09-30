@@ -60,7 +60,7 @@ pub extern "C" fn bsp_main() -> ! {
         (KERNEL_VERSION.1),
         (KERNEL_VERSION.2)
     );
-    logln!("=========================");
+    logln!("========================================================================");
     logln!("Initializing the system using the bootstrap processor...");
     unsafe {
         multiprocessor::assign_id();
