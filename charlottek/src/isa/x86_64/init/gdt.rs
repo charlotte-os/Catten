@@ -1,4 +1,4 @@
-use core::arch::asm;
+use core::arch::{asm, naked_asm};
 use core::mem::size_of;
 use core::ptr;
 
@@ -117,26 +117,28 @@ impl Gdt {
             asm!("ltr [rip + TSS_SELECTOR]");
         }
     }
+}
 
-    pub fn reload_segment_regs() {
-        unsafe {
-            asm!(
-                "movzx rax, word ptr [rip + KERNEL_CODE_SELECTOR]",
-                "push rax",
-                "lea rax, [rip + reload_cs]",
-                "push rax",
-                "retfq",
-                "reload_cs:",
-                "mov ax, [rip + KERNEL_DATA_SELECTOR]",
-                "mov ds, ax",
-                "mov es, ax",
-                "mov fs, ax",
-                "mov gs, ax",
-                "mov ss, ax",
-                out("rax") _,
-            );
-        }
-    }
+core::arch::global_asm!(
+    ".global reload_segment_regs",
+    "reload_segment_regs:",
+    "movzx rax, word ptr [rip + KERNEL_CODE_SELECTOR]",
+    "push rax",
+    "lea rax, [rip + reload_cs]",
+    "push rax",
+    "retfq",
+    "reload_cs:",
+    "mov ax, [rip + KERNEL_DATA_SELECTOR]",
+    "mov ds, ax",
+    "mov es, ax",
+    "mov fs, ax",
+    "mov gs, ax",
+    "mov ss, ax",
+    "ret"
+);
+
+unsafe extern "C" {
+    pub fn reload_segment_regs();
 }
 
 #[repr(C, packed(1))]
