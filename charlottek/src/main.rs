@@ -44,12 +44,19 @@ use isa::interface::system_info::CpuInfoIfce;
 use isa::system_info::CpuInfo;
 use limine::mp::Cpu;
 
+const KERNEL_VERSION: (u64, u64, u64) = (0, 2, 0);
+
 /// This is the bootstrap processor's entry point into the kernel. The `bsp_main` function is
 /// called by the bootloader after setting up the environment. It is made C ABI compatible so
 /// that it can be called by Limine or any other Limine Boot Protocol compliant bootloader.
 #[unsafe(no_mangle)]
 pub extern "C" fn bsp_main() -> ! {
-    logln!("charlottek Kernel Version 0.2.0");
+    logln!(
+        "CharlotteOS Kernel Version {}.{}.{}",
+        (KERNEL_VERSION.0),
+        (KERNEL_VERSION.1),
+        (KERNEL_VERSION.2)
+    );
     logln!("=========================");
     logln!("Initializing the system using the bootstrap processor...");
     unsafe {
