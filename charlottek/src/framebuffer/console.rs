@@ -254,8 +254,9 @@ macro_rules! print {
     ($($arg:tt)*) => {
         use core::fmt::Write;
         use crate::framebuffer::console::CONSOLE;
-        CONSOLE.lock().write_fmt(format_args!($($arg)*)).unwrap();
-        CONSOLE.lock().clear_inner_styling();
+        let con = CONSOLE.lock();
+        con.write_fmt(format_args!($($arg)*)).unwrap();
+        con.clear_inner_styling();
     }
 }
 
@@ -264,8 +265,9 @@ macro_rules! println {
     ($($arg:tt)*) => {
         use core::fmt::Write;
         use crate::framebuffer::console::CONSOLE;
-        CONSOLE.lock().write_fmt(format_args!($($arg)*)).unwrap();
-        CONSOLE.lock().write_char('\n', None, None);
-        CONSOLE.lock().clear_inner_styling();
+        let mut con = CONSOLE.lock();
+        con.write_fmt(format_args!($($arg)*)).unwrap();
+        con.write_char('\n', None, None);
+        con.clear_inner_styling();
     }
 }

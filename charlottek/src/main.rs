@@ -85,5 +85,6 @@ pub unsafe extern "C" fn ap_main(_cpuinfo: &Cpu) -> ! {
         multiprocessor::assign_id();
     }
     init::ap_init();
+    logln!("LP{}: Nothing left to do. Waiting for interrupts...", (get_lp_id!()));
     halt!()
 }
