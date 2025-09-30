@@ -36,7 +36,7 @@ pub fn bsp_init() {
 }
 
 pub fn ap_init() {
-    let lp_id = lp::ops::get_lp_id();
+    let lp_id = lp::ops::get_lp_id!();
     logln!("Initializing LP {}...", lp_id);
     logln!("LP {}: Performing ISA specific initialization...", lp_id);
     match IsaInitializer::init_ap() {

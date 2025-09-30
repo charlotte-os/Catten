@@ -28,7 +28,7 @@ impl GlobalScheduler {
     }
 
     pub fn get_local_lp_scheduler(&self) -> &Mutex<Box<dyn LpScheduler>> {
-        &self.lp_schedulers[get_lp_id() as usize]
+        &self.lp_schedulers[get_lp_id!() as usize]
     }
 }
 

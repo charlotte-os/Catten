@@ -15,7 +15,7 @@ impl InitInterface for IsaInitializer {
     type Error = core::convert::Infallible;
 
     fn init_bsp() -> Result<(), Self::Error> {
-        let lp_id = get_lp_id();
+        let lp_id = get_lp_id!();
         logln!("LP{}: Starting x86-64 bootstrap processor initialization", lp_id);
         // Initialize TSS, GDT, and IDT
         bsp::init_bsp();
@@ -25,7 +25,7 @@ impl InitInterface for IsaInitializer {
     }
 
     fn init_ap() -> Result<(), Self::Error> {
-        let lp_id = get_lp_id();
+        let lp_id = get_lp_id!();
         logln!("LP{}: Starting x86-64 application processor initialization", lp_id);
         // Initialize TSS, GDT, and IDT
         ap::init_ap();

@@ -20,6 +20,7 @@ static BSP_IDT: Lazy<Idt> = Lazy::new(|| {
 
 pub fn init_bsp() {
     BSP_GDT.load();
+    Gdt::reload_segment_regs();
     BSP_IDT.load();
     logln!("BSP: x86-64 logical processor initialization complete");
 }

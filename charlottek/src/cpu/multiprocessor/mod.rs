@@ -55,6 +55,6 @@ pub unsafe fn assign_id() {
     logln!(
         "Logical Processor with local interrupt controller ID = {} has been designated LP{}.",
         (get_lic_id!()),
-        (get_lp_id())
+        (get_lp_id!())
     );
 }

@@ -59,7 +59,7 @@ macro_rules! get_lic_id {
 #[rustfmt::skip]
 pub use get_lic_id;
 
-use core::arch::asm;
+use core::arch::{asm, naked_asm};
 
 use super::LpId;
 
@@ -78,17 +78,17 @@ pub fn store_lp_id(id: LpId) {
         );
     }
 }
-
-pub fn get_lp_id() -> LpId {
-    let id: u32;
-    unsafe {
-        asm!(
-            "rdtscp",
-            out("eax") _,
-            out("edx") _,
-            out("ecx") id,
-            options(nomem, nostack, preserves_flags)
-        );
-    }
-    id
+#[macro_export]
+macro_rules! get_lp_id {
+    () => {{
+        let mut id: u32;
+        unsafe {
+            core::arch::asm!(
+                "rdpid rax",
+                out("eax") id,
+            );
+        }
+        id as crate::isa::lp::LpId
+    }};
 }
+pub use get_lp_id;

@@ -43,7 +43,6 @@ use cpu::multiprocessor;
 use isa::interface::system_info::CpuInfoIfce;
 use isa::system_info::CpuInfo;
 use limine::mp::Cpu;
-use spin::Mutex;
 
 /// This is the bootstrap processor's entry point into the kernel. The `bsp_main` function is
 /// called by the bootloader after setting up the environment. It is made C ABI compatible so
