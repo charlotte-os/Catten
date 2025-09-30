@@ -43,9 +43,12 @@ use cpu::multiprocessor;
 use isa::interface::system_info::CpuInfoIfce;
 use isa::system_info::CpuInfo;
 use limine::mp::Cpu;
+use spin::{Barrier, Lazy};
+
+use crate::cpu::multiprocessor::get_lp_count;
 
 const KERNEL_VERSION: (u64, u64, u64) = (0, 2, 0);
-
+static INIT_BARRIER: Lazy<Barrier> = Lazy::new(|| Barrier::new(get_lp_count() as usize));
 /// This is the bootstrap processor's entry point into the kernel. The `bsp_main` function is
 /// called by the bootloader after setting up the environment. It is made C ABI compatible so
 /// that it can be called by Limine or any other Limine Boot Protocol compliant bootloader.
@@ -66,6 +69,7 @@ pub extern "C" fn bsp_main() -> ! {
     logln!("System initialized.");
     logln!("Starting secondary LPs...");
     multiprocessor::start_secondary_lps().expect("Failed to start secondary LPs");
+    INIT_BARRIER.wait();
     self_test::run_self_tests();
     logln!("System Information:");
     logln!("CPU Vendor: {}", (CpuInfo::get_vendor()));
@@ -85,6 +89,7 @@ pub unsafe extern "C" fn ap_main(_cpuinfo: &Cpu) -> ! {
         multiprocessor::assign_id();
     }
     init::ap_init();
+    INIT_BARRIER.wait();
     logln!("LP{}: Nothing left to do. Waiting for interrupts...", (get_lp_id!()));
     halt!()
 }
