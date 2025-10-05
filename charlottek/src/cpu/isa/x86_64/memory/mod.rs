@@ -1,5 +1,6 @@
 pub mod address;
 pub mod paging;
+pub mod stack;
 pub mod tlb;
 
 pub use crate::cpu::isa::interface::memory::MemoryIfce;

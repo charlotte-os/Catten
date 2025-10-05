@@ -1,9 +1,8 @@
-use alloc::boxed::Box;
-
 use spin::{Lazy, RwLock};
 
+use crate::common::collections::id_table::IdTable;
 use crate::cpu::isa::lp::thread_context::ThreadContext;
-use crate::lib::collections::id_table::IdTable;
+use crate::cpu::isa::memory::stack::StackBuf;
 
 type ThreadTable = IdTable<ThreadId, Thread>;
 pub type ThreadId = usize;
@@ -12,5 +11,5 @@ pub static THREAD_TABLE: Lazy<RwLock<ThreadTable>> = Lazy::new(|| RwLock::new(Th
 
 pub struct Thread {
     pub state: ThreadContext,
-    _stack_buffer: Box<[u8]>,
+    _stack_buffer: StackBuf,
 }

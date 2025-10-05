@@ -26,13 +26,13 @@
 
 extern crate alloc;
 
+pub mod common;
 pub mod cpu;
 pub mod drivers;
 pub mod environment;
 pub mod event;
 pub mod framebuffer;
 pub mod init;
-pub mod lib;
 pub mod log;
 pub mod memory;
 pub mod panic;

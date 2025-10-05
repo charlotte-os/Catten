@@ -6,10 +6,10 @@ use core::result::Result;
 use lazy_static::lazy_static;
 use spin::Mutex;
 
+use crate::common::io::Read;
 use crate::cpu::isa::interface::io::{IReg8Ifce, OReg8Ifce};
 use crate::cpu::isa::io::{self, Reg8};
 use crate::drivers::uart::Uart;
-use crate::lib::io::Read;
 
 #[cfg(target_arch = "x86_64")]
 lazy_static! {
