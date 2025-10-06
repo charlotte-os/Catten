@@ -11,8 +11,8 @@ use crate::logln;
 
 pub fn run_self_tests() {
     logln!("Running self tests...");
-    memory::pmem::test_pmem();
-    memory::vmem::test_vmem();
+    memory::physical::test_pmem();
+    memory::linear::test_vmem();
     memory::allocator::test_allocator();
     logln!("Testing Complete. All Tests Passed!");
 }

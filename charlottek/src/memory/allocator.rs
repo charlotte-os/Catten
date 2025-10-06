@@ -4,7 +4,7 @@ use spinning_top::RawSpinlock;
 use talc::{ErrOnOom, Span, Talc, Talck};
 
 use super::PHYSICAL_FRAME_ALLOCATOR;
-use super::vmem::{MemoryMapping, VAddr};
+use super::linear::{MemoryMapping, VAddr};
 use crate::cpu::isa::interface::memory::address::VirtualAddress;
 use crate::cpu::isa::interface::memory::{AddressSpaceInterface, MemoryIfce};
 use crate::cpu::isa::memory::Memory;
@@ -48,7 +48,7 @@ pub fn init_allocator() -> Result<(), ()> {
             .map_page(MemoryMapping {
                 vaddr: i,
                 paddr: frame,
-                page_type: crate::memory::vmem::PageType::KernelData,
+                page_type: crate::memory::linear::PageType::KernelData,
             })
             .expect("Failed to map page for kernel heap");
     }

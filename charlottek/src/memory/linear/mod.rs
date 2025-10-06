@@ -1,3 +1,5 @@
+//! # Linear (Virtual) Memory Management
+
 pub use crate::cpu::isa::memory::address::paddr::PAddr;
 pub use crate::cpu::isa::memory::address::vaddr::VAddr;
 

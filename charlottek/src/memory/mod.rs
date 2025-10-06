@@ -1,10 +1,11 @@
 pub mod allocator;
-pub mod pmem;
-pub mod vmem;
+pub mod linear;
+pub mod physical;
+pub mod stack;
 
-pub use pmem::{MemoryIfce, PAddr, PhysicalFrameAllocator};
+pub use linear::VAddr;
+pub use physical::{MemoryIfce, PAddr, PhysicalFrameAllocator};
 pub use spin::{Lazy, Mutex, RwLock};
-pub use vmem::VAddr;
 
 pub use crate::common::collections::id_table::IdTable;
 pub use crate::cpu::isa::interface::memory::AddressSpaceInterface;

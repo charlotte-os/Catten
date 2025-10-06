@@ -19,10 +19,10 @@ use core::arch::global_asm;
 
 use spin::Mutex;
 
+use crate::cpu::isa::memory::tlb;
 use crate::cpu::scheduler::GLOBAL_SCHEDULER;
 use crate::cpu::threads::ThreadId;
-use crate::cpu::isa::memory::tlb;
-use crate::memory::vmem::VAddr;
+use crate::memory::linear::VAddr;
 use crate::memory::{AddressSpaceId, KERNEL_ASID};
 
 #[unsafe(no_mangle)]

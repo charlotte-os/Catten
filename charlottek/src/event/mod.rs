@@ -6,13 +6,16 @@ pub trait Observer {
     fn notify(&mut self);
 }
 
-pub struct Completion {
+pub struct Completion<F: Fn() + Send + Sync + 'static> {
     completed: bool,
-    callback:  Option<fn()>,
+    callback:  Option<F>,
 }
 
-impl Completion {
-    pub fn new(callback: Option<fn()>) -> Self {
+impl<F> Completion<F>
+where
+    F: Fn() + Send + Sync + 'static,
+{
+    pub fn new(callback: Option<F>) -> Self {
         Completion {
             completed: false,
             callback,
@@ -23,27 +26,33 @@ impl Completion {
         self.completed
     }
 
-    pub fn register_callback(&mut self, callback: fn()) {
+    pub fn register_callback(&mut self, callback: F) {
         self.callback.replace(callback);
     }
 }
 
-impl Observer for Completion {
+impl<F> Observer for Completion<F>
+where
+    F: Fn() + Send + Sync + 'static,
+{
     fn notify(&mut self) {
         self.completed = true;
-        if let Some(cb) = self.callback {
+        if let Some(ref cb) = self.callback {
             cb();
         }
     }
 }
 
-pub struct Sentinel {
+pub struct Sentinel<F: Fn() + Send + Sync + 'static> {
     times_notified: u64,
-    callback: Option<fn()>,
+    callback: Option<F>,
 }
 
-impl Sentinel {
-    pub fn new(callback: Option<fn()>) -> Self {
+impl<F> Sentinel<F>
+where
+    F: Fn() + Send + Sync + 'static,
+{
+    pub fn new(callback: Option<F>) -> Self {
         Sentinel {
             times_notified: 0,
             callback,
@@ -54,15 +63,18 @@ impl Sentinel {
         self.times_notified
     }
 
-    pub fn register_callback(&mut self, callback: fn()) {
+    pub fn register_callback(&mut self, callback: F) {
         self.callback.replace(callback);
     }
 }
 
-impl Observer for Sentinel {
+impl<F> Observer for Sentinel<F>
+where
+    F: Fn() + Send + Sync + 'static,
+{
     fn notify(&mut self) {
         self.times_notified += 1;
-        if let Some(cb) = self.callback {
+        if let Some(ref cb) = self.callback {
             cb();
         }
     }

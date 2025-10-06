@@ -45,6 +45,7 @@ use cpu::multiprocessor;
 use limine::mp::Cpu;
 use spin::{Barrier, Lazy};
 
+use crate::cpu::isa::lp::LpIfce;
 use crate::cpu::multiprocessor::get_lp_count;
 
 const KERNEL_VERSION: (u64, u64, u64) = (0, 2, 0);

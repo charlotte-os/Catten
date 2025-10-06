@@ -3,7 +3,7 @@ use crate::cpu::isa::interface::memory::address::VirtualAddress;
 use crate::cpu::isa::memory::paging::AddressSpace;
 use crate::logln;
 use crate::memory::PHYSICAL_FRAME_ALLOCATOR;
-use crate::memory::vmem::{MemoryMapping, PageType, VAddr};
+use crate::memory::linear::{MemoryMapping, PageType, VAddr};
 
 pub fn test_vmem() {
     logln!("Entering Virtual Memory Subsystem Self Test");

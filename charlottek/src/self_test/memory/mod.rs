@@ -1,3 +1,3 @@
 pub mod allocator;
-pub mod pmem;
-pub mod vmem;
+pub mod linear;
+pub mod physical;

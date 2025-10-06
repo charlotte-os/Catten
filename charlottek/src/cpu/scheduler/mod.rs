@@ -31,6 +31,11 @@ impl GlobalScheduler {
     pub fn get_local_lp_scheduler(&self) -> &Mutex<Box<dyn LpScheduler>> {
         &self.lp_schedulers[LogicalProcessor::read_lp_id() as usize]
     }
+
+    pub fn unblock_thread(&self, tid: ThreadId) {
+        self.blocked_threads.write().remove(&tid);
+        self.ready_unassigned.lock().push_back(tid);
+    }
 }
 
 unsafe impl Send for GlobalScheduler {}
