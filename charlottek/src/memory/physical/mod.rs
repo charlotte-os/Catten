@@ -18,7 +18,6 @@ pub enum Error {
     MisalignedPhysicalAddress,
     OutOfFrames,
     InvalidPAddr,
-    CannotDeallocateUnallocatedFrame,
     PAddrError(PAddrError),
 }
 
@@ -67,7 +66,8 @@ impl PhysicalFrameAllocator {
             let bit_idx = idx.1;
             unsafe {
                 if self.bitmap_ptr.offset(byte_idx as isize).read_volatile() & (1 << bit_idx) == 0 {
-                    Err(Error::CannotDeallocateUnallocatedFrame)
+                    // deallocating an unallocated frame is a no-op not an error
+                    Ok(())
                 } else {
                     // clear the bit corresponding to the frame being deallocated
                     *self.bitmap_ptr.offset(byte_idx as isize) &= !(1 << bit_idx);
