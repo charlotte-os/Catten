@@ -1,4 +1,6 @@
 use crate::logln;
+use crate::memory::VAddr;
+use crate::memory::stack::KERNEL_GUARD_PAGE_BASES;
 
 core::arch::global_asm! {
     include_str!("exceptions.asm"),
@@ -115,6 +117,11 @@ extern "C" fn ih_page_fault(error_code: u64) {
         core::arch::asm!("mov {0}, cr2", out(reg) pf_addr);
     }
     logln!("Page fault address: {:x}", pf_addr);
+    let pf_addr_base = VAddr::from(pf_addr as usize).page_base();
+    if KERNEL_GUARD_PAGE_BASES.read().contains(&pf_addr_base) {
+        logln!("Resizing kernel thread stack with guard page base address {:?}.", pf_addr_base);
+        todo!("Actually reallocate the kernel stack that triggered the #PF")
+    }
     panic!("Page fault");
 }
 

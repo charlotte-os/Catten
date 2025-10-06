@@ -1,6 +1,9 @@
 use core::fmt::Debug;
+use core::hash::Hash;
 
-pub trait Address: Copy + Clone + Debug + PartialEq + Eq + PartialOrd + Ord + Into<usize> {
+pub trait Address:
+    Copy + Clone + Debug + PartialEq + Eq + PartialOrd + Ord + Into<usize> + Hash
+{
     const MIN: Self;
     const MAX: Self;
     const NULL: Self;

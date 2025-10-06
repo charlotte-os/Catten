@@ -5,9 +5,21 @@
 use alloc::alloc::{Layout, alloc_zeroed, dealloc};
 use core::hint::unlikely;
 
+use hashbrown::HashSet;
+use spin::{Lazy, RwLock};
+
 use crate::cpu::isa::interface::memory::address::VirtualAddress;
-use crate::cpu::isa::memory::paging::PAGE_SIZE;
-use crate::memory::VAddr;
+use crate::cpu::isa::memory::paging::{PAGE_SIZE, *};
+use crate::memory::{
+    ADDRESS_SPACE_TABLE,
+    AddressSpaceInterface,
+    KERNEL_ASID,
+    PHYSICAL_FRAME_ALLOCATOR,
+    VAddr,
+};
+
+pub static KERNEL_GUARD_PAGE_BASES: Lazy<RwLock<HashSet<VAddr>>> =
+    Lazy::new(|| RwLock::new(HashSet::new()));
 
 /* We page align all stacks and round their sizes up to the nearest full page to simplify paging */
 const STACK_ALIGNMENT: usize = PAGE_SIZE;
@@ -15,8 +27,9 @@ const MIN_STACK_SIZE: usize = PAGE_SIZE * 4;
 /// A stack buffer with a top address and a size in bytes
 #[derive(Debug)]
 pub struct StackBuf {
-    top:  VAddr,
+    top: VAddr,
     size: usize,
+    _guard_page_base: VAddr,
 }
 
 pub enum Error {
@@ -32,7 +45,26 @@ impl StackBuf {
         if unlikely(size % PAGE_SIZE != 0) {
             size = (size / PAGE_SIZE + 1) * PAGE_SIZE;
         }
+        // add an extra page for the guard page
+        size += PAGE_SIZE;
         size
+    }
+
+    fn init_guard_page(&self) {
+        /* Unmap and deallocate the guard page */
+        if let Some(kernel_as) = ADDRESS_SPACE_TABLE.try_get_element_arc(KERNEL_ASID) {
+            let gp_pa = (*kernel_as)
+                .write()
+                .unmap_page(self._guard_page_base)
+                .expect("Error unmapping guard page for kernel thread stack");
+            PHYSICAL_FRAME_ALLOCATOR
+                .lock()
+                .deallocate_frame(gp_pa)
+                .expect("Error deallocating page frame from kernel thread stack guard page");
+            /* Mark the guard page aperture for the page fault handler */
+            let mut kgp = KERNEL_GUARD_PAGE_BASES.write();
+            (*kgp).insert(self._guard_page_base);
+        }
     }
 
     /// Create a new stack with the given size in bytes
@@ -45,10 +77,13 @@ impl StackBuf {
         if buf.is_null() {
             Err(Error::OutOfMemory)
         } else {
-            Ok(StackBuf {
+            let ret = StackBuf {
                 top: VAddr::from_mut(unsafe { buf.byte_add(size) }),
                 size,
-            })
+                _guard_page_base: VAddr::from_mut(buf),
+            };
+            ret.init_guard_page();
+            Ok(ret)
         }
     }
 

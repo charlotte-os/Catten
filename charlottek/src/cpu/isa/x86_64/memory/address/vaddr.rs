@@ -4,7 +4,7 @@ use core::ops::{Add, Sub};
 use crate::cpu::isa::interface::memory::address::{Address, VirtualAddress};
 
 #[repr(transparent)]
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct VAddr {
     raw: usize,
 }
@@ -48,6 +48,10 @@ impl VAddr {
 
     pub fn page_offset(&self) -> usize {
         self.raw & OFFSET_MASK
+    }
+
+    pub fn page_base(&self) -> VAddr {
+        VAddr::from(self.raw & !OFFSET_MASK)
     }
 
     /// Safety: The address must be in canonical form
