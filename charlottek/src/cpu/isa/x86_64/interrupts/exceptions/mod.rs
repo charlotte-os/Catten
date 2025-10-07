@@ -122,7 +122,7 @@ extern "C" fn ih_page_fault(error_code: u64) {
         logln!("Resizing kernel thread stack with guard page base address {:?}.", pf_addr_base);
         todo!("Actually reallocate the kernel stack that triggered the #PF")
     } else {
-        panic!("Page fault");
+        panic!("An unrecoverable page fault has occurred in kernelspace!");
     }
 }
 
