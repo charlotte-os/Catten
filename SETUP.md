@@ -1,6 +1,6 @@
 # Development Environment Setup
 
-The following software must be installed on a Unix like system in order to build and develop `charlottek`. On Windows WSL2 can be used.
+The following software must be installed on a Unix like system in order to build and develop `catten`. On Windows WSL2 can be used.
 The preferred developement operating system is Fedora Workstation and all documentation and helper scripts will assume that it is the development OS used.
 
 - curl
