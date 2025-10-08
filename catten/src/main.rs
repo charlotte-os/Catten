@@ -12,9 +12,9 @@
 #![allow(static_mut_refs)]
 #![allow(named_asm_labels)]
 
-//! # charlottek
+//! # catten
 //!
-//! charlottek is an operating system kernel developed as a component of CharlotteOS, an
+//! catten is an operating system kernel developed as a component of CharlotteOS, an
 //! experimental modern operating system.This kernel is responsible for initializing the hardware,
 //! providing commonizing abstractions for all hardware resources, and managing the execution of
 //! user-space applications and the environment in which they run. It is a crucial part of the
