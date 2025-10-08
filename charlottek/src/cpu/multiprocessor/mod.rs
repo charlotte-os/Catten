@@ -50,10 +50,12 @@ use crate::cpu::isa::lp::{LogicalProcessor, LpIfce};
 pub static ID_COUNTER: AtomicU32 = AtomicU32::new(0);
 
 pub unsafe fn assign_id() {
+    logln!("Fetch-adding ID_COUNTER");
     let lp_id = ID_COUNTER.fetch_add(1, Ordering::SeqCst);
+    logln!("Writing the LP ID to ISA specific register.");
     LogicalProcessor::write_lp_id(lp_id);
     logln!(
-        "Logical Processor with local interrupt controller ID = {} has been designated LP{}.",
+        "Logical Processor with local interrupt controller ID = {:?} has been designated LP{}.",
         (LogicalProcessor::read_lic_id()),
         (LogicalProcessor::read_lp_id())
     );

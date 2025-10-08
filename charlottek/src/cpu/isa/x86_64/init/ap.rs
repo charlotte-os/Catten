@@ -106,5 +106,7 @@ pub fn init_ap() {
     AP_GDTS[ap_index].load();
     gdt::reload_segment_regs();
     AP_IDTS[ap_index].load();
+    // Record the APIC ID mapping
+    crate::cpu::isa::interrupts::x2apic::id::write_id_mapping();
     crate::logln!("AP{}: x86-64 logical processor initialization complete", lp_id);
 }

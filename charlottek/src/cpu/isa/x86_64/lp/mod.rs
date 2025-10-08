@@ -6,53 +6,47 @@ use core::arch::asm;
 pub use pcid::Pcid;
 
 pub use crate::cpu::isa::interface::lp::LpIfce;
+use crate::cpu::isa::interrupts::x2apic::id::X2ApicId;
+use crate::cpu::isa::interrupts::x2apic::{self};
+
+static TSC_AUX_MSR: u32 = 0xc000_0103u32;
 
 pub struct LogicalProcessor;
 
 impl LpIfce for LogicalProcessor {
     // PCID, stored in the low 12 bits of CR3
     type HwAsid = Pcid;
-    // obtained from MSR 0x802
-    type LicId = u32;
+    // obtained from MSR 802h and MSR 80Dh
+    type LicId = X2ApicId;
     // kernel assigned, stored in TSC_AUX
     type LpId = u32;
 
     #[inline(always)]
     fn halt() -> ! {
-    //! Halts the calling processor to wait for any unmasked interrupts
+        //! Halts the calling processor to wait for any unmasked interrupts
         unsafe {
             asm!(
                 "hlt",
-                options(noreturn)        
+                options(noreturn)
             )
         }
     }
 
     #[inline(always)]
     fn mask_interrupts() {
-    //! Clears the interrupt enable bit in RFLAGS
+        //! Clears the interrupt enable bit in RFLAGS
         unsafe { asm!("cli") }
     }
 
     #[inline(always)]
     fn unmask_interrupts() {
-    //! Sets the interrupt enable bit in RFLAGS
+        //! Sets the interrupt enable bit in RFLAGS
         unsafe { asm!("sti") }
     }
 
     #[inline(always)]
     fn read_lic_id() -> Self::LicId {
-    //! Obtains the local x2APIC identifier for the calling processor
-        let mut lic_id: Self::LicId;
-        unsafe {
-            asm!(
-                "rdmsr",
-                inlateout("ecx") 0x802 => _,
-                out("edx") _,
-                out("rax") lic_id
-            );
-        }
-        lic_id
+        x2apic::id::X2ApicId::get_local()
     }
 
     #[inline(always)]
@@ -60,7 +54,7 @@ impl LpIfce for LogicalProcessor {
         unsafe {
             asm!(
                 "wrmsr",
-                in("ecx") 0xC000_0103u32,
+                in("ecx") 0xc000_0103u32,
                 in("eax") lp_id as u32,
                 in("edx") 0u32,
                 options(nostack, preserves_flags)
@@ -69,9 +63,9 @@ impl LpIfce for LogicalProcessor {
     }
 
     #[inline(always)]
-    fn read_lp_id() -> Self::LicId {
-    //! Obtains the kernel assigned logical processor identifier
-        let mut lp_id: Self::LicId;
+    fn read_lp_id() -> Self::LpId {
+        //! Obtains the kernel assigned logical processor identifier
+        let mut lp_id: Self::LpId;
         unsafe {
             asm!(
                 "rdpid {:r}",

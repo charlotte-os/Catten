@@ -22,5 +22,7 @@ pub fn init_bsp() {
     BSP_GDT.load();
     reload_segment_regs();
     BSP_IDT.load();
+    // Record the x2APIC ID
+    crate::cpu::isa::interrupts::x2apic::id::write_id_mapping();
     logln!("BSP: x86-64 logical processor initialization complete");
 }
