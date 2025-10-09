@@ -9,8 +9,4 @@ log.txt
 Limine
 .vscode/**
 log_*.txt
-target/rust-analyzer/flycheck0/stdout
-target/rust-analyzer/flycheck0/stderr
-target/rust-analyzer/flycheck0/stderr
-target/rust-analyzer/flycheck0/stdout
-target/rust-analyzer/flycheck0/stderr
+target/rust-analyzer/flycheck0/*
