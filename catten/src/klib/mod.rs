@@ -8,3 +8,4 @@
 pub mod collections;
 pub mod constants;
 pub mod io;
+pub mod size;

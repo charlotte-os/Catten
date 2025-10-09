@@ -8,6 +8,7 @@ pub enum Error {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PageType {
+    NotPresent,
     KernelCode,         //read, execute
     KernelData,         //read, write
     KernelRoData,       //read only
