@@ -10,3 +10,5 @@ Limine
 .vscode/**
 log_*.txt
 target/rust-analyzer/flycheck0/*
+target/rust-analyzer/flycheck0/stderr
+target/rust-analyzer/flycheck0/stdout
