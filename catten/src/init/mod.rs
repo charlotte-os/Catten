@@ -1,6 +1,6 @@
-use crate::isa::init::IsaInitializer;
-use crate::isa::interface::init::InitInterface;
-use crate::isa::lp;
+use crate::cpu::isa::init::IsaInitializer;
+use crate::cpu::isa::interface::init::InitInterface;
+use crate::cpu::isa::lp;
 use crate::logln;
 use crate::memory::PHYSICAL_FRAME_ALLOCATOR;
 

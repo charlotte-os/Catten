@@ -6,8 +6,8 @@ use alloc::vec::Vec;
 use spin::Mutex;
 use spin::rwlock::RwLock;
 
+use crate::cpu::isa::lp::ops::get_lp_id;
 use crate::cpu::threads::{Thread, ThreadId};
-use crate::isa::lp::ops::get_lp_id;
 use crate::memory::AddressSpaceId;
 
 pub static GLOBAL_SCHEDULER: GlobalScheduler = GlobalScheduler::new();

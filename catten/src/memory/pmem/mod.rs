@@ -5,11 +5,11 @@
 
 pub use limine::response::MemoryMapResponse;
 
-pub use crate::isa::interface::memory::MemoryInterface;
-use crate::isa::interface::memory::address::Address;
-pub use crate::isa::interface::memory::address::PhysicalAddress;
-pub use crate::isa::memory::MemoryInterfaceImpl;
-pub use crate::isa::memory::address::paddr::{PAddr, PAddrError};
+pub use crate::cpu::isa::interface::memory::MemoryInterface;
+use crate::cpu::isa::interface::memory::address::Address;
+pub use crate::cpu::isa::interface::memory::address::PhysicalAddress;
+pub use crate::cpu::isa::memory::MemoryInterfaceImpl;
+pub use crate::cpu::isa::memory::address::paddr::{PAddr, PAddrError};
 use crate::logln;
 
 #[derive(Debug, Clone, Copy)]
