@@ -1,6 +1,20 @@
 use core::fmt::Debug;
 
-pub trait Address: Copy + Clone + Debug + PartialEq + Eq + PartialOrd + Ord + Into<usize> {
+pub trait Address:
+    Copy
+    + Clone
+    + Debug
+    + PartialEq
+    + Eq
+    + PartialOrd
+    + Ord
+    + Into<usize>
+    + Default
+    + core::ops::Add<isize, Output = Self>
+    + core::ops::Sub<isize, Output = Self>
+    + core::ops::Add<usize, Output = Self>
+    + core::ops::Sub<usize, Output = Self>
+{
     const MIN: Self;
     const MAX: Self;
     const NULL: Self;

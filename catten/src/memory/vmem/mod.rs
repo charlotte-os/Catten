@@ -63,7 +63,7 @@ impl PageType {
         }
     }
 }
-
+#[derive(Debug, Clone)]
 pub struct MemoryMapping {
     pub vaddr: VAddr,
     pub paddr: PAddr,
