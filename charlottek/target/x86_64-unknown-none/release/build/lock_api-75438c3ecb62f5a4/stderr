@@ -1,0 +1,11 @@
+error[E0463]: can't find crate for `std`
+  |
+  = note: the `x86_64-unknown-none` target may not support the standard library
+  = note: `std` is required by `autocfg_76a7e0af25e08fa3_0` because it does not declare `#![no_std]`
+  = help: consider building the standard library from source with `cargo build -Zbuild-std`
+
+error: cannot resolve a prelude import
+
+error: aborting due to 2 previous errors
+
+For more information about this error, try `rustc --explain E0463`.
