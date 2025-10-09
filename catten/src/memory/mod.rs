@@ -7,9 +7,9 @@ pub use spin::{Lazy, Mutex, RwLock};
 pub use vmem::VAddr;
 
 pub use crate::common::collections::id_table::IdTable;
+pub use crate::cpu::isa::interface::memory::AddressSpaceInterface;
+pub use crate::cpu::isa::memory::paging::AddressSpace;
 use crate::environment::boot_protocol::limine::{HHDM_REQUEST, MEMORY_MAP_REQUEST};
-pub use crate::isa::interface::memory::AddressSpaceInterface;
-pub use crate::isa::memory::paging::AddressSpace;
 
 pub type AddressSpaceId = usize;
 

@@ -1,6 +1,6 @@
-use crate::isa::interface::memory::AddressSpaceInterface;
-use crate::isa::interface::memory::address::VirtualAddress;
-use crate::isa::memory::paging::AddressSpace;
+use crate::cpu::isa::interface::memory::AddressSpaceInterface;
+use crate::cpu::isa::interface::memory::address::VirtualAddress;
+use crate::cpu::isa::memory::paging::AddressSpace;
 use crate::logln;
 use crate::memory::PHYSICAL_FRAME_ALLOCATOR;
 use crate::memory::vmem::{MemoryMapping, PageType, VAddr};
