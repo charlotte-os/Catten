@@ -9,7 +9,7 @@ use spin::Mutex;
 use crate::drivers::uart::Uart;
 use crate::isa::interface::io::{IReg8Ifce, OReg8Ifce};
 use crate::isa::io::{self, IoReg8};
-use crate::klib::io::Read;
+use crate::common::io::Read;
 
 #[cfg(target_arch = "x86_64")]
 lazy_static! {
