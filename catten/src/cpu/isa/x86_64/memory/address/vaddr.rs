@@ -154,6 +154,30 @@ impl Add<isize> for VAddr {
     }
 }
 
+impl Sub<isize> for VAddr {
+    type Output = VAddr;
+
+    fn sub(self, other: isize) -> Self::Output {
+        VAddr::from(self.raw - other as usize)
+    }
+}
+
+impl Add<usize> for VAddr {
+    type Output = VAddr;
+
+    fn add(self, other: usize) -> Self::Output {
+        VAddr::from(self.raw + other)
+    }
+}
+
+impl Sub<usize> for VAddr {
+    type Output = VAddr;
+
+    fn sub(self, other: usize) -> Self::Output {
+        VAddr::from(self.raw - other)
+    }
+}
+
 impl Step for VAddr {
     fn steps_between(start: &Self, end: &Self) -> (usize, Option<usize>) {
         if start > end {
@@ -180,6 +204,14 @@ impl Step for VAddr {
             })
         } else {
             None
+        }
+    }
+}
+
+impl Default for VAddr {
+    fn default() -> Self {
+        VAddr {
+            raw: 0,
         }
     }
 }

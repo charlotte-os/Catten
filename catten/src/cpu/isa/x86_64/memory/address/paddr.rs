@@ -1,4 +1,4 @@
-use core::ops::Add;
+use core::ops::{Add, Sub};
 
 use crate::cpu::isa::interface::memory::address::{Address, PhysicalAddress, VirtualAddress};
 use crate::memory::HHDM_BASE;
@@ -109,5 +109,37 @@ impl Add<isize> for PAddr {
 
     fn add(self, rhs: isize) -> Self::Output {
         PAddr::try_from(self.raw.wrapping_add(rhs as usize)).unwrap()
+    }
+}
+
+impl Sub<isize> for PAddr {
+    type Output = PAddr;
+
+    fn sub(self, rhs: isize) -> Self::Output {
+        PAddr::try_from(self.raw.wrapping_sub(rhs as usize)).unwrap()
+    }
+}
+
+impl Add<usize> for PAddr {
+    type Output = PAddr;
+
+    fn add(self, rhs: usize) -> Self::Output {
+        PAddr::try_from(self.raw.wrapping_add(rhs)).unwrap()
+    }
+}
+
+impl Sub<usize> for PAddr {
+    type Output = PAddr;
+
+    fn sub(self, rhs: usize) -> Self::Output {
+        PAddr::try_from(self.raw.wrapping_sub(rhs)).unwrap()
+    }
+}
+
+impl Default for PAddr {
+    fn default() -> Self {
+        PAddr {
+            raw: 0,
+        }
     }
 }
