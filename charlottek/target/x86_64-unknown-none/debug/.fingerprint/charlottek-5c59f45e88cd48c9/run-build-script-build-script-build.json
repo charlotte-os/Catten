@@ -1,0 +1,1 @@
+{"rustc":9815686553265299112,"features":"","declared_features":"","target":0,"profile":0,"path":0,"deps":[[15682804653367352827,"build_script_build",false,15517092941948484544]],"local":[{"RerunIfChanged":{"output":"x86_64-unknown-none/debug/build/charlottek-5c59f45e88cd48c9/output","paths":["linker/x86_64.ld","asm"]}}],"rustflags":[],"config":0,"compile_kind":0}
