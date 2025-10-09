@@ -4,8 +4,8 @@ use alloc::vec::Vec;
 use hashbrown::HashMap;
 use spin::{Lazy, Mutex, RwLock, RwLockReadGuard};
 
+use crate::common::collections::id_table::IdTable;
 use crate::isa::lp::thread_context::ThreadContext;
-use crate::klib::collections::id_table::IdTable;
 
 static mut THREAD_TABLE: Lazy<ThreadTable> = Lazy::new(ThreadTable::new);
 

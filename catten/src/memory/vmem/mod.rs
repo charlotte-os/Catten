@@ -1,3 +1,5 @@
+pub mod address_map;
+
 pub use crate::isa::memory::address::paddr::PAddr;
 pub use crate::isa::memory::address::vaddr::VAddr;
 
