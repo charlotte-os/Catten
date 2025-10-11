@@ -33,15 +33,14 @@ pub mod environment;
 pub mod event;
 pub mod framebuffer;
 pub mod init;
-pub mod isa;
 pub mod log;
 pub mod memory;
 pub mod panic;
 pub mod self_test;
 
+use cpu::isa::interface::system_info::CpuInfoIfce;
+use cpu::isa::system_info::CpuInfo;
 use cpu::multiprocessor;
-use isa::interface::system_info::CpuInfoIfce;
-use isa::system_info::CpuInfo;
 use limine::mp::Cpu;
 use spin::{Barrier, Lazy};
 
@@ -84,7 +83,6 @@ pub extern "C" fn bsp_main() -> ! {
 /// then hands it off to the scheduler. It is made C ABI compatible so that it can work with the
 /// Limine Boot Protocol MP feature. Other boot protocols may require alternate implementations of
 /// `ap_main`.
-#[cfg(all(feature = "limine", not(feature = "uniprocessor")))]
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ap_main(_cpuinfo: &Cpu) -> ! {
     unsafe {
