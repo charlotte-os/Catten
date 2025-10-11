@@ -8,7 +8,7 @@ use spinning_top::RawSpinlock;
 
 use crate::cpu::isa::memory::paging::PAGE_SIZE;
 use crate::memory::VAddr;
-use crate::memory::vmem::address_map::{LA_MAP_48BIT, RegionType};
+use crate::memory::linear::address_map::{LA_MAP_48BIT, RegionType};
 
 pub static GLOBAL_ALLOCATOR: GeneralAlloc = GeneralAlloc::new();
 

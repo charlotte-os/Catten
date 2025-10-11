@@ -1,17 +1,17 @@
 use crate::cpu::isa::interface::memory::AddressSpaceInterface;
 use crate::cpu::isa::memory::paging::PAGE_SIZE;
 use crate::logln;
-use crate::memory::pmem::*;
-use crate::memory::vmem::{MemoryMapping, PageType, VAddr};
-use crate::memory::{KERNEL_AS, PHYSICAL_FRAME_ALLOCATOR, pmem};
+use crate::memory::linear::{MemoryMapping, PageType, VAddr};
+use crate::memory::physical::*;
+use crate::memory::{KERNEL_AS, PHYSICAL_FRAME_ALLOCATOR, physical};
 
 pub enum Error {
-    PfaError(pmem::Error),
+    PfaError(physical::Error),
     IsaMemoryError(crate::cpu::isa::memory::Error),
 }
 
-impl From<pmem::Error> for Error {
-    fn from(err: pmem::Error) -> Self {
+impl From<physical::Error> for Error {
+    fn from(err: physical::Error) -> Self {
         Error::PfaError(err)
     }
 }
