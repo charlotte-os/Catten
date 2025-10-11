@@ -1,78 +1,79 @@
-use crate::cpu::isa::interface::memory::AddressSpaceInterface;
+mod memory;
+
+use alloc::alloc::{AllocError, Allocator, Layout};
+use core::ptr::{NonNull, null_mut, slice_from_raw_parts_mut};
+
+use lock_api::RawMutex;
+use spinning_top::RawSpinlock;
+
 use crate::cpu::isa::memory::paging::PAGE_SIZE;
-use crate::logln;
-use crate::memory::pmem::*;
-use crate::memory::vmem::{MemoryMapping, PageType, VAddr};
-use crate::memory::{ADDRESS_SPACE_TABLE, KERNEL_ASID, PHYSICAL_FRAME_ALLOCATOR, pmem};
+use crate::memory::VAddr;
+use crate::memory::vmem::address_map::{LA_MAP_48BIT, RegionType};
 
-pub enum Error {
-    PfaError(pmem::Error),
-    IsaMemoryError(crate::cpu::isa::memory::Error),
+pub static GLOBAL_ALLOCATOR: GeneralAlloc = GeneralAlloc::new();
+
+struct BlockDesc {
+    base: VAddr,
+    size: usize,
 }
 
-impl From<pmem::Error> for Error {
-    fn from(err: pmem::Error) -> Self {
-        Error::PfaError(err)
-    }
+/// The general dynamic memory allocator of Catten
+struct GeneralAlloc {
+    lock: RawSpinlock,
+    arena_size: usize,
+    free_list_addr: *mut [*mut BlockDesc],
+    free_list_size: *mut [*mut BlockDesc],
 }
 
-impl From<crate::cpu::isa::memory::Error> for Error {
-    fn from(err: crate::cpu::isa::memory::Error) -> Self {
-        Error::IsaMemoryError(err)
-    }
-}
+/// Safety: The pointers in here are never accessed from anywhere else and they are basically used
+/// as manual vectors of manual Boxes since we cannot use those types given that we are the
+/// allocator
+unsafe impl Sync for GeneralAlloc {}
 
-fn try_allocate_and_map_range(base: VAddr, num_pages: usize) -> Result<(), Error> {
-    // lock the kernel address space for writing
-    let kas_lock_ptr = ADDRESS_SPACE_TABLE.try_get_element_arc(KERNEL_ASID).unwrap();
-    let mut kas = kas_lock_ptr.write();
-    let mut mapping = MemoryMapping {
-        vaddr: VAddr::default(),
-        paddr: PAddr::default(),
-        page_type: PageType::KernelData,
-    };
-    // allocate and map the pages
-    // if mapping fails, deallocate and unmap the frames that were allocated
-    for page_idx in 0..num_pages {
-        let frame = match PHYSICAL_FRAME_ALLOCATOR.lock().allocate_frame() {
-            Ok(f) => f,
-            Err(err) => {
-                // release the lock so the unmap_and_deallocate_range function can acquire it
-                drop(kas);
-                unmap_and_deallocate_range(base, page_idx);
-                return Err(Error::PfaError(err));
-            }
-        };
-        let vaddr = base + (page_idx * PAGE_SIZE) as isize;
-        mapping.vaddr = vaddr;
-        mapping.paddr = frame;
-        if let Err(err) = kas.map_page(mapping.clone()) {
-            // release the lock so the unmap_and_deallocate_range function can acquire it
-            drop(kas);
-            // deallocate and unmap the frames that were allocated
-            unmap_and_deallocate_range(base, page_idx + 1);
-            // deallocate the frame that was just allocated
-            if let Err(err) = PHYSICAL_FRAME_ALLOCATOR.lock().deallocate_frame(frame) {
-                logln!("Error deallocating frame at {frame:?} during cleanup: {err:?}");
-            }
-            return Err(Error::IsaMemoryError(err));
+impl GeneralAlloc {
+    // We use a private const constructor since this type is a singleton and should dynamically
+    // provision memory and address space regions anyway
+    const fn new() -> Self {
+        GeneralAlloc {
+            lock: RawSpinlock::INIT,
+            arena_size: 0,
+            free_list_addr: slice_from_raw_parts_mut(null_mut(), 0),
+            free_list_size: slice_from_raw_parts_mut(null_mut(), 0),
         }
     }
-    Ok(())
+
+    /// This function is used instead of new because this type is a singleton
+    pub fn get() -> &'static Self {
+        &GLOBAL_ALLOCATOR
+    }
+
+    /// What do you think it does?
+    fn expand_arena(&self) -> Result<(), AllocError> {
+        // This operation requires mutual exclusion
+        let _lock = self.lock.lock();
+        let expansion_base =
+            LA_MAP_48BIT.get_region(RegionType::KernelAllocatorArena).base + self.arena_size;
+        if memory::try_allocate_and_map_range(expansion_base, self.arena_size / PAGE_SIZE).is_err()
+        {
+            Err(AllocError)
+        } else {
+            Ok(())
+        }
+    }
+
+    fn find_best_fit(&self) -> Option<BlockDesc> {
+        todo!(
+            "Scan the freelist ordered by size to find the smallest free block that can meet the specified size and alignment requirements, if any."
+        )
+    }
 }
 
-fn unmap_and_deallocate_range(base: VAddr, num_pages: usize) {
-    let kas_lock_ptr = ADDRESS_SPACE_TABLE.try_get_element_arc(KERNEL_ASID).unwrap();
-    let mut kas = kas_lock_ptr.write();
-    for page_idx in 0..num_pages {
-        let vaddr = base + (page_idx * PAGE_SIZE) as isize;
-        if let Ok(paddr) = kas.translate_address(vaddr) {
-            if let Err(err) = PHYSICAL_FRAME_ALLOCATOR.lock().deallocate_frame(paddr) {
-                logln!("Error deallocating frame at {paddr:?} during cleanup: {err:?}");
-            }
-            if let Err(err) = kas.unmap_page(vaddr) {
-                logln!("Error unmapping vaddr {vaddr:?} during cleanup: {err:?}");
-            }
-        }
+unsafe impl Allocator for GeneralAlloc {
+    fn allocate(&self, layout: core::alloc::Layout) -> Result<NonNull<[u8]>, AllocError> {
+        todo!()
+    }
+
+    unsafe fn deallocate(&self, ptr: NonNull<u8>, layout: Layout) {
+        todo!()
     }
 }
