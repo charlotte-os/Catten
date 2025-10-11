@@ -82,7 +82,9 @@ pub extern "C" fn bsp_main() -> ! {
 /// This is the application processor's entry point into the kernel. The `ap_main` function is
 /// called by each application processor upon entering the kernel. It initializes the processor and
 /// then hands it off to the scheduler. It is made C ABI compatible so that it can work with the
-/// Limine Boot Protocol MP feature.
+/// Limine Boot Protocol MP feature. Other boot protocols may require alternate implementations of
+/// `ap_main`.
+#[cfg(all(feature = "limine", not(feature = "uniprocessor")))]
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ap_main(_cpuinfo: &Cpu) -> ! {
     unsafe {
