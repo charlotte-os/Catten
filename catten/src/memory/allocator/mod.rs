@@ -3,8 +3,8 @@ mod memory;
 use alloc::alloc::{AllocError, Allocator, Layout};
 use core::ptr::{NonNull, null_mut, slice_from_raw_parts_mut};
 
-use lock_api::RawMutex;
 use spinning_top::RawSpinlock;
+use spinning_top::lock_api::RawMutex;
 
 use crate::cpu::isa::memory::paging::PAGE_SIZE;
 use crate::memory::VAddr;
@@ -61,7 +61,7 @@ impl GeneralAlloc {
         }
     }
 
-    fn find_best_fit(&self) -> Option<BlockDesc> {
+    fn find_best_fit(&self) -> Option<*mut BlockDesc> {
         todo!(
             "Scan the freelist ordered by size to find the smallest free block that can meet the specified size and alignment requirements, if any."
         )
