@@ -4,8 +4,8 @@ pub mod tlb;
 
 pub use crate::cpu::isa::interface::memory::MemoryInterface;
 use crate::cpu::isa::memory::address::paddr::PAddrError;
-use crate::memory::pmem::Error as PMemError;
-use crate::memory::vmem::Error as VMemError;
+use crate::memory::linear::Error as VMemError;
+use crate::memory::physical::Error as PMemError;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Error {
