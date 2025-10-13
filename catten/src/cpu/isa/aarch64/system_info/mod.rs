@@ -1,6 +1,7 @@
 use crate::cpu::isa::interface::system_info::CpuInfoIfce;
 #[derive(Debug)]
 pub enum IsaExtension {}
+
 #[derive(Debug)]
 pub enum Vendor {
     SwReserved = 0x00,
@@ -17,6 +18,7 @@ pub enum Vendor {
     Marvell = 0x56,
     Intel = 0x69,
     Ampere = 0xc0,
+    Unrecognized,
 }
 
 impl From<u8> for Vendor {
@@ -36,7 +38,7 @@ impl From<u8> for Vendor {
             0x56 => Vendor::Marvell,
             0x69 => Vendor::Intel,
             0xc0 => Vendor::Ampere,
-            _ => panic!("aarch64 systeminfo: Unrecognized vendor ID!"),
+            _ => Vendor::Unrecognized,
         }
     }
 }
@@ -95,7 +97,7 @@ impl CpuInfoIfce for CpuInfo {
         match vaddr_range {
             0b0000 => 48, // 48-bit VA
             0b0001 => 52, // 52-bit VA when using the 64KB granule
-            0b0010 => 56, // 52-bit VA only when FEAT_D128 is implemented
+            0b0010 => 56, // 56-bit VA only when FEAT_D128 is implemented
             _ => panic!("aarch64 systeminfo: Unrecognized virtual address range value!"),
         }
     }
