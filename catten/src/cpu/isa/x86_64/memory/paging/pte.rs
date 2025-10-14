@@ -1,5 +1,7 @@
 //! # Page Table Entry
 
+use spin::Lazy;
+
 use crate::cpu::isa::x86_64::memory::address::paddr::PAddr;
 
 /// PTE component indexes and masks
@@ -14,7 +16,9 @@ const ACCESSED_BIT_INDEX: u64 = 5;
 const DIRTY_BIT_INDEX: u64 = 6;
 const PAGE_SIZE_BIT_INDEX: u64 = 7; // only for PTEs pointing to a 2 MiB or 1 GiB page
 const GLOBAL_BIT_INDEX: u64 = 8;
-lazy_static::lazy_static! {static ref FRAME_ADDR_MASK: u64 = 0xfffffffffffff000 & *super::super::address::PADDR_MASK as u64;}
+
+static FRAME_ADDR_MASK: Lazy<u64> =
+    Lazy::new(|| 0xfffffffffffff000 & *super::super::address::PADDR_MASK as u64);
 const EXECUTE_DISABLE_BIT_INDEX: u64 = 63;
 
 /// The page table entry structure
