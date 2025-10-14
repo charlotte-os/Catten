@@ -3,6 +3,7 @@ use crate::cpu::isa::interface::init::InitInterface;
 use crate::cpu::isa::lp;
 use crate::logln;
 use crate::memory::PHYSICAL_FRAME_ALLOCATOR;
+use crate::memory::allocator::init_primary_allocator;
 
 pub fn bsp_init() {
     logln!("Performing ISA specific initialization...");
@@ -24,12 +25,7 @@ pub fn bsp_init() {
         }
     }
     logln!("Initializing kernel allocator...");
-    match crate::memory::allocator::init_allocator() {
-        Ok(_) => logln!("Kernel allocator initialized."),
-        Err(_) => {
-            panic!("Kernel allocator initialization failed!");
-        }
-    }
+    init_primary_allocator();
     logln!("Intialized kernel allocator.");
     logln!("ISA independent initialization complete.");
     logln!("BSP initialization complete.");
