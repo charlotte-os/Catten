@@ -1,45 +1,19 @@
 //! # National Semiconductor 16550 Compatible UART Driver
+mod legacy_ports;
 
 use core::fmt::{self, Write};
 use core::result::Result;
 
-use lazy_static::lazy_static;
-use spin::Mutex;
+use spin::{Lazy, Mutex};
 
-use crate::drivers::uart::Uart;
+use crate::common::io::Read;
 use crate::cpu::isa::interface::io::{IReg8Ifce, OReg8Ifce};
 use crate::cpu::isa::io::{self, IoReg8};
-use crate::common::io::Read;
+use crate::drivers::uart::Uart;
 
 #[cfg(target_arch = "x86_64")]
-lazy_static! {
-    pub static ref LOG_PORT: Mutex<Uart16550> =
-        Mutex::new(Uart16550::try_new(io::IoReg8::IoPort(COM1)).unwrap());
-}
-
-/*
- * Standard PC COM port base addresses
- *
- * These won't work on modern hardware as it no longer uses the ISA bus however they are useful
- * for logging when running under hypervisors like QEMU or Bochs which emulate ISA hardware.
- * Typically modern hardware exposes UARTs via MMIO or PCIe.
- */
-#[allow(unused)]
-static COM1: u16 = 0x3f8;
-#[allow(unused)]
-static COM2: u16 = 0x2f8;
-#[allow(unused)]
-static COM3: u16 = 0x3e8;
-#[allow(unused)]
-static COM4: u16 = 0x2e8;
-#[allow(unused)]
-static COM5: u16 = 0x5f8;
-#[allow(unused)]
-static COM6: u16 = 0x4f8;
-#[allow(unused)]
-static COM7: u16 = 0x5e8;
-#[allow(unused)]
-static COM8: u16 = 0x4e8;
+pub static LOG_PORT: Lazy<Mutex<Uart16550>> =
+    Lazy::new(|| Mutex::new(Uart16550::try_new(io::IoReg8::IoPort(legacy_ports::COM1)).unwrap()));
 
 #[derive(Copy, Clone, Debug)]
 #[repr(transparent)]

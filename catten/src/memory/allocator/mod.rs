@@ -1,68 +1,55 @@
 mod memory;
 
-use alloc::alloc::{AllocError, Allocator, Layout};
-use core::cmp::min;
-use core::ptr::{self, NonNull};
+use core::mem::MaybeUninit;
 
-use spinning_top::RawSpinlock;
-use spinning_top::lock_api::RawMutex;
+use spin::{Lazy, Mutex};
+use talc::*;
 
+use crate::common::size::mebibytes;
 use crate::cpu::isa::interface::memory::address::{Address, VirtualAddress};
 use crate::cpu::isa::memory::paging::PAGE_SIZE;
-use crate::memory::VAddr;
-use crate::memory::linear::address_map::{LA_MAP, RegionType};
+use crate::memory::allocator::memory::try_allocate_and_map_range;
+use crate::memory::linear::VAddr;
+use crate::memory::linear::address_map::LA_MAP;
+use crate::memory::linear::address_map::RegionType::KernelStackArena;
 
-pub static GENERAL_ALLOCATOR: GeneralAlloc = GeneralAlloc::new();
+const INITIAL_HEAP_SIZE: usize = mebibytes(2);
 
-/// The general dynamic memory allocator of Catten
-struct GeneralAlloc {
-    lock: RawSpinlock,
-    arena_size: usize,
-    free_list: *mut [NonNull<usize>],
+static PRIMARY_ALLOCATOR: Lazy<Talck<Mutex<()>, ExtendOnOom>> =
+    Lazy::new(|| Talck::new(Talc::new(ExtendOnOom::new())));
+static HEAP_SPAN: Mutex<MaybeUninit<Span>> = Mutex::new(MaybeUninit::uninit());
+
+struct ExtendOnOom {
+    heap_span: Span,
 }
 
-/// Safety: The pointers in here are never accessed from anywhere else and they are basically used
-/// as manual vectors of manual Boxes since we cannot use those types given that we are the
-/// allocator
-unsafe impl Sync for GeneralAlloc {}
-
-impl GeneralAlloc {
-    // We use a private const constructor since this type is a singleton and should dynamically
-    // provision memory and address space regions anyway
-    const fn new() -> Self {
-        GeneralAlloc {
-            lock: RawSpinlock::INIT,
-            arena_size: 0,
-            free_list: ptr::slice_from_raw_parts_mut::<NonNull<usize>>(ptr::null_mut(), 0),
+impl ExtendOnOom {
+    fn new() -> Self {
+        let base = LA_MAP.get_region(KernelStackArena).base;
+        try_allocate_and_map_range(base, INITIAL_HEAP_SIZE / PAGE_SIZE)
+            .expect("Failed to allocate and map initial kernel heap memory");
+        ExtendOnOom {
+            heap_span: Span::new(base.into_mut(), (base + INITIAL_HEAP_SIZE).into_mut()),
         }
     }
+}
 
-    /// This function is used instead of new because this type is a singleton that owns the entire
-    /// kernel dynamic memory region in the higher half of all address spaces
-    pub fn get() -> &'static Self {
-        &GENERAL_ALLOCATOR
-    }
-
-    /// What do you think it does?
-    fn expand_heap(&self) -> Result<(), AllocError> {
-        // This operation requires mutual exclusion
-        let _lock = self.lock.lock();
-        let expansion_base =
-            LA_MAP.get_region(RegionType::KernelAllocatorArena).base + self.arena_size;
-        if memory::try_allocate_and_map_range(expansion_base, min(self.arena_size / PAGE_SIZE, 1))
-            .is_err()
-        {
-            Err(AllocError)
-        } else {
+impl OomHandler for ExtendOnOom {
+    fn handle_oom(talc: &mut Talc<Self>, _layout: core::alloc::Layout) -> Result<(), ()> {
+        let raw_span = unsafe { HEAP_SPAN.lock().assume_init() }.get_base_acme().unwrap();
+        let (base, acme) = (VAddr::from_ptr(raw_span.0), VAddr::from_ptr(raw_span.1));
+        let current_size = acme - base;
+        let new_acme = core::cmp::min(
+            acme + current_size,
+            LA_MAP.get_region(KernelStackArena).base + LA_MAP.get_region(KernelStackArena).length,
+        );
+        let new_span = Span::new(base.into_mut(), new_acme.into_mut());
+        if let Ok(_) = try_allocate_and_map_range(acme, current_size as usize / PAGE_SIZE) {
+            HEAP_SPAN.lock().write(new_span);
+            unsafe { talc.extend(Span::new(base.into_mut(), acme.into_mut()), new_span) };
             Ok(())
+        } else {
+            Err(())
         }
-    }
-}
-
-unsafe impl Allocator for GeneralAlloc {
-    fn allocate(&self, layout: Layout) -> Result<NonNull<[u8]>, AllocError> {}
-
-    unsafe fn deallocate(&self, ptr: NonNull<u8>, layout: Layout) {
-        todo!()
     }
 }
