@@ -5,6 +5,7 @@ use crate::memory::linear::{MemoryMapping, PageType, VAddr};
 use crate::memory::physical::*;
 use crate::memory::{KERNEL_AS, PHYSICAL_FRAME_ALLOCATOR, physical};
 
+#[derive(Debug)]
 pub enum Error {
     PfaError(physical::Error),
     IsaMemoryError(crate::cpu::isa::memory::Error),

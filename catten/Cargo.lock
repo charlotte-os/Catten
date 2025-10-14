@@ -28,7 +28,7 @@ dependencies = [
  "lazy_static",
  "limine",
  "spin 0.10.0",
- "spinning_top",
+ "talc",
 ]
 
 [[package]]
@@ -104,10 +104,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "spinning_top"
-version = "0.3.0"
+name = "talc"
+version = "4.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d96d2d1d716fb500937168cc09353ffdc7a012be8475ac7308e1bdf0e3923300"
+checksum = "a3ae828aa394de34c7de08f522d1b86bd1c182c668d27da69caadda00590f26d"
 dependencies = [
  "lock_api",
 ]
