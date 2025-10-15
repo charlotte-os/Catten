@@ -97,9 +97,12 @@ impl CpuInfoIfce for CpuInfo {
         let vaddr_range = ((id_aa64mmfr2_el1 >> 16) & 0xf) as u8;
 
         match vaddr_range {
-            0b0000 => 48, // 48-bit VA
-            0b0001 => 52, // 52-bit VA when using the 64KB granule
-            0b0010 => 56, // 56-bit VA only when FEAT_D128 is implemented
+            // 48-bit VA; always implemented on AArch64
+            0b0000 => 48,
+            // FEAT_LVA: 52-bit VA when using the 64KB granule
+            0b0001 => 52,
+            // FEAT_LVA3: 56-bit VA available and FEAT_D128 is guaranteed to be implemented
+            0b0010 => 56,
             _ => panic!("aarch64 systeminfo: Unrecognized virtual address range value!"),
         }
     }
@@ -112,14 +115,25 @@ impl CpuInfoIfce for CpuInfo {
         let paddr_range = (id_aa64mmfr0_el1 & 0xf) as u8;
 
         match paddr_range {
-            0b0000 => 32, // 32-bit PA, 4GB
-            0b0001 => 36, // 36-bit PA, 64GB
-            0b0010 => 40, // 40-bit PA, 1TB
-            0b0011 => 42, // 42-bit PA, 4TB
-            0b0100 => 44, // 44-bit PA, 16TB
-            0b0101 => 48, // 48-bit PA, 256TB
-            0b0110 => 52, // 52-bit PA, 4PB when FEAT_LPA is implemented
-            0b0111 => 56, // 56-bit PA, 64PB when FEAT_D128 is implemented
+            // 32-bit PA, 4GiB
+            0b0000 => 32,
+            // 36-bit PA, 64GiB
+            0b0001 => 36,
+            // 40-bit PA, 1TiB
+            0b0010 => 40,
+            // 42-bit PA, 4TiB
+            0b0011 => 42,
+            // 44-bit PA, 16TiB
+            0b0100 => 44,
+            // 48-bit PA, 256TiB
+            0b0101 => 48,
+            /* The following numbers of significant bits require FEAT_LPA in order to be used
+            with the 64 KiB granule and additionally FEAT_LPA2 in order to be used
+            with the 4 KiB and 16 KiB granules */
+            // 52-bit PA, 4PiB
+            0b0110 => 52,
+            /* 52-bit PA, 64PiB when FEAT_D128 is implemented and using the 64KB granule */
+            0b0111 => 56,
             _ => panic!("aarch64 systeminfo: Unrecognized physical address range value!"),
         }
     }
