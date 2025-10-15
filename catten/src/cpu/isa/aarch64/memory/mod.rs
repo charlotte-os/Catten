@@ -89,6 +89,35 @@ impl AddressSpaceInterface for AddressSpace {
         &mut self,
         vaddr: VAddr,
     ) -> Result<PAddr, <MemoryInterfaceImpl as MemoryInterface>::Error> {
-        todo!("Implement the address translation logic for AArch64")
+        let mut par_el1 = (0u64, 0u64);
+        unsafe {
+            asm!(
+                // Address translation stage 1 at EL1 without permission check
+                "at s1e1a, {}",
+                "isb", // Weakly ordered ISA is weakly ordered lol
+                "mrrs x0, x1, par_el1",
+                vaddr = in(reg) vaddr,
+                lateout("x0") par_el1.0,
+                lateout("x1") par_el1.1,
+            );
+        }
+        if par_el1.0 & 1 == 1 {
+            // Check F bit
+            Err(Error {})
+        } else {
+            Ok(PAddr(
+                if is_d128_set(par_el1) {
+                    par_el1.1
+                } else {
+                    par_el1.0
+                } & PAR_EL1_PADDR_MASK,
+            ))
+        }
     }
+}
+
+const PAR_EL1_PADDR_MASK: u64 = 0x0000fffffffff000;
+
+fn is_d128_set(par_el1: (u64, u64)) -> bool {
+    par_el1.1 & 1 == 1
 }

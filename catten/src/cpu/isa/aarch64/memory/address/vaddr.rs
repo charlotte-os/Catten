@@ -3,6 +3,7 @@ use crate::cpu::isa::interface::memory::address::{Address, VirtualAddress};
 use crate::cpu::isa::interface::system_info::CpuInfoIfce;
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
+#[repr(transparent)]
 pub struct VAddr(usize);
 
 impl Address for VAddr {
