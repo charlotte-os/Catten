@@ -1,6 +1,8 @@
+mod feature_check;
+
+use feature_check::*;
+
 use crate::cpu::isa::interface::system_info::CpuInfoIfce;
-#[derive(Debug)]
-pub enum IsaExtension {}
 
 #[derive(Debug)]
 pub enum Vendor {
@@ -122,7 +124,9 @@ impl CpuInfoIfce for CpuInfo {
         }
     }
 
-    fn is_extension_supported(_extension: Self::IsaExtension) -> bool {
-        false
+    fn is_extension_supported(extension: Self::IsaExtension) -> bool {
+        match extension {
+            IsaExtension::FeatD128 => check_feat::d128(),
+        }
     }
 }

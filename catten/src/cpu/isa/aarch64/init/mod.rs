@@ -12,13 +12,17 @@ pub enum Error {
 impl InitInterface for IsaInitializer {
     type Error = Error;
 
-    fn init() -> Result<(), Self::Error> {
+    fn init_bsp() -> Result<(), Self::Error> {
+        init_ap()
+    }
+
+    fn init_ap() -> Result<(), Self::Error> {
         // Initialization code for the aarch64 architecture
         logln!("Performing Aarch64 ISA specific initialization...");
         // Setup the interrupt vector table
-        logln!("Loading the interrupt vector table on the BSP");
+        logln!("Loading the interrupt vector table on the AP");
         load_ivt();
-        logln!("Interrupt vector table loaded on the BSP");
+        logln!("Interrupt vector table loaded on the AP");
 
         logln!("Aarch64 ISA specific initialization complete!");
         Ok(())
