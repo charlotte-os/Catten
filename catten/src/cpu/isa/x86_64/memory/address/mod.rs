@@ -1,8 +1,6 @@
-pub mod paddr;
-pub mod vaddr;
-
 use spin::Lazy;
 
+pub use crate::cpu::isa::common::memory::address::*;
 use crate::cpu::isa::interface::system_info::CpuInfoIfce;
 use crate::cpu::isa::x86_64::system_info::CpuInfo;
 
