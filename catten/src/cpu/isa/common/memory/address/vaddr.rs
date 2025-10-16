@@ -2,6 +2,7 @@ use core::iter::Step;
 use core::ops::{Add, Sub};
 
 use crate::cpu::isa::interface::memory::address::{Address, VirtualAddress};
+use crate::cpu::isa::memory::address::VADDR_SIG_BITS;
 
 #[repr(transparent)]
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -118,8 +119,8 @@ impl VirtualAddress for VAddr {
 
 impl From<usize> for VAddr {
     fn from(value: usize) -> Self {
-        let mask = (1 << *super::VADDR_SIG_BITS) - 1;
-        let sign_extended = if value & (1 << (*super::VADDR_SIG_BITS - 1)) != 0 {
+        let mask = (1 << *VADDR_SIG_BITS) - 1;
+        let sign_extended = if value & (1 << (*VADDR_SIG_BITS - 1)) != 0 {
             value | (!mask)
         } else {
             value & mask

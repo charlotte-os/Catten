@@ -1,6 +1,7 @@
 use core::ops::{Add, Sub};
 
 use crate::cpu::isa::interface::memory::address::{Address, PhysicalAddress, VirtualAddress};
+use crate::cpu::isa::memory::address::PADDR_MASK;
 use crate::memory::HHDM_BASE;
 
 #[derive(Debug, Clone, Copy)]
@@ -30,7 +31,7 @@ impl Address for PAddr {
     }
 
     fn is_valid(value: usize) -> bool {
-        value & *super::PADDR_MASK == value
+        value & *PADDR_MASK == value
     }
 
     fn is_null(&self) -> bool {
@@ -74,7 +75,7 @@ impl TryFrom<usize> for PAddr {
     type Error = PAddrError;
 
     fn try_from(value: usize) -> Result<Self, PAddrError> {
-        if value & !*super::PADDR_MASK != 0 {
+        if value & !*PADDR_MASK != 0 {
             Err(PAddrError::OutOfCpuSupportedRange(value))
         } else {
             Ok(PAddr {
@@ -93,7 +94,7 @@ impl Into<usize> for PAddr {
 impl From<u64> for PAddr {
     fn from(value: u64) -> Self {
         PAddr {
-            raw: value as usize & *super::PADDR_MASK,
+            raw: value as usize & *PADDR_MASK,
         }
     }
 }
