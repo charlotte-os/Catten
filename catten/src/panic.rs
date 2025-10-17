@@ -1,3 +1,5 @@
+//! # Rust Panic Handler
+
 use core::panic::PanicInfo;
 
 use crate::cpu::isa::lp::ops::halt;
