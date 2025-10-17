@@ -1,3 +1,5 @@
+//! # Initialization Module
+
 use crate::cpu::isa::init::IsaInitializer;
 use crate::cpu::isa::interface::init::InitInterface;
 use crate::cpu::isa::lp;

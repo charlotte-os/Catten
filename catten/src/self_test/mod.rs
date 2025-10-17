@@ -1,4 +1,4 @@
-//! #Self Testing Subsystem
+//! # Kernel Self-Test Subsystem
 //!
 //! This subsystem contains diagnostic tests meant to test the kernel itself and aid in development
 //! and troubleshooting. Almost all subsystems with the exception of drivers should have at least

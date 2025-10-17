@@ -1,3 +1,5 @@
+//! # Event Subsystem
+
 pub trait Event {
     fn register_observer(&mut self, observer: &dyn Observer);
 }
