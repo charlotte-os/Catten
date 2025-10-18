@@ -20,8 +20,8 @@ use core::arch::global_asm;
 use spin::Mutex;
 
 use crate::cpu::isa::memory::tlb;
-use crate::cpu::scheduler::GLOBAL_SCHEDULER;
-use crate::cpu::threads::ThreadId;
+use crate::cpu::scheduler::system_scheduler::SYSTEM_SCHEDULER;
+use crate::cpu::scheduler::threads::ThreadId;
 use crate::memory::linear::VAddr;
 use crate::memory::{AddressSpaceId, KERNEL_ASID};
 
@@ -56,13 +56,13 @@ pub extern "C" fn ih_interprocessor_interrupt(ipi_queue: &'static mut Mutex<VecD
             }
             Ipi::AsidInval(asid) => tlb::inval_asid(asid),
             Ipi::TerminateThreads(tids) => {
-                GLOBAL_SCHEDULER.get_local_lp_scheduler().lock().terminate_threads(tids)
+                SYSTEM_SCHEDULER.get_local_scheduler().lock().terminate_threads(tids)
             }
             Ipi::AbortThreads(tids) => {
-                GLOBAL_SCHEDULER.get_local_lp_scheduler().lock().abort_threads(tids)
+                SYSTEM_SCHEDULER.get_local_scheduler().lock().abort_threads(tids)
             }
             Ipi::AbortAsThreads(asid) => {
-                GLOBAL_SCHEDULER.get_local_lp_scheduler().lock().abort_as_threads(asid)
+                SYSTEM_SCHEDULER.get_local_scheduler().lock().abort_as_threads(asid)
             }
         }
     }
