@@ -5,6 +5,11 @@ use core::arch::asm;
 
 pub static mut X2APIC_ID_TABLE: Vec<LapicId> = Vec::new();
 
+/// x2APIC MSR space docs: AAPM 16.11.1 and ISDM 12.12.1.2
+pub static X2APIC_ID_REG: u32 = 0x802;
+pub static X2APIC_LOGICAL_DEST_REG: u32 = 0x80d;
+
+#[repr(C, packed)]
 pub struct LapicId {
     pub physical: PhysicalLapicId,
     pub logical:  LogicalLapicId,
@@ -16,10 +21,10 @@ impl LapicId {
         let logical: u32;
         unsafe {
             asm! (
-                "mov ecx, 0x802", // x2APIC ID Register
+                "mov ecx, X2APIC_ID_REG", // x2APIC ID Register
                 "rdmsr",
                 "mov [{phys:e}], eax",
-                "mov ecx, 0x80d", // x2APIC Logical Destination Register
+                "mov ecx, X2APIC_LOGICAL_DEST_REG", // x2APIC Logical Destination Register
                 "rdmsr",
                 "mov [{log:e}], eax",
                 phys = out(reg) physical,
@@ -28,10 +33,7 @@ impl LapicId {
         }
         LapicId {
             physical,
-            logical: LogicalLapicId {
-                cluster_id: ((logical >> 16) & (1 << 16 - 1)) as u16,
-                apic_bitmask: (logical & (1 << 16 - 1)) as u16,
-            },
+            logical: unsafe { core::mem::transmute(logical) },
         }
     }
 }

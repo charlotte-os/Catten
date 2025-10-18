@@ -1,9 +1,8 @@
 //! The RISC-V 64-bit Instruction Set Architecture
 //!
-//! This module contains all RISC-V 64-bit-specific code. The main reference document
-//! for this ISA is the
-//! [RISC-V Instruction Set Manual](https://riscv.org/technical/specifications/)
-//! which includes both the unprivileged and privileged specifications.
+//! This module contains all RISC-V 64-bit-specific code. The reference documents
+//! for this ISA are available on the
+//! [RISC-V technical specifications page](https://riscv.org/technical/specifications/).
 
 pub mod init;
 pub mod interrupts;
