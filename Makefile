@@ -62,51 +62,6 @@ run-x86_64-release: ovmf-x86_64 build-x86_64-release
 check-x86_64:
 	cd catten && cargo check --target x86_64-unknown-none
 
-# aarch64
-
-ovmf-aarch64:
-	mkdir -p ovmf-aarch64
-	cd ovmf-aarch64 && curl -o OVMF.fd https://retrage.github.io/edk2-nightly/bin/RELEASEAARCH64_QEMU_EFI.fd
-build-aarch64-debug: Limine
-	cd catten && cargo build --target aarch64-unknown-none
-catten-aarch64-debug.iso: build-aarch64-debug
-	rm -rf iso_root
-	mkdir -p iso_root
-	cp -v catten/target/aarch64-unknown-none/debug/catten \
-		limine.conf Limine/limine-uefi-cd.bin iso_root/
-	mkdir -p iso_root/EFI/BOOT
-	cp -v Limine/BOOTAA64.EFI iso_root/EFI/BOOT/
-	xorriso -as mkisofs \
-		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot limine-uefi-cd.bin \
-		-efi-boot-part --efi-boot-image --protective-msdos-label \
-		iso_root -o catten-aarch64-debug.iso
-	rm -rf iso_root
-run-aarch64-debug: ovmf-aarch64 catten-aarch64-debug.iso
-	qemu-system-aarch64 -M virt -cpu cortex-a76 -device ramfb -device qemu-xhci -device usb-kbd -m 2G -bios ovmf-aarch64/OVMF.fd -cdrom catten-aarch64-debug.iso -boot d
-run-aarch64-log: ovmf-aarch64 catten-aarch64-debug.iso
-	qemu-system-aarch64 -M virt -cpu cortex-a76 -device ramfb -device qemu-xhci -device usb-kbd -m 2G -bios ovmf-aarch64/OVMF.fd -cdrom catten-aarch64-debug.iso -boot d \
-		-serial file:log_aarch64.txt
-
-
-build-aarch64-release: Limine
-	cd catten && cargo build --target aarch64-unknown-none --release
-catten-aarch64-release.iso: build-aarch64-release
-	rm -rf iso_root
-	mkdir -p iso_root
-	cp -v catten/target/aarch64-unknown-none/release/catten \
-		limine.conf Limine/limine-uefi-cd.bin iso_root/
-	mkdir -p iso_root/EFI/BOOT
-	cp -v Limine/BOOTAA64.EFI iso_root/EFI/BOOT/
-	xorriso -as mkisofs \
-		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot limine-uefi-cd.bin \
-		-efi-boot-part --efi-boot-image --protective-msdos-label \
-		iso_root -o catten-aarch64-release.iso
-	rm -rf iso_root
-run-aarch64-release: ovmf-aarch64 catten-aarch64-release.iso
-	qemu-system-aarch64 -M virt -cpu cortex-a72 -device ramfb -device qemu-xhci -device usb-kbd -m 2G -bios ovmf-aarch64/OVMF.fd -cdrom catten-aarch64-release.iso -boot d
-
 # riscv64
 
 ovmf-riscv64:
@@ -161,16 +116,12 @@ run-riscv64-release: ovmf-riscv64 catten-riscv64-release.iso
 
 clean:
 	cd catten && cargo clean
-	rm -rf ovmf-aarch64
 	rm -rf ovmf-riscv64
 	rm -rf ovmf-x86_64
-	rm -f catten-aarch64-debug.iso
 	rm -f catten-riscv64-debug.iso
 	rm -f catten-x86_64-debug.iso
-	rm -f catten-aarch64-release.iso
 	rm -f catten-riscv64-release.iso
 	rm -f catten-x86_64-release.iso
-	rm -f log_aarch64.txt
 	rm -f log_riscv64.txt
 	rm -f log_x86_64.txt
 
