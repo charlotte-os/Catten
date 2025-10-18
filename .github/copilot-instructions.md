@@ -3,13 +3,13 @@
 Concise, action-focused context to make high-quality changes rapidly. Keep responses specific to this repository; avoid generic OS dev boilerplate unless directly relevant.
 
 ## 1. Project Snapshot
-- Repository: `charlottek` – a monolithic, modular Rust kernel (early stage) for multiple ISAs (currently x86_64 primary; aarch64 & riscv64 scaffolding present).
+- Repository: `charlottek` – a monolithic, modular Rust kernel (early stage) for multiple ISAs (currently x86_64 primary; riscv64 scaffolding present).
 - Boot flow: Limine Boot Protocol → `bsp_main` (`src/main.rs`) → `init::bsp_init()` → start secondary logical processors (`multiprocessing::start_secondary_lps`) → optional self tests → idle (HLT).
 - Secondary CPUs enter at `ap_main` (currently minimal) and halt.
 - Kernel is `#![no_std]`, uses `alloc` + custom global allocator built atop physical + virtual memory layers.
 
 ## 2. Key Subsystem Layout
-- `isa/` – Architectural abstraction. `isa::interface/*` defines traits (memory, lp_control, system_info, io, interrupts). Concrete per-arch modules live under `isa/x86_64`, `isa/aarch64`, etc. Use `isa::target` for arch-selected reexports.
+- `isa/` – Architectural abstraction. `isa::interface/*` defines traits (memory, lp_control, system_info, io, interrupts). Concrete per-arch modules live under `isa/x86_64`, `isa/riscv64`, etc. Use `isa::target` for arch-selected reexports.
 - `memory/` – Layered memory mgmt: `pmem` (physical frame allocator), `vmem` (address space + paging abstraction), `allocator.rs` (heap init using Talc). Kernel heap region is dynamically found in higher half; page size & significant VA bits come from ISA module.
 - `drivers/` – Early basic drivers (keyboard ps/2, uart ns16550). Pattern: each driver in its own submodule, minimal global state guarded by spin or custom raw mutex.
 - `multiprocessing/` – Brings up secondary logical processors (x2APIC requirement noted in README). Uses Limine SMP info.
@@ -26,14 +26,14 @@ Concise, action-focused context to make high-quality changes rapidly. Keep respo
 - Architecture selection: gate new ISA code with `#[cfg(target_arch = "x86_64")]` etc and expose via `target` reexport for call sites.
 - Logging & panics: always prefer `logln!` before halting. Panic path must remain minimal (no allocations assumed safe).
 
-## 4. Build & Run Workflows (Do These, Don’t Recreate)
+## 4. Build & Run Workflows (Do These, Don't Recreate)
 - Build debug x86_64 ISO: `make build-x86_64-debug` (generates `charlottek-x86_64-debug.iso`).
 - Run (KVM accel, serial on stdio): `make run-x86_64-debug`.
 - Multiprocessor / NUMA test variants: `make run-x86_64-debug-multicore`, `make run-x86_64-debug-numa`.
 - Release build: `make run-x86_64-release` (includes build step).
-- Other ISAs: `make run-aarch64-debug`, `make run-riscv64-debug` (scaffolding; feature completeness may lag x86_64).
+- Other ISAs: `make run-riscv64-debug` (scaffolding; feature completeness may lag x86_64).
 - Clean: `make clean` / `make distclean` (also removes bootloader clone & OVMF blobs).
-- Cargo alone: always pass explicit target triple (e.g., `cargo build --target x86_64-unknown-none`). Don’t assume host std env.
+- Cargo alone: always pass explicit target triple (e.g., `cargo build --target x86_64-unknown-none`). Don't assume host std env.
 
 ## 5. Allocator & Memory Gotchas
 - Global allocator (`Talc`) is installed in `memory/allocator.rs`; call `init_allocator()` only once after paging + frame allocator ready.
