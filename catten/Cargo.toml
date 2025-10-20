@@ -13,11 +13,13 @@ bench = false
 [build-dependencies]
 
 [dependencies]
+flanterm-raw = { git = "https://codeberg.org/CharlotteOS/flanterm-raw.git", branch = "main" }
 hashbrown = "*"
 limine = ">=0.5.0"
 spin = { version = ">=0.10.0", features = ["ticket_mutex", "lock_api"] }
 talc = { version = "*" }
 uacpi-raw = {git = "https://codeberg.org/CharlotteOS/uacpi-raw.git", branch = "main"}
+
 
 [profile.dev]
 debug = "full"
