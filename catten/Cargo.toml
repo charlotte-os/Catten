@@ -13,6 +13,7 @@ bench = false
 [build-dependencies]
 
 [dependencies]
+acpi = ">=6.0.1"
 hashbrown = "*"
 limine = ">=0.5.0"
 spin = { version = ">=0.10.0", features = ["ticket_mutex", "lock_api"] }
