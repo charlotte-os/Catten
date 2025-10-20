@@ -1,4 +1,4 @@
-use acpi::AcpiTables;
+//use acpi::AcpiTables;
 use spin::RwLock;
 
 //pub static ACPI_TABLES: RwLock<AcpiTables<AcpiHandler>> =
