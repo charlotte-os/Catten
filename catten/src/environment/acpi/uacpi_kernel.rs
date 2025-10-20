@@ -25,4 +25,6 @@ pub extern "C" fn uacpi_kernel_get_rsdp(out_rsdp_address: *mut uacpi_phys_addr) 
 pub extern "C" fn uacpi_kernel_map(addr: uacpi_phys_addr, len: uacpi_size) -> *mut c_void {
     let corrected_phys_addr = addr & !(0xfff);
     let corrected_len = len + (addr - corrected_phys_addr) as uacpi_size;
+
+    todo!("Use the VMM and PFA to map physical memory into the kernel's address space.")
 }
