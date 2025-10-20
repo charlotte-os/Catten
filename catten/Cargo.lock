@@ -75,6 +75,7 @@ checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
 name = "charlottek"
 version = "0.2.1"
 dependencies = [
+ "flanterm-raw",
  "hashbrown",
  "limine",
  "spin",
@@ -120,6 +121,15 @@ name = "find-msvc-tools"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "52051878f80a721bb68ebfbc930e07b65ba72f2da88968ea5c06fd6ca3d3a127"
+
+[[package]]
+name = "flanterm-raw"
+version = "0.1.0"
+source = "git+https://codeberg.org/CharlotteOS/flanterm-raw.git?branch=main#481ff894d610f611f1f0852030b3e82a41379e12"
+dependencies = [
+ "bindgen",
+ "cc",
+]
 
 [[package]]
 name = "foldhash"
