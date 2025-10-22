@@ -3,5 +3,5 @@ version = 1
 [[annotations]]
 path = ["./"]
 precedence = "closest"
-SPDX-FileCopyrightText = "2025 Mohit D. Patel and Contributors <charlotte-os@outlook.com>"
+SPDX-FileCopyrightText = ["2025 Mohit D. Patel <mdpatel.csecon@outlook.com>", "2025 Contributors to The Charlotte Operating System <charlotte-os@outlook.com>"]
 SPDX-License-Identifier = "GPL-3.0-or-later"
