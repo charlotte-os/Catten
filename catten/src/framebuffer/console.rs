@@ -254,7 +254,7 @@ macro_rules! print {
     ($($arg:tt)*) => {
         use core::fmt::Write;
         use crate::framebuffer::console::CONSOLE;
-        let con = CONSOLE.lock();
+        let mut con = CONSOLE.lock();
         con.write_fmt(format_args!($($arg)*)).unwrap();
         con.clear_inner_styling();
     }
