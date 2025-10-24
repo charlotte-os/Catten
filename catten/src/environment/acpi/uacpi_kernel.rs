@@ -70,7 +70,9 @@ pub extern "C" fn uacpi_kernel_unmap(mapped_addr: *mut c_void, len: uacpi_size) 
     }
 }
 
-fn uacpi_kernel_log(ll: uacpi_log_level, cstr: *const uacpi_char) {
+#[allow(unused)]
+#[unsafe(no_mangle)]
+pub extern "C" fn uacpi_kernel_log(ll: uacpi_log_level, cstr: *const uacpi_char) {
     let string = unsafe { CString::from_raw(cstr as *mut c_char) };
     let rust_str = string.to_str().unwrap_or("Invalid UTF-8 string passed by UACPI.");
     let prefix = match ll {
