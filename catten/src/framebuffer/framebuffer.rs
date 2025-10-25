@@ -170,16 +170,16 @@ impl FrameBufferInfo {
         let char_int: usize = chracter as usize;
         let first_byte_index = char_int * 16;
         let mut do_draw: bool;
-        let mut colour_buffer: u32;
+        let mut color_buffer: u32;
         for by in 0..16 {
             for bi in 0..8 {
                 do_draw = ((FONT[first_byte_index + by] >> (7 - bi)) & 1) != 0;
                 if do_draw {
-                    colour_buffer = color;
+                    color_buffer = color;
                 } else {
-                    colour_buffer = background_color;
+                    color_buffer = background_color;
                 }
-                self.draw_pixel(x + bi, y + by, colour_buffer);
+                self.draw_pixel(x + bi, y + by, color_buffer);
             }
         }
     }
