@@ -1,5 +1,5 @@
 [package]
-name = "charlottek"
+name = "catten"
 version = "0.2.1"
 edition = "2024"
 
@@ -10,10 +10,11 @@ path = "src/main.rs"
 test = false
 bench = false
 
-[build-dependencies]
+[features]
+limine = []
+default = ["limine"]
 
 [dependencies]
-flanterm-raw = { git = "https://codeberg.org/CharlotteOS/flanterm-raw.git", branch = "main" }
 hashbrown = "*"
 limine = ">=0.5.0"
 spin = { version = ">=0.10.0", features = ["ticket_mutex", "lock_api"] }
@@ -25,12 +26,12 @@ uacpi-raw = {git = "https://codeberg.org/CharlotteOS/uacpi-raw.git", branch = "m
 debug = "full"
 debug-assertions = true
 panic = "abort"
-lto = true
+lto = false
 opt-level = 0
 
 [profile.release]
 debug = "none"
 debug-assertions = false
 panic = "abort"
-lto = true
+lto = false
 opt-level = 3

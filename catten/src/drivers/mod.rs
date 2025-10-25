@@ -1,4 +1,5 @@
 //! # Device Drivers
 
-pub mod keyboard;
+pub mod display;
+pub mod input;
 pub mod uart;

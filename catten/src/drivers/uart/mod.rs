@@ -1,8 +1,5 @@
-//! # Universal Asynchronous Receiver/Transmitter (UART) Subsystem
-//!
-//! This subsystem provides a common interface for UART devices and contains drivers for specific
-//! UART devices that implement this interface.
-//! # UART Drivers
+//! # Universal Asynchronous Receiver/Transmitter (UART) Drivers
+
 pub mod ns16550;
 
 use core::fmt::Write;
