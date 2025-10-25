@@ -24,10 +24,10 @@ build-x86_64-debug: Limine
 	rm -rf iso_root
 
 run-x86_64-debug: ovmf-x86_64 build-x86_64-debug
-	qemu-system-x86_64 -enable-kvm -cpu host -M q35 -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom catten-x86_64-debug.iso -boot d -serial stdio
+	qemu-system-x86_64 -enable-kvm -cpu host,+invtsc -M q35 -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom catten-x86_64-debug.iso -boot d -serial stdio
 
 run-x86_64-debug-multicore: ovmf-x86_64 build-x86_64-debug
-	qemu-system-x86_64 -enable-kvm -M q35 -smp 16 -cpu host -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom catten-x86_64-debug.iso -boot d -serial stdio
+	qemu-system-x86_64 -enable-kvm -cpu host,+invtsc -M q35 -smp 16 -cpu host -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom catten-x86_64-debug.iso -boot d -serial stdio
 
 run-x86_64-debug-numa: ovmf-x86_64 build-x86_64-debug
 	qemu-system-x86_64 -enable-kvm -M q35 -cpu host -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom catten-x86_64-debug.iso -boot d -serial stdio -smp 4 -object memory-backend-ram,size=4G,id=m0 -object memory-backend-ram,size=4G,id=m1 -numa node,memdev=m0,cpus=0-1,nodeid=0 -numa node,memdev=m1,cpus=2-3,nodeid=1
@@ -57,7 +57,7 @@ build-x86_64-release: Limine
 	rm -rf iso_root
 
 run-x86_64-release: ovmf-x86_64 build-x86_64-release
-	qemu-system-x86_64 -enable-kvm -M q35 -cpu host -smp 16 -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom catten-x86_64-release.iso -boot d -serial stdio
+	qemu-system-x86_64 -enable-kvm -M q35 -cpu host,+invtsc -smp 16 -m 16G -bios ovmf-x86_64/OVMF.fd -cdrom catten-x86_64-release.iso -boot d -serial stdio
 
 check-x86_64:
 	cd catten && cargo check --target x86_64-unknown-none

@@ -36,18 +36,16 @@ macro_rules! unmask_interrupts {
 #[rustfmt::skip]
 pub use unmask_interrupts;
 
-pub const LAPIC_ID_MSR: u32 = 0x802;
-
 #[rustfmt::skip]
 #[macro_export]
 macro_rules! get_lic_id {
     () => {{
         let apic_id: u32;
-        use crate::cpu::isa::lp::ops::LAPIC_ID_MSR;
+        use crate::cpu::isa::constants::*;
         unsafe {
             core::arch::asm!(
                 "rdmsr",
-                inlateout("ecx") LAPIC_ID_MSR => _,
+                inlateout("ecx") msrs::LAPIC_ID => _,
                 lateout("eax") apic_id,
                 lateout("edx") _,
                 options(nostack, preserves_flags)
@@ -59,11 +57,10 @@ macro_rules! get_lic_id {
 #[rustfmt::skip]
 pub use get_lic_id;
 
-use core::arch::{asm, naked_asm};
+use core::arch::asm;
 
 use super::LpId;
-
-pub const TSC_AUX_MSR: u32 = 0xc000_0103;
+use crate::cpu::isa::constants::*;
 
 pub fn store_lp_id(id: LpId) {
     let id_upper = ((id as u64) >> 32) as u32;
@@ -73,7 +70,7 @@ pub fn store_lp_id(id: LpId) {
             "wrmsr",
             in("eax") id_lower,
             in("edx") id_upper,
-            in("ecx") TSC_AUX_MSR,
+            in("ecx") msrs::TSC_AUX,
             options(nostack, preserves_flags)
         );
     }

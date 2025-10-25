@@ -1,3 +1,4 @@
+pub mod tsc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::arch::x86_64::__cpuid_count;
@@ -11,6 +12,7 @@ pub enum IsaExtension {
     /* indicates support for `invlpgb` (Invalidate Page with Broadcast) and `tlbsync`
      * (TLB shootdown synchronization after `invlpgb`) */
     Invlpgb,
+    InvariantTsc,
 }
 
 pub struct CpuInfo;
@@ -83,6 +85,10 @@ impl CpuInfoIfce for CpuInfo {
             IsaExtension::Invlpgb => unsafe {
                 let cpuid_result = __cpuid_count(0x8000_0008, 0);
                 (cpuid_result.ebx & 1 << 5) != 0
+            },
+            IsaExtension::InvariantTsc => unsafe {
+                let feat_ext = __cpuid_count(0x80000007, 0);
+                (feat_ext.edx & (1 << 8)) != 0
             },
         }
     }

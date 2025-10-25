@@ -8,6 +8,7 @@
 //! [Intel64 and IA-32 Architectures Software Developer's Manual](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html)
 //! which we generally refer to as the "ISDM".
 
+pub mod constants;
 pub mod init;
 pub mod interrupts;
 pub mod io;
