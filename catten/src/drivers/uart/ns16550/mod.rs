@@ -27,16 +27,16 @@ pub enum Error {
 
 impl Uart16550 {
     fn is_transmit_empty(&self) -> i32 {
-        ((self.base + 5).read() & 0x20).into()
+        (unsafe { (self.base + 5).read() } & 0x20).into()
     }
 
     fn received(&self) -> bool {
-        ((self.base + 5).read() & 1) != 0
+        (unsafe { (self.base + 5).read() } & 1) != 0
     }
 
     fn read_char(&self) -> char {
         while !self.received() {}
-        (self.base).read() as char
+        unsafe { (self.base).read() as char }
     }
 }
 
@@ -47,21 +47,23 @@ impl Uart for Uart16550 {
         let port = Uart16550 {
             base: base,
         };
-        (port.base + 1).write(0x00); // Disable all interrupts
-        (port.base + 3).write(0x80); // Enable DLAB (set baud rate divisor)
-        (port.base + 0).write(0x01); // Set divisor to 1 (lo byte) 115200 baud
-        (port.base + 1).write(0x00); //                  (hi byte)
-        (port.base + 3).write(0x03); // 8 bits, no parity, one stop bit
-        (port.base + 2).write(0xc7); // Enable FIFO, clear them, with 14-byte threshold
-        (port.base + 4).write(0x0b); // IRQs enabled, RTS/DSR set
-        (port.base + 4).write(0x1e); // Set in loopback mode, test the serial chip
-        (port.base + 0).write(0xae); // Test serial chip (send byte 0xAE and check if serial returns same byte)
+        unsafe {
+            (port.base + 1).write(0x00); // Disable all interrupts
+            (port.base + 3).write(0x80); // Enable DLAB (set baud rate divisor)
+            (port.base + 0).write(0x01); // Set divisor to 1 (lo byte) 115200 baud
+            (port.base + 1).write(0x00); //                  (hi byte)
+            (port.base + 3).write(0x03); // 8 bits, no parity, one stop bit
+            (port.base + 2).write(0xc7); // Enable FIFO, clear them, with 14-byte threshold
+            (port.base + 4).write(0x0b); // IRQs enabled, RTS/DSR set
+            (port.base + 4).write(0x1e); // Set in loopback mode, test the serial chip
+            (port.base + 0).write(0xae); // Test serial chip (send byte 0xAE and check if serial returns same byte)
 
-        if port.base.read() != 0xae {
-            Err(Error::FailedSelfTest)
-        } else {
-            (port.base + 4).write(0x0f);
-            Ok(port)
+            if port.base.read() != 0xae {
+                Err(Error::FailedSelfTest)
+            } else {
+                (port.base + 4).write(0x0f);
+                Ok(port)
+            }
         }
     }
 }
@@ -78,10 +80,14 @@ impl Write for Uart16550 {
         while self.is_transmit_empty() == 0 {}
         if c.is_ascii() {
             if c == '\n' {
-                (self.base).write('\r' as u8);
-                (self.base).write('\n' as u8);
+                unsafe {
+                    (self.base).write('\r' as u8);
+                    (self.base).write('\n' as u8);
+                }
             } else {
-                (self.base).write(c as u8);
+                unsafe {
+                    (self.base).write(c as u8);
+                }
             }
             Ok(())
         } else {

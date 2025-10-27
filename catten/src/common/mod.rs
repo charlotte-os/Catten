@@ -4,9 +4,9 @@
 //! standard library like functionality for the Catten kernel. This module should not duplicate
 //! functionality that is already provided by core or any other high quality no_std library unless
 //! there is a compelling reason to do so.
-
 pub mod bitwise;
 pub mod collections;
 pub mod constants;
+pub mod integer;
 pub mod io;
 pub mod size;

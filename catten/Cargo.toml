@@ -17,6 +17,7 @@ default = ["limine"]
 [dependencies]
 hashbrown = "*"
 limine = ">=0.5.0"
+os-terminal = "0.6.11"
 spin = { version = ">=0.10.0", features = ["ticket_mutex", "lock_api"] }
 talc = { version = "*" }
 uacpi-raw = {git = "https://codeberg.org/CharlotteOS/uacpi-raw.git", branch = "main"}

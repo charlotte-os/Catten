@@ -1,4 +1,3 @@
-pub mod tsc;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::arch::x86_64::__cpuid_count;
