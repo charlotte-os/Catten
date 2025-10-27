@@ -10,7 +10,8 @@ pub fn load_ivt() {
         // Load the interrupt vector table
         asm!(
             "ldr x0, =ivt", 
-            "msr vbar_el1, x0"
+            "msr vbar_el1, x0",
+            out("x0") _,
         );
     }
 }
