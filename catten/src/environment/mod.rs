@@ -15,6 +15,8 @@
 //! - Embedded systems are expected to at least adhere to the Embedded Base Boot Requirements (EBBR)
 //!   specification and provide a reduced subset of UEFI boot services and either ACPI tables or a
 //!   Flattened Device Tree (FDT) if they do not provide full UEFI and ACPI conformant firmware.
+//! - All ARM64 systems are expected to provide an ARM Trusted Firmware (ATF) and consequently a
+//!   Secure Monitor Call (SMC) interface.
 //! - x86_64 systems tend to provide firmware operating in System Management Mode (SMM) however the
 //!   interface to SMM interrupt calls is not standardized and thus must be accessed through ACPI.
 //!   As such we do not provide a separate module for SMM calls.
@@ -25,5 +27,8 @@ pub mod boot_protocol;
 // Device Tree
 #[cfg(not(target_arch = "x86_64"))]
 mod devicetree;
+// ARM Secure Monitor Call (SMC) Interface
+#[cfg(target_arch = "aarch64")]
+mod arm_smc;
 // Unified Extensible Firmware Interface (UEFI) Runtime Services
 mod uefi_rt;

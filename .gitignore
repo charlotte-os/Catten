@@ -1,4 +1,5 @@
 *.iso
+ovmf-aarch64
 ovmf-riscv64
 ovmf-x86_64
 catten/target/**

@@ -10,6 +10,12 @@ fn main() {
             // ...and to re-run if it changes.
             println!("cargo:rerun-if-changed=linker/x86_64.ld");
         }
+        "aarch64" => {
+            // Tell cargo to pass the linker script to the linker...
+            println!("cargo:rustc-link-arg=-Tlinker/aarch64.ld");
+            // ...and to re-run if it changes.
+            println!("cargo:rerun-if-changed=linker/aarch64.ld");
+        }
         "riscv64" => {
             // Tell cargo to pass the linker script to the linker...
             println!("cargo:rustc-link-arg=-Tlinker/riscv64.ld");
