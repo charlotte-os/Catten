@@ -44,7 +44,7 @@ use cpu::multiprocessor;
 use limine::mp::Cpu;
 use spin::{Barrier, Lazy};
 
-use crate::cpu::isa::timers::tsc::IS_TSC_INVARIANT;
+use crate::cpu::isa::timers::tsc::{IS_TSC_INVARIANT, TSC_FREQUENCY_HZ};
 use crate::cpu::multiprocessor::get_lp_count;
 
 const KERNEL_VERSION: (u64, u64, u64) = (0, 2, 1);
@@ -78,8 +78,8 @@ pub extern "C" fn bsp_main() -> ! {
             logln!("The x86-64 Timestamp Counter is NOT invariant.");
         }
         logln!(
-            "The x86-64 Timestamp Counter frequency is {} Hz.",
-            (cpu::isa::timers::tsc::get_tsc_freq())
+            "The x86-64 Timestamp Counter frequency is {} MHz.",
+            (*TSC_FREQUENCY_HZ / 1_000_000)
         );
     }
     logln!("System Information:");

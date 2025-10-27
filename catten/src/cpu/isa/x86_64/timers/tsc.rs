@@ -10,6 +10,7 @@ use crate::cpu::isa::timers::i8254;
 
 pub static IS_TSC_INVARIANT: Lazy<bool> =
     Lazy::new(|| CpuInfo::is_extension_supported(IsaExtension::InvariantTsc));
+pub static TSC_FREQUENCY_HZ: Lazy<u64> = Lazy::new(get_tsc_freq);
 
 pub fn rdtsc() -> u64 {
     //! # Read the timestamp counter with proper serialization
@@ -26,7 +27,7 @@ pub fn rdtsc() -> u64 {
     ((tsc_high as u64) << 32) | tsc_low as u64
 }
 
-pub fn get_tsc_freq() -> u64 {
+fn get_tsc_freq() -> u64 {
     //! # Get the timestamp counter frequency in Hz.
     // Determining the TSC frequency differs by vendor
     match CpuInfo::get_vendor().as_str() {
