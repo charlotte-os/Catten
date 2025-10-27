@@ -47,7 +47,7 @@ use spin::{Barrier, Lazy};
 use crate::cpu::isa::timers::tsc::{IS_TSC_INVARIANT, TSC_FREQUENCY_HZ};
 use crate::cpu::multiprocessor::get_lp_count;
 
-const KERNEL_VERSION: (u64, u64, u64) = (0, 2, 1);
+const KERNEL_VERSION: (u64, u64, u64) = (0, 3, 0);
 static INIT_BARRIER: Lazy<Barrier> = Lazy::new(|| Barrier::new(get_lp_count() as usize));
 /// This is the bootstrap processor's entry point into the kernel. The `bsp_main` function is
 /// called by the bootloader after setting up the environment. It is made C ABI compatible so
@@ -55,7 +55,7 @@ static INIT_BARRIER: Lazy<Barrier> = Lazy::new(|| Barrier::new(get_lp_count() as
 #[unsafe(no_mangle)]
 pub extern "C" fn bsp_main() -> ! {
     logln!(
-        "CharlotteOS Kernel Version {}.{}.{}",
+        "Catten Kernel Version {}.{}.{}",
         (KERNEL_VERSION.0),
         (KERNEL_VERSION.1),
         (KERNEL_VERSION.2)
