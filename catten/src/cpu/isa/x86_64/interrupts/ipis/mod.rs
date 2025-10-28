@@ -1,17 +1,19 @@
 //! # Inter-Processor Interrupts (IPIs) on the x86_64 Architecture
 //!
-//! The charlottek IPI protocol is designed to work using remote procedure calls (RPCs).
+//! The Catten IPI protocol is designed to work using remote procedure calls (RPCs).
 //! This allows for a flexible and extensible way to send IPIs between processors.
 //! The protocol supports both unicast (single target) and multicast (multiple targets) IPIs.
 //! The implementation is kept as similar as possible across different architectures within reason.
 //!
-//! Each logical processor (LP) has it's own IPI mailbox, which is contains an enum with the IPI
-//! type and arguments. Sending an IPI involves writing to the target LP's mailbox and then
-//! triggering the IPI via the architecture-specific mechanism. Receiving an IPI involves checking
-//! the mailbox and executing the corresponding handler. If the IPI is multicast, the first argument
-//! passed is a pointer to the completion barrier, which is used to signal when all target LPs have
-//! completed handling the IPI. This is important for ensuring that all target LPs have completed
-//! the requested operation before any of them return from the ISR.
+//! Each logical processor (LP) has its own IPI mailbox, which holds a pointer to the the requested
+//! RPC and its arguments. To send an IPI create the RPC type instance and attempt to write its
+//! address into each target LP's mailbox but only if it is currenlty null using an atomic
+//! compare-and-swap (CAS) operation. If you fail to write even one of the the target LPs'
+//! mailboxes, revert the ones you did write back to null. When writing to multiple mailboxes you
+//! MUST do so in order of ascending LP ID to avoid deadlocks. If you are able to write to all
+//! target mailboxes, then immediately send an IPI interrupt to each target LP to trigger the IPI
+//! ISR and have your RPC be executed. At the end of the IPI ISR the target LP MUST set its
+//! mailbox back to null to indicate it is ready to receive another IPI.
 
 use alloc::collections::vec_deque::VecDeque;
 use alloc::vec::Vec;
@@ -26,7 +28,7 @@ use crate::memory::linear::VAddr;
 use crate::memory::{AddressSpaceId, KERNEL_ASID};
 
 #[unsafe(no_mangle)]
-pub static GS_OFFSET_IPI_QUEUE: usize = 16;
+pub static GS_OFFSET_IPI_MAILBOX: usize = 16;
 
 global_asm!(include_str!("ipis.asm"));
 
@@ -35,7 +37,7 @@ unsafe extern "C" {
 }
 
 #[derive(Clone, Debug)]
-pub enum Ipi {
+pub enum IpiRpc {
     VMemInval(AddressSpaceId, VAddr, usize),
     AsidInval(AddressSpaceId),
     TerminateThreads(Vec<ThreadId>),
@@ -44,24 +46,24 @@ pub enum Ipi {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn ih_interprocessor_interrupt(ipi_queue: &'static mut Mutex<VecDeque<Ipi>>) {
+pub extern "C" fn ih_interprocessor_interrupt(ipi_queue: &'static mut Mutex<VecDeque<IpiRpc>>) {
     while let Some(ipi) = ipi_queue.lock().pop_front() {
         match ipi {
-            Ipi::VMemInval(asid, base, size) => {
+            IpiRpc::VMemInval(asid, base, size) => {
                 if asid == KERNEL_ASID {
                     tlb::inval_range_kernel(base, size);
                 } else {
                     tlb::inval_range_user(asid, base, size);
                 }
             }
-            Ipi::AsidInval(asid) => tlb::inval_asid(asid),
-            Ipi::TerminateThreads(tids) => {
+            IpiRpc::AsidInval(asid) => tlb::inval_asid(asid),
+            IpiRpc::TerminateThreads(tids) => {
                 SYSTEM_SCHEDULER.get_local_scheduler().lock().terminate_threads(tids)
             }
-            Ipi::AbortThreads(tids) => {
+            IpiRpc::AbortThreads(tids) => {
                 SYSTEM_SCHEDULER.get_local_scheduler().lock().abort_threads(tids)
             }
-            Ipi::AbortAsThreads(asid) => {
+            IpiRpc::AbortAsThreads(asid) => {
                 SYSTEM_SCHEDULER.get_local_scheduler().lock().abort_as_threads(asid)
             }
         }

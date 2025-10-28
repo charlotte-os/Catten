@@ -1,12 +1,13 @@
 use alloc::sync::Arc;
 use alloc::vec::Vec;
+use core::fmt::Debug;
 
 use hashbrown::HashMap;
 use spin::{Mutex, RwLock};
 
 pub struct IdTable<I, T>
 where
-    I: From<usize> + Copy + core::cmp::Eq + core::hash::Hash,
+    I: TryFrom<usize> + Copy + core::cmp::Eq + core::hash::Hash,
 {
     map: HashMap<I, Arc<RwLock<T>>>,
     available_ids: Mutex<Vec<I>>,
@@ -14,7 +15,8 @@ where
 
 impl<I, T> IdTable<I, T>
 where
-    I: From<usize> + Copy + core::cmp::Eq + core::hash::Hash,
+    I: TryFrom<usize> + Copy + core::cmp::Eq + core::hash::Hash,
+    <I as TryFrom<usize>>::Error: Debug,
 {
     pub fn new() -> Self {
         IdTable {
@@ -28,7 +30,7 @@ where
             if let Some(id) = self.available_ids.lock().pop() {
                 id
             } else {
-                self.map.len().into()
+                self.map.len().try_into().unwrap()
             }
         };
         self.map.insert(element_id, Arc::new(RwLock::new(element)));
@@ -51,7 +53,7 @@ where
 
 unsafe impl<I, T> Send for IdTable<I, T>
 where
-    I: From<usize> + Copy + core::cmp::Eq + core::hash::Hash,
+    I: TryFrom<usize> + Copy + core::cmp::Eq + core::hash::Hash,
     T: Send,
 {
 }

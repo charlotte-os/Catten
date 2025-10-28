@@ -3,7 +3,7 @@ use alloc::sync::Arc;
 
 use spin::Mutex;
 
-use super::lp_schedulers::LpLocalScheduler;
+use super::lp_schedulers::LocalScheduler;
 use crate::cpu::isa::lp::LpId;
 use crate::cpu::isa::lp::ops::get_lp_id;
 use crate::cpu::scheduler::threads::ThreadId;
@@ -17,7 +17,7 @@ pub enum Error {
 
 /// The system-wide thread scheduler
 pub struct SystemScheduler {
-    lp_schedulers: BTreeMap<LpId, Arc<Mutex<dyn LpLocalScheduler>>>,
+    lp_schedulers: BTreeMap<LpId, Arc<Mutex<LocalScheduler>>>,
 }
 
 impl SystemScheduler {
@@ -27,7 +27,7 @@ impl SystemScheduler {
         }
     }
 
-    pub fn get_local_scheduler(&self) -> Arc<Mutex<dyn LpLocalScheduler>> {
+    pub fn get_local_scheduler(&self) -> Arc<Mutex<LocalScheduler>> {
         self.lp_schedulers[&get_lp_id!()].clone()
     }
 

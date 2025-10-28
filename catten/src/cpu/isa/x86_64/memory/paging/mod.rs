@@ -14,6 +14,31 @@ use crate::cpu::isa::interface::memory::{AddressSpaceInterface, MemoryInterface,
 use crate::logln;
 use crate::memory::{AddressSpaceId, PAddr};
 
+#[repr(transparent)]
+pub struct HwAsid(u16);
+
+impl HwAsid {
+    pub unsafe fn get_inner_unchecked(&self) -> u16 {
+        self.0
+    }
+
+    pub extern "C" fn get_inner(&self) -> u16 {
+        self.0 & 0xfff
+    }
+}
+
+impl TryFrom<u16> for HwAsid {
+    type Error = ();
+
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        if value & !0xfff == 0 {
+            Ok(HwAsid(value))
+        } else {
+            Err(())
+        }
+    }
+}
+
 pub const PAGE_SIZE: usize = 4096;
 pub const N_PAGE_TABLE_ENTRIES: usize = 512;
 pub type PageTable = [pte::PageTableEntry; N_PAGE_TABLE_ENTRIES];
