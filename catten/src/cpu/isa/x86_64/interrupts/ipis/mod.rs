@@ -57,15 +57,9 @@ pub extern "C" fn ih_interprocessor_interrupt(ipi_queue: &'static mut Mutex<VecD
                 }
             }
             IpiRpc::AsidInval(asid) => tlb::inval_asid(asid),
-            IpiRpc::TerminateThreads(tids) => {
-                SYSTEM_SCHEDULER.get_local_scheduler().lock().terminate_threads(tids)
-            }
-            IpiRpc::AbortThreads(tids) => {
-                SYSTEM_SCHEDULER.get_local_scheduler().lock().abort_threads(tids)
-            }
-            IpiRpc::AbortAsThreads(asid) => {
-                SYSTEM_SCHEDULER.get_local_scheduler().lock().abort_as_threads(asid)
-            }
+            IpiRpc::TerminateThreads(tids) => SYSTEM_SCHEDULER.terminate_threads(tids),
+            IpiRpc::AbortThreads(tids) => SYSTEM_SCHEDULER.abort_threads(tids),
+            IpiRpc::AbortAsThreads(asid) => SYSTEM_SCHEDULER.abort_as_threads(asid),
         }
     }
 }

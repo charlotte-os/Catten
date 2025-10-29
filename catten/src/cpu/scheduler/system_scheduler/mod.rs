@@ -1,5 +1,6 @@
 use alloc::collections::btree_map::BTreeMap;
 use alloc::sync::Arc;
+use alloc::vec::Vec;
 
 use spin::Mutex;
 
@@ -8,6 +9,7 @@ use crate::cpu::isa::lp::LpId;
 use crate::cpu::isa::lp::ops::get_lp_id;
 use crate::cpu::scheduler::threads::ThreadId;
 use crate::event::Event;
+use crate::memory::AddressSpaceId;
 
 pub static SYSTEM_SCHEDULER: SystemScheduler = SystemScheduler::new();
 
@@ -47,6 +49,18 @@ impl SystemScheduler {
         queue for the specified thread. If the tid doesn't point to any thread structure then
         return Error::InvalidThread. If the thread is not already blocked then send a broadcast
         over the kernel IPI-RPC protocol with the EvictThread command. */
+        todo!()
+    }
+
+    pub fn terminate_threads(&self, tids: Vec<ThreadId>) {
+        todo!()
+    }
+
+    pub fn abort_threads(&self, tids: Vec<ThreadId>) {
+        todo!()
+    }
+
+    pub fn abort_as_threads(&self, asid: AddressSpaceId) {
         todo!()
     }
 }
