@@ -4,11 +4,6 @@
 
 catten is still in early development, and core subsystems are actively being built. We welcome contributions—feel free to grab an issue from the tracker, suggest features, or participate in discussions on our repository, Discord server or Matrix instance.
 
-|Find us on:|
-|-----------|
-|[Discord](https://discord.gg/vE7bCCKx4X)|
-|[Matrix](https://matrix.to/#/#charlotteos:matrix.org)|
-
 ## Programming Languages
 
 - `catten` is written in Rust and ISA specific assembly languages
@@ -60,3 +55,9 @@ Please reach out to us on Matrix or Discord if you are interested in contributin
 ## Licensing
 
 This kernel is licensed under the GNU General Public License version 3.0 (or at your option, any later version). By contributing to this project you agree to license your contributions under those same terms exclusively.
+
+Find us on
+------------
+
+- [Discord](https://discord.gg/vE7bCCKx4X)
+- [Matrix](https://matrix.to/#/#charlotteos:matrix.org)
