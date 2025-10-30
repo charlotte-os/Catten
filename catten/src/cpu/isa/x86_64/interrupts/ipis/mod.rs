@@ -22,7 +22,7 @@ use core::arch::global_asm;
 use spin::Mutex;
 
 use crate::cpu::isa::memory::tlb;
-use crate::cpu::scheduler::system_scheduler::SYSTEM_SCHEDULER;
+use crate::cpu::scheduler::system::SYSTEM_SCHEDULER;
 use crate::cpu::scheduler::threads::ThreadId;
 use crate::memory::linear::VAddr;
 use crate::memory::{AddressSpaceId, KERNEL_ASID};

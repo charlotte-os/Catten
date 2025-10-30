@@ -1,3 +1,5 @@
+//! # ISA Specific Memory Management Interfaces
+
 pub mod address;
 
 use crate::cpu::isa::memory::MemoryInterfaceImpl;

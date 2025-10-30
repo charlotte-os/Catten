@@ -1,3 +1,5 @@
+//! # Instruction Set Architecture (ISA) Interfaces
+
 pub mod init;
 pub mod interrupts;
 pub mod io;

@@ -1,4 +1,4 @@
-//! # x86_64 Logical Processor Control Interface
+//! # ISA Specific Logical Processor Management Interfaces
 
 pub trait CoreStateIfce {
     extern "C" fn save(&mut self);

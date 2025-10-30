@@ -1,3 +1,5 @@
+//! # System Information Interfaces
+
 pub enum Error {
     UnsupportedByIsa,
     UnableToDetermine,

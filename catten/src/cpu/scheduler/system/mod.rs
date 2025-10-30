@@ -4,7 +4,7 @@ use alloc::vec::Vec;
 
 use spin::Mutex;
 
-use super::lp_schedulers::LocalScheduler;
+use super::local::LocalScheduler;
 use crate::cpu::isa::lp::LpId;
 use crate::cpu::isa::lp::ops::get_lp_id;
 use crate::cpu::scheduler::threads::ThreadId;

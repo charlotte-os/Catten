@@ -1,3 +1,5 @@
+//! # ISA Specific Memory Mapped and Port I/O Interfaces
+
 pub trait IReg8Ifce {
     unsafe fn read(&self) -> u8;
 }

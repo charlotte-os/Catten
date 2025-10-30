@@ -1,3 +1,5 @@
+//! # Common Virtual Address Code
+
 use core::iter::Step;
 use core::ops::{Add, Sub};
 

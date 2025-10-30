@@ -1,3 +1,5 @@
+//! # Common Physical Address Code
+
 use core::ops::{Add, Sub};
 
 use crate::cpu::isa::interface::memory::address::{Address, PhysicalAddress, VirtualAddress};

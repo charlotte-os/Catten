@@ -1,7 +1,7 @@
 use core::arch::asm;
 
 use crate::cpu::isa::memory::paging::PAGE_SIZE;
-use crate::cpu::scheduler::system_scheduler::SYSTEM_SCHEDULER;
+use crate::cpu::scheduler::system::SYSTEM_SCHEDULER;
 use crate::memory::{AddressSpaceId, VAddr};
 
 pub fn inval_range_user(asid: AddressSpaceId, base: VAddr, size: usize) {

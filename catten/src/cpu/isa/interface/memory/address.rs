@@ -1,3 +1,5 @@
+//! # ISA Specific Address Traits
+
 use core::fmt::Debug;
 
 pub trait Address:

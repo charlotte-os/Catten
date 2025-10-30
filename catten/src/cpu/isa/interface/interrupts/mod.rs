@@ -1,3 +1,5 @@
+//! # ISA Specific Interrupt Interfaces
+
 use crate::cpu::isa::lp::LpId;
 pub trait InterruptManagerIfce {
     type Error;

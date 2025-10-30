@@ -1,4 +1,7 @@
-//! Aarch64 Instruction Set Architecture
+//! # Aarch64 Instruction Set Architecture
+//!
+//! !!! NOT UNDER ACTIVE DEVELOPMENT !!!
+//! Reach out on Discord or Matrix if you want to take on maintainership of this ISA backend.
 //!
 //! This module contains all aarch64-specific code. The main reference documentation
 //! for this ISA is the
