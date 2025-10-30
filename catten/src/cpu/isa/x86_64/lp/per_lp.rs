@@ -9,3 +9,14 @@ pub struct PerLpDataSegment {
     idt: Idt,
     local_scheduler: Mutex<LocalScheduler>,
 }
+
+pub extern "C" fn get_per_lp_data_segment() -> &'static PerLpDataSegment {
+    unsafe {
+        let gs_base: u64;
+        asm!(
+            "rdgsbase {}", 
+            out(reg) gs_base
+        );
+        &*(gs_base as *const PerLpDataSegment)
+    }
+}
