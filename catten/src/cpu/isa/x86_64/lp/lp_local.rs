@@ -5,14 +5,12 @@ use spin::Mutex;
 
 use crate::cpu::isa::interrupts::idt::Idt;
 use crate::cpu::isa::interrupts::ipis;
-use crate::cpu::isa::timers::apic_timer::ApicTimerDesc;
 use crate::cpu::scheduler::local::LocalScheduler;
 
 pub struct LpLocalSegment {
     pub ipi_mailbox: *const ipis::IpiRpc,
     local_scheduler: Mutex<LocalScheduler>,
     idt: Idt,
-    apic_timer_desc: ApicTimerDesc,
 }
 
 impl LpLocalSegment {

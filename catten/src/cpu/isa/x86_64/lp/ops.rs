@@ -45,7 +45,7 @@ macro_rules! get_lic_id {
         unsafe {
             core::arch::asm!(
                 "rdmsr",
-                inlateout("ecx") msrs::x2apic::LAPIC_ID => _,
+                inlateout("ecx") msrs::x2apic::X2APIC_ID_REGISTER => _,
                 lateout("eax") apic_id,
                 lateout("edx") _,
                 options(nostack, preserves_flags)
