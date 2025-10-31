@@ -5,7 +5,12 @@ use core::arch::asm;
 
 use spin::rwlock::RwLock;
 
+use crate::common::bitwise::DBYTE_MASK;
+use crate::common::constants::PS_PER_SEC;
+use crate::common::time::ExtDuration;
+use crate::cpu::isa::constants::msrs;
 use crate::cpu::isa::lp::LpId;
+use crate::cpu::isa::timers::tsc::rdtsc;
 
 pub static mut X2APIC_ID_TABLE: RwLock<BTreeMap<LpId, LogicalLapicId>> =
     RwLock::new(BTreeMap::new());
@@ -22,19 +27,26 @@ pub struct LogicalLapicId {
 }
 
 pub struct X2Apic {
-    timer_res: u64,
+    timer_res: ExtDuration,
 }
 
 impl X2Apic {
     fn new() -> Self {
         X2Apic {
-            timer_res: Self::measure_res(),
+            timer_res: Self::measure_timer_res(),
         }
     }
 
-    fn measure_res() -> u64 {
-        // Placeholder for actual timer resolution measurement logic
-        0
+    fn measure_timer_res() -> ExtDuration {
+        const SAMPLE_CYCLES: u64 = 100;
+        unsafe { msrs::write(msrs::x2apic::TIMER_INITIAL_COUNT_REGISTER, SAMPLE_CYCLES) };
+        let start_tsc = rdtsc();
+        while unsafe { msrs::read(msrs::x2apic::TIMER_CURRENT_COUNT_REGISTER) } > 0 {}
+        let end_tsc = rdtsc();
+        let delta_tsc = end_tsc - start_tsc;
+        let timer_freq = delta_tsc / SAMPLE_CYCLES;
+        let res_ps = PS_PER_SEC / timer_freq;
+        ExtDuration::from_ps(res_ps)
     }
 
     pub fn get_physical_id(&self) -> PhysicalLapicId {
@@ -61,8 +73,8 @@ impl X2Apic {
             );
         }
         LogicalLapicId {
-            cluster_id: ((logical_id >> 16) & 0xffff) as u16,
-            apic_bitmask: (logical_id & 0xffff) as u16,
+            cluster_id: ((logical_id >> 16) & DBYTE_MASK as u32) as u16,
+            apic_bitmask: (logical_id & DBYTE_MASK as u32) as u16,
         }
     }
 }
