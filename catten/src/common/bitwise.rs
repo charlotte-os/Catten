@@ -1,3 +1,9 @@
+pub const NYBBLE_MASK: u8 = 0x0f;
+pub const BYTE_MASK: u8 = 0xff;
+pub const DBYTE_MASK: u16 = 0xffff;
+pub const QBYTE_MASK: u64 = 0xffff_ffff;
+pub const OBYTE_MASK: u128 = 0xffff_ffff_ffff_ffff;
+
 /// Obtain a bitfield from a larger word size.
 pub fn mask_shift_read<T>(val: T, mask: T, shift: u8) -> T
 where
@@ -21,7 +27,7 @@ where
 {
     ((T::from(1) << len) - T::from(1)) << shift
 }
-/// write a bitfield into a larger word size.
+/// write a bitfield into a larger bitfield.
 pub fn splice_into<T>(dest: &mut T, val: T, mask: T, shift: u8) -> Result<T, ()>
 where
     T: core::ops::Not<Output = T>
@@ -31,8 +37,9 @@ where
         + core::ops::BitAnd<Output = T>
         + Copy,
 {
-    dest.bitand_assign(!mask);
-    // set the bits in dest
-    dest.bitor_assign((val << shift) & mask);
+    // clear the masked bits in dest
+    *dest &= !mask;
+    // set the masked bits in dest from val
+    *dest |= (val << shift) & mask;
     Ok(*dest)
 }
