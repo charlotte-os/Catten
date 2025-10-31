@@ -13,7 +13,7 @@ pub use crate::cpu::isa::interface::memory::AddressSpaceInterface;
 pub use crate::cpu::isa::memory::paging::AddressSpace;
 use crate::environment::boot_protocol::limine::{HHDM_REQUEST, MEMORY_MAP_REQUEST};
 
-pub type AddressSpaceId = usize;
+pub type AddressSpaceId = u64;
 
 /*The kernel address space is always ASID 0 and it is handled differently from userspace address
  * spaces because it needs to be initialized and accessible before the kernel allocator is

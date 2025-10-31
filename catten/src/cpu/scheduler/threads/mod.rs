@@ -1,13 +1,13 @@
 use alloc::boxed::Box;
-use alloc::vec::Vec;
+use alloc::vec;
 
-use hashbrown::HashMap;
-use spin::{Lazy, Mutex, RwLock, RwLockReadGuard};
+use spin::{Lazy, RwLock};
 
 use crate::common::collections::id_table::IdTable;
 use crate::cpu::isa::lp::thread_context::ThreadContext;
+use crate::memory::{AddressSpaceId, VAddr};
 
-static mut THREAD_TABLE: Lazy<ThreadTable> = Lazy::new(ThreadTable::new);
+pub static THREAD_TABLE: Lazy<RwLock<ThreadTable>> = Lazy::new(|| RwLock::new(ThreadTable::new()));
 
 type ThreadTable = IdTable<ThreadId, Thread>;
 
@@ -15,5 +15,25 @@ pub type ThreadId = usize;
 
 pub struct Thread {
     state: ThreadContext,
-    stack_buffer: Box<[u8]>,
+    _stack_buffer: Box<[u8]>,
+}
+
+impl Thread {
+    pub fn new(stack_size: usize, asid: AddressSpaceId, entry_point: VAddr) -> Self {
+        let mut stack_buffer = vec![0u8; stack_size].into_boxed_slice();
+        let stack_top = stack_buffer.as_mut_ptr() as usize + stack_size;
+        let state = ThreadContext {
+            cr3: asid as u64,
+            rsp: stack_top as u64,
+            rip: entry_point.into(),
+        };
+        Thread {
+            state,
+            _stack_buffer: stack_buffer,
+        }
+    }
+
+    pub fn get_state(&self) -> &ThreadContext {
+        &self.state
+    }
 }

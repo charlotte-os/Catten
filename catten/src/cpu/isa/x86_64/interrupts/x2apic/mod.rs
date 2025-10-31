@@ -26,55 +26,29 @@ pub struct LogicalLapicId {
     apic_bitmask: u16,
 }
 
-pub struct X2Apic {
-    timer_res: ExtDuration,
+pub(in crate::cpu::isa::x86_64) fn measure_timer_res() -> ExtDuration {
+    const SAMPLE_CYCLES: u64 = 100;
+    unsafe { msrs::write(msrs::x2apic::TIMER_INITIAL_COUNT_REGISTER, SAMPLE_CYCLES) };
+    let start_tsc = rdtsc();
+    while unsafe { msrs::read(msrs::x2apic::TIMER_CURRENT_COUNT_REGISTER) } > 0 {}
+    let end_tsc = rdtsc();
+    let delta_tsc = end_tsc - start_tsc;
+    let timer_freq = delta_tsc / SAMPLE_CYCLES;
+    let res_ps = PS_PER_SEC / timer_freq;
+    ExtDuration::from_ps(res_ps)
 }
 
-impl X2Apic {
-    fn new() -> Self {
-        X2Apic {
-            timer_res: Self::measure_timer_res(),
-        }
-    }
+pub fn get_physical_id() -> PhysicalLapicId {
+    unsafe { msrs::read(X2APIC_ID_REG) as PhysicalLapicId }
+}
 
-    fn measure_timer_res() -> ExtDuration {
-        const SAMPLE_CYCLES: u64 = 100;
-        unsafe { msrs::write(msrs::x2apic::TIMER_INITIAL_COUNT_REGISTER, SAMPLE_CYCLES) };
-        let start_tsc = rdtsc();
-        while unsafe { msrs::read(msrs::x2apic::TIMER_CURRENT_COUNT_REGISTER) } > 0 {}
-        let end_tsc = rdtsc();
-        let delta_tsc = end_tsc - start_tsc;
-        let timer_freq = delta_tsc / SAMPLE_CYCLES;
-        let res_ps = PS_PER_SEC / timer_freq;
-        ExtDuration::from_ps(res_ps)
+pub fn get_logical_id() -> LogicalLapicId {
+    let logical_id: u64;
+    unsafe {
+        logical_id = msrs::read(X2APIC_LOGICAL_DEST_REG);
     }
-
-    pub fn get_physical_id(&self) -> PhysicalLapicId {
-        let apic_id: u32;
-        unsafe {
-            asm!(
-                "rdmsr",
-                in("ecx") X2APIC_ID_REG,
-                out("eax") apic_id,
-                out("edx") _,
-            );
-        }
-        apic_id
-    }
-
-    pub fn get_logical_id(&self) -> LogicalLapicId {
-        let logical_id: u32;
-        unsafe {
-            asm!(
-                "rdmsr",
-                in("ecx") X2APIC_LOGICAL_DEST_REG,
-                out("eax") logical_id,
-                out("edx") _,
-            );
-        }
-        LogicalLapicId {
-            cluster_id: ((logical_id >> 16) & DBYTE_MASK as u32) as u16,
-            apic_bitmask: (logical_id & DBYTE_MASK as u32) as u16,
-        }
+    LogicalLapicId {
+        cluster_id: ((logical_id >> 16) & DBYTE_MASK as u64) as u16,
+        apic_bitmask: (logical_id & DBYTE_MASK as u64) as u16,
     }
 }

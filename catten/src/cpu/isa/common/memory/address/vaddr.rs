@@ -139,6 +139,12 @@ impl Into<usize> for VAddr {
     }
 }
 
+impl Into<u64> for VAddr {
+    fn into(self) -> u64 {
+        self.raw as u64
+    }
+}
+
 impl Sub for VAddr {
     type Output = isize;
 
