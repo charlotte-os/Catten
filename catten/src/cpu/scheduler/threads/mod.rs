@@ -22,11 +22,7 @@ impl Thread {
     pub fn new(stack_size: usize, asid: AddressSpaceId, entry_point: VAddr) -> Self {
         let mut stack_buffer = vec![0u8; stack_size].into_boxed_slice();
         let stack_top = stack_buffer.as_mut_ptr() as usize + stack_size;
-        let state = ThreadContext {
-            cr3: asid as u64,
-            rsp: stack_top as u64,
-            rip: entry_point.into(),
-        };
+        let state = ThreadContext::new(asid, VAddr::from(stack_top), entry_point);
         Thread {
             state,
             _stack_buffer: stack_buffer,
