@@ -7,6 +7,7 @@
 //!
 //! Ref: https://osdev.wiki/wiki/Programmable_Interval_Timer
 
+use crate::common::bitwise::BYTE_MASK;
 use crate::cpu::isa::io::{IReg8Ifce, IoReg8, OReg8Ifce};
 
 static PIT_CH0_DATA_REG: IoReg8 = IoReg8::IoPort(0x40);
@@ -26,8 +27,8 @@ fn make_command_byte(channel: u8, access_mode: u8, operating_mode: u8) -> u8 {
 
 pub fn set_interrupt_on_terminal_count(count: u16) {
     let cb = make_command_byte(2, 0b11, 0b000);
-    let low_byte = (count & 0xff) as u8;
-    let high_byte = ((count >> 8) & 0xff) as u8;
+    let low_byte = (count & BYTE_MASK as u16) as u8;
+    let high_byte = ((count >> 8) & BYTE_MASK as u16) as u8;
     unsafe {
         let mut pgo = PIT_CH2_GATE_AND_OUTPUT_REG.read();
         pgo |= 1 << CH2_GATE_INPUT_BIT;

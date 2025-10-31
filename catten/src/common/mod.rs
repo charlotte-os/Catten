@@ -10,3 +10,4 @@ pub mod constants;
 pub mod integer;
 pub mod io;
 pub mod size;
+pub mod time;

@@ -1,5 +1,7 @@
 use core::arch::asm;
 
+use crate::common::bitwise::DBYTE_MASK;
+
 const N_INTERRUPT_VECTORS: usize = 256;
 
 #[derive(Debug)]
@@ -26,7 +28,7 @@ impl Idt {
         let gate = &mut self.gates[index];
         let isr_addr = isr_ptr as u64;
 
-        gate.addr0 = u16::try_from(isr_addr & 0xffff).unwrap();
+        gate.addr0 = u16::try_from(isr_addr & DBYTE_MASK as u64).unwrap();
         gate.segment_selector = segment_selector;
         gate.reserved_ist_index = 0u8; // the IST is not used
         gate.flags = if is_trap {
@@ -41,8 +43,8 @@ impl Idt {
         } else {
             gate.flags &= !(0b1u8 << 7);
         }
-        gate.addr1 = ((isr_addr & (0xffff << 16)) >> 16) as u16;
-        gate.addr2 = ((isr_addr & (0xffffffff << 32)) >> 32) as u32;
+        gate.addr1 = ((isr_addr & ((DBYTE_MASK as u64) << 16)) >> 16) as u16;
+        gate.addr2 = ((isr_addr & ((DBYTE_MASK as u64) << 32)) >> 32) as u32;
         gate.reserved = 0u32;
     }
 

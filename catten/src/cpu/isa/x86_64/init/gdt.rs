@@ -2,6 +2,8 @@ use core::arch::{asm, naked_asm};
 use core::mem::size_of;
 use core::ptr;
 
+use crate::common::bitwise::{BYTE_MASK, DBYTE_MASK};
+
 #[repr(C, packed(1))]
 #[derive(Clone, Copy, Debug)]
 struct SegmentDescriptor {
@@ -75,12 +77,12 @@ impl Gdt {
     }
 
     fn set_tss_desc(&mut self, base: u64, limit: u32) {
-        let low = ((limit as u64) & 0xFFFF)
-            | ((base & 0xFFFFFF) << 16)
+        let low = ((limit as u64) & DBYTE_MASK as u64)
+            | ((base & 0xffffff) << 16)
             | ((0x89u64) << 40) // Type for TSS
             | ((limit as u64 & 0xF0000) << 32)
-            | ((base & 0xFF000000) << 32);
-        let high = (base >> 32) & 0xffffffff;
+            | ((base & 0xff000000) << 32);
+        let high = (base >> 32) & DBYTE_MASK as u64;
 
         self.tss_desc.low = low;
         self.tss_desc.high = high;
@@ -96,16 +98,16 @@ impl Gdt {
     ) {
         let dest_sd = &mut (self.segment_descs[index]);
 
-        dest_sd.limit0 = (limit & 0xffff) as u16;
+        dest_sd.limit0 = (limit & DBYTE_MASK as u32) as u16;
         dest_sd.limit1_flags = ((limit & 0xff0000) >> 16) as u8; // Only the lower 4 bits of this field encodes limit bits
 
-        dest_sd.base0 = (base & 0xffff) as u16;
+        dest_sd.base0 = (base & DBYTE_MASK as u32) as u16;
         dest_sd.base1 = ((base & 0xff0000) >> 16) as u8;
         dest_sd.base2 = ((base & 0xff000000) >> 24) as u8;
 
         dest_sd.access_byte = access_byte;
 
-        dest_sd.limit1_flags |= (flags & 0xff) << 4; // The upper 4 bits
+        dest_sd.limit1_flags |= (flags & BYTE_MASK) << 4; // The upper 4 bits
         // of this field
         // encodes flags
     }

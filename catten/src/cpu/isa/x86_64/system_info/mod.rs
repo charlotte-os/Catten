@@ -3,6 +3,7 @@ use alloc::vec::Vec;
 use core::arch::x86_64::__cpuid_count;
 use core::mem::transmute;
 
+use crate::common::bitwise::BYTE_MASK;
 use crate::cpu::isa::interface::system_info::CpuInfoIfce;
 
 pub enum IsaExtension {
@@ -71,7 +72,7 @@ impl CpuInfoIfce for CpuInfo {
     fn get_vaddr_sig_bits() -> u8 {
         unsafe {
             let cpuid_result = __cpuid_count(0x80000008, 0);
-            ((cpuid_result.eax >> 8) & 0xff) as u8
+            ((cpuid_result.eax >> 8) & BYTE_MASK as u32) as u8
         }
     }
 

@@ -10,7 +10,7 @@ impl Color {
     pub const GREEN: u32 = 0x0000ff00;
     pub const MAGENTA: u32 = 0x00ff00ff;
     pub const RED: u32 = 0x00ff0000;
-    pub const WHITE: u32 = 0xffffffff;
+    pub const WHITE: u32 = 0x00ffffff;
     pub const YELLOW: u32 = 0x00ffff00;
 }
 
