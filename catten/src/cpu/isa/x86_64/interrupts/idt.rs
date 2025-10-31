@@ -1,7 +1,4 @@
 use core::arch::asm;
-use core::mem::MaybeUninit;
-
-static mut IDTR: MaybeUninit<Idtr> = MaybeUninit::uninit();
 
 const N_INTERRUPT_VECTORS: usize = 256;
 
@@ -64,13 +61,11 @@ impl Idt {
     }
 
     pub fn load(&self) {
-        unsafe {
-            IDTR.write(Idtr::new(
-                size_of::<InterruptGate>() as u16 * N_INTERRUPT_VECTORS as u16 - 1u16,
-                self as *const Idt as u64,
-            ));
-            asm_load_idt(IDTR.as_ptr());
-        }
+        Idtr::new(
+            size_of::<InterruptGate>() as u16 * N_INTERRUPT_VECTORS as u16 - 1u16,
+            self as *const Idt as u64,
+        )
+        .load();
     }
 }
 #[derive(Clone, Copy, Debug)]
@@ -112,11 +107,11 @@ impl Idtr {
             base,
         }
     }
-}
 
-#[inline(always)]
-unsafe fn asm_load_idt(idtr: *const Idtr) {
-    unsafe {
-        asm!("lidt [rdi]", in("rdi") idtr);
+    #[inline(always)]
+    fn load(&self) {
+        unsafe {
+            asm!("lidt [{}]", in(reg) self, options(nostack, preserves_flags));
+        }
     }
 }
