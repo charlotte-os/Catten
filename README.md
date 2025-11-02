@@ -21,9 +21,11 @@ catten is still in early development, and core subsystems are actively being bui
 - Processor:
   - x86_64 (Primary ISA)
     - x2APIC LAPIC operating mode
+  - RISC-V64 RVA23 (Secondary ISA)
 - Firmware:
   - Unified Extensible Firmware Interface (UEFI)
   - Advanced Configuration and Power Interface (ACPI)
+  - Supervisor Binary Interface (SBI) - RISC-V Only
 - Memory:
   - Recommended: >= 1 GiB
   - Required: 128 MiB
@@ -37,16 +39,17 @@ catten is still in early development, and core subsystems are actively being bui
   - Display Adapter: Any adapter capable of providing framebuffers via the UEFI Graphics Output Protocol
   - Serial:
     - NS16550 compatible UART
-    - USB CDC ACM (Virtual UART)
+    - USB Communications Device Class Abstract Control Model (Virtual UART over USB)
 - Input:
   - Keyboard
-    - PS/2
-    - USB HID
+    - i8042 compatible PS/2
+    - USB Human Interface Device Class
+    - I2C Human Interface Device Class
   - Serial
     - NS16550 compatible UART
-    - USB CDC ACM (Virtual UART)
+    - USB Communications Device Class Abstract Control Model (Virtual UART over USB)
 - Networking:
-  - USB CDC Network Control Model
+  - USB Communications Device Class Network Control Model (Ethernet over USB)
 
 ## Contributing
 
