@@ -80,6 +80,16 @@ impl Address for VAddr {
         VAddr::from(aligned)
     }
 
+    fn prev_aligned_to(&self, alignment: usize) -> Self {
+        VAddr {
+            raw: if alignment % 2 == 0 {
+                self.raw & !(alignment - 1)
+            } else {
+                self.raw - (self.raw % alignment)
+            },
+        }
+    }
+
     fn is_valid(value: usize) -> bool {
         value != 0
     }

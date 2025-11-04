@@ -42,6 +42,16 @@ impl Address for PAddr {
         unsafe { PAddr::from_unchecked((self.raw + alignment - 1) & !(alignment - 1)) }
     }
 
+    fn prev_aligned_to(&self, alignment: usize) -> Self {
+        PAddr {
+            raw: if alignment % 2 == 0 {
+                self.raw & !(alignment - 1)
+            } else {
+                self.raw - (self.raw % alignment)
+            },
+        }
+    }
+
     unsafe fn from_unchecked(raw: usize) -> Self {
         PAddr {
             raw,
