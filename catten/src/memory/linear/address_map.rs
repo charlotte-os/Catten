@@ -146,7 +146,8 @@ impl LinearAddressMap {
             RegionType::KernelImage
         } else {
             unreachable!(
-                "This should be unreachable because the entire address space is tightly mapped and the VAddr type guarantees a valid address."
+                "This should be unreachable because the entire address space is tightly mapped \
+                 and the VAddr type guarantees a valid address."
             );
         }
     }
@@ -163,7 +164,7 @@ impl LinearAddressMap {
         }
     }
 }
-
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct LinearMemoryRegion {
     pub base: VAddr,
     pub length: usize,
@@ -172,5 +173,11 @@ pub struct LinearMemoryRegion {
 impl LinearMemoryRegion {
     pub fn contains(&self, addr: VAddr) -> bool {
         addr >= self.base && addr < (self.base + (self.length as isize))
+    }
+}
+
+impl Into<(VAddr, VAddr)> for LinearMemoryRegion {
+    fn into(self) -> (VAddr, VAddr) {
+        (self.base, self.base + self.length as isize)
     }
 }

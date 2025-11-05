@@ -5,7 +5,7 @@ use crate::cpu::isa::interface::init::InitInterface;
 use crate::cpu::isa::lp;
 use crate::logln;
 use crate::memory::PHYSICAL_FRAME_ALLOCATOR;
-use crate::memory::allocator::init_primary_allocator;
+use crate::memory::allocators::global_allocator::init_primary_allocator;
 
 pub fn bsp_init() {
     logln!("Performing ISA specific initialization...");
