@@ -1,19 +1,35 @@
 use alloc::boxed::Box;
-use alloc::vec::Vec;
+use core::ops::Add;
+use core::sync::atomic::AtomicBool;
 
-use hashbrown::HashMap;
-use spin::{Lazy, Mutex, RwLock, RwLockReadGuard};
+use spin::Lazy;
 
 use crate::common::collections::id_table::IdTable;
+use crate::cpu::isa::lp::LpId;
 use crate::cpu::isa::lp::thread_context::ThreadContext;
+use crate::memory::{AddressSpaceId, VAddr};
 
 static mut THREAD_TABLE: Lazy<ThreadTable> = Lazy::new(ThreadTable::new);
-
 type ThreadTable = IdTable<ThreadId, Thread>;
+
+const LP_AFFINITY_COUNT: usize = 8;
 
 pub type ThreadId = usize;
 
 pub struct Thread {
-    state: ThreadContext,
-    stack_buffer: Box<[u8]>,
+    is_user: bool,
+    context: ThreadContext,
+    asid: AddressSpaceId,
+    lp_affinity: [LpId; LP_AFFINITY_COUNT],
+}
+
+impl Thread {
+    pub fn new(is_user: bool, asid: AddressSpaceId, entrypoint: VAddr) -> Self {
+        Thread {
+            is_user,
+            context: ThreadContext::new(,
+            asid,
+            lp_affinity: [LpId::default(); LP_AFFINITY_COUNT],
+        }
+    }
 }

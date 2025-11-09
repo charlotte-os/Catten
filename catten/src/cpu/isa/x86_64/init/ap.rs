@@ -5,9 +5,9 @@ use spin::Mutex;
 use spin::lazy::Lazy;
 
 use super::{INTERRUPT_STACK_SIZE, gdt};
-use crate::cpu::multiprocessor::get_lp_count;
 use crate::cpu::isa::init::gdt::Gdt;
 use crate::cpu::isa::lp::ops::get_lp_id;
+use crate::cpu::multiprocessor::get_lp_count;
 use crate::logln;
 
 static AP_INTERRUPT_STACKS: Lazy<Vec<[u8; INTERRUPT_STACK_SIZE]>> = Lazy::new(|| {
@@ -34,7 +34,7 @@ static AP_DF_STACKS: Lazy<Vec<[u8; INTERRUPT_STACK_SIZE]>> = Lazy::new(|| {
     ret
 });
 
-static AP_TSS: Lazy<Vec<super::gdt::Tss>> = Lazy::new(|| {
+pub static AP_TSS: Lazy<Vec<super::gdt::Tss>> = Lazy::new(|| {
     logln!("LP{}: Creating the TSS vector.", (get_lp_id!()));
     let mut tsses = Vec::new();
     logln!("LP{}: Allocating {} TSS entries.", (get_lp_id!()), (get_lp_count() - 1));
@@ -61,7 +61,7 @@ static AP_GDTS: Lazy<Vec<super::gdt::Gdt>> = Lazy::new(|| {
     gdts
 });
 
-static AP_IDTS: Lazy<Vec<crate::cpu::isa::interrupts::idt::Idt>> = Lazy::new(|| {
+pub static AP_IDTS: Lazy<Vec<crate::cpu::isa::interrupts::idt::Idt>> = Lazy::new(|| {
     logln!("LP{}: Creating the IDT vector.", (get_lp_id!()));
     let mut idts = Vec::new();
     logln!("LP{}: Allocating {} IDT entries.", (get_lp_id!()), (get_lp_count() - 1));
