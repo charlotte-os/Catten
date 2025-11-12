@@ -209,6 +209,6 @@ impl I8042 {
 
     /// Disable keyboard scanning (stop sending key scancodes).
     pub fn disable_keyboard(&self) -> bool {
-        unsafe { self.send_keyboard_command(KBD_DISABLE_SCANNING) }
+        unsafe { return self.send_keyboard_command(KBD_DISABLE_SCANNING) }
     }
 }
