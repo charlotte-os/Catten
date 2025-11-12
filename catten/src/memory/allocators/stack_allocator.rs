@@ -24,7 +24,7 @@ use crate::memory::{AddressSpaceInterface, KERNEL_AS};
 
 static KERNEL_GUARD_PAGE_SET: Lazy<RwLock<BTreeSet<VAddr>>> =
     Lazy::new(|| RwLock::new(BTreeSet::new()));
-
+#[derive(Debug)]
 pub enum Error {
     IsaMemoryIfce(<MemoryInterfaceImpl as MemoryInterface>::Error),
     AllocatorsMemory(memory::Error),

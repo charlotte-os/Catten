@@ -147,6 +147,17 @@ impl Into<usize> for VAddr {
     }
 }
 
+impl From<u64> for VAddr {
+    fn from(value: u64) -> Self {
+        VAddr::from(value as usize)
+    }
+}
+impl Into<u64> for VAddr {
+    fn into(self) -> u64 {
+        self.raw as u64
+    }
+}
+
 impl Sub for VAddr {
     type Output = isize;
 

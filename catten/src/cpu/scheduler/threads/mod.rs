@@ -1,7 +1,3 @@
-use alloc::boxed::Box;
-use core::ops::Add;
-use core::sync::atomic::AtomicBool;
-
 use spin::Lazy;
 
 use crate::common::collections::id_table::IdTable;
@@ -24,10 +20,10 @@ pub struct Thread {
 }
 
 impl Thread {
-    pub fn new(is_user: bool, asid: AddressSpaceId, entrypoint: VAddr) -> Self {
+    pub fn new(is_user: bool, asid: AddressSpaceId, entry_point: VAddr) -> Self {
         Thread {
             is_user,
-            context: ThreadContext::new(,
+            context: ThreadContext::new(asid, entry_point).expect(""),
             asid,
             lp_affinity: [LpId::default(); LP_AFFINITY_COUNT],
         }
