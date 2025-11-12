@@ -22,13 +22,13 @@
   - x86_64 (Primary ISA)
     - Invariant Timestamp Counter
     - Local APIC supporting x2APIC operating mode
-  - ARM64 (Secondary ISA)
-    - ARMv8.2A or later
-    - GICv3 or later
+  - RISC-V64 (Secondary ISA)
+    - RVA23 or later
+    - V extension not required
 - Firmware:
   - Unified Extensible Firmware Interface (UEFI)
   - Advanced Configuration and Power Interface (ACPI)
-  - ARM Secure Monitor Calls (SMCs)
+  - RISC-V Supervisor Binary Interface (SBI)
   - DTSpec conforming Flattened Devicetree (FDT)
 - Memory:
   - Recommended: >= 1 GiB
@@ -50,7 +50,6 @@
     - I2C Human Interface Device Class
   - Serial:
     - NS16550 compatible UART
-    - PL011 compatible UART
     - USB Communications Device Class Abstract Control Model (Virtual UART over USB)
 - Networking:
   - USB Communications Device Class Network Control Model (Ethernet over USB)
