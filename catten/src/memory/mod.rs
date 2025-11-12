@@ -1,6 +1,6 @@
 //! # Memory Management Subsystem
 
-pub mod allocator;
+pub mod allocators;
 pub mod linear;
 pub mod physical;
 

@@ -21,6 +21,7 @@ pub trait Address:
 
     fn is_aligned_to(&self, alignment: usize) -> bool;
     fn next_aligned_to(&self, alignment: usize) -> Self;
+    fn prev_aligned_to(&self, alignment: usize) -> Self;
     fn is_valid(value: usize) -> bool;
     fn is_null(&self) -> bool;
 

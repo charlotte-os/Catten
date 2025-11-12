@@ -1,6 +1,8 @@
-use core::arch::{asm, naked_asm};
+use core::arch::asm;
 use core::mem::size_of;
 use core::ptr;
+
+use crate::get_lp_id;
 
 #[repr(C, packed(1))]
 #[derive(Clone, Copy, Debug)]
@@ -114,7 +116,10 @@ impl Gdt {
         GdtRegister::new(self).load();
         /* load the tss */
         unsafe {
-            asm!("ltr [rip + TSS_SELECTOR]");
+            asm!(
+                "ltr [{}]",
+                in(reg) &raw const TSS_SELECTOR
+            );
         }
     }
 }
@@ -155,6 +160,7 @@ impl GdtRegister {
         }
     }
 
+    #[inline(always)]
     fn load(&self) {
         unsafe {
             asm!(
@@ -242,5 +248,22 @@ impl Tss {
             iopb: size_of::<Tss>() as u16,
             res3: 0,
         }
+    }
+}
+
+/* Safety: Do not ever access or mutate a TSS from any LP other than the one that uses it */
+unsafe fn get_tss() -> *mut Tss {
+    let lp_id = get_lp_id!();
+    if lp_id == 0 {
+        &raw const (*super::bsp::BSP_TSS) as *mut Tss
+    } else {
+        &raw const super::ap::AP_TSS[lp_id as usize - 1] as *mut Tss
+    }
+}
+
+pub extern "C" fn write_rsp0(val: u64) {
+    unsafe {
+        let tss = get_tss();
+        (*tss).rsp0 = val;
     }
 }

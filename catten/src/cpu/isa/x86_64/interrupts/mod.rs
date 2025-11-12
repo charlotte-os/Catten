@@ -4,7 +4,6 @@ pub mod idt;
 pub mod ipis;
 pub mod x2apic;
 
-use context_switch::isr_switch_thread_context;
 use idt::*;
 use spin::{Lazy, Mutex};
 
@@ -18,7 +17,6 @@ pub static IDT_TABLE: Lazy<IdTable<LpId, Mutex<Idt>>> = Lazy::new(IdTable::new);
 
 pub fn register_fixed_isr_gates(idt: &mut Idt) {
     exceptions::load_exceptions(idt);
-    idt.set_gate(32, isr_switch_thread_context, gdt::KERNEL_CODE_SELECTOR, false, true);
 }
 
 pub struct IsrDesc {

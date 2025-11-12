@@ -80,6 +80,16 @@ impl Address for VAddr {
         VAddr::from(aligned)
     }
 
+    fn prev_aligned_to(&self, alignment: usize) -> Self {
+        VAddr {
+            raw: if alignment % 2 == 0 {
+                self.raw & !(alignment - 1)
+            } else {
+                self.raw - (self.raw % alignment)
+            },
+        }
+    }
+
     fn is_valid(value: usize) -> bool {
         value != 0
     }
@@ -134,6 +144,17 @@ impl From<usize> for VAddr {
 impl Into<usize> for VAddr {
     fn into(self) -> usize {
         self.raw
+    }
+}
+
+impl From<u64> for VAddr {
+    fn from(value: u64) -> Self {
+        VAddr::from(value as usize)
+    }
+}
+impl Into<u64> for VAddr {
+    fn into(self) -> u64 {
+        self.raw as u64
     }
 }
 

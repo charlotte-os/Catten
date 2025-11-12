@@ -1,7 +1,7 @@
 use alloc::alloc::{Allocator, Layout};
 
 use crate::logln;
-use crate::memory::allocator::PRIMARY_ALLOCATOR;
+use crate::memory::allocators::global_allocator::PRIMARY_ALLOCATOR;
 
 pub fn test_allocator() {
     logln!("Starting the kernel allocator self-test...");

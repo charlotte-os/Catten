@@ -16,93 +16,93 @@ pub static LA_MAP: Lazy<&'static LinearAddressMap> = Lazy::new(|| match *VADDR_S
 
 static LA_MAP_39BIT: Lazy<LinearAddressMap> = Lazy::new(|| LinearAddressMap {
     null_page: LinearMemoryRegion {
-        base: VAddr::from(0x0000_0000_0000_0000),
+        base: VAddr::from(0x0000_0000_0000_0000usize),
         length: kibibytes(4),
     },
     application: LinearMemoryRegion {
-        base: VAddr::from(0x0000000000001000),
+        base: VAddr::from(0x0000000000001000usize),
         length: gibibytes(512),
     },
     direct_mapping: LinearMemoryRegion {
-        base: VAddr::from(0xffffff8000000000),
+        base: VAddr::from(0xffffff8000000000usize),
         length: gibibytes(512),
     },
     kernel_stack_arena: LinearMemoryRegion {
-        base: VAddr::from(0xffffff0000000000),
+        base: VAddr::from(0xffffff0000000000usize),
         length: gibibytes(4),
     },
     kernel_mmio: LinearMemoryRegion {
-        base: VAddr::from(0xffffff0800000000),
+        base: VAddr::from(0xffffff0800000000usize),
         length: gibibytes(4),
     },
     kenrnel_allocator_arena: LinearMemoryRegion {
-        base: VAddr::from(0xffffff1000000000),
+        base: VAddr::from(0xffffff1000000000usize),
         length: gibibytes(988),
     },
     kernel_image: LinearMemoryRegion {
-        base: VAddr::from(0xffffffff80000000),
+        base: VAddr::from(0xffffffff80000000usize),
         length: gibibytes(2),
     },
 });
 
 static LA_MAP_48BIT: Lazy<LinearAddressMap> = Lazy::new(|| LinearAddressMap {
     null_page: LinearMemoryRegion {
-        base: VAddr::from(0x0000_0000_0000_0000),
+        base: VAddr::from(0x0000_0000_0000_0000usize),
         length: kibibytes(4),
     },
     application: LinearMemoryRegion {
-        base: VAddr::from(0x0000000000001000),
+        base: VAddr::from(0x0000000000001000usize),
         length: tebibytes(256),
     },
     direct_mapping: LinearMemoryRegion {
-        base: VAddr::from(0xffffff8000000000),
+        base: VAddr::from(0xffffff8000000000usize),
         length: tebibytes(256),
     },
     kernel_stack_arena: LinearMemoryRegion {
-        base: VAddr::from(0xffff800000000000),
+        base: VAddr::from(0xffff800000000000usize),
         length: tebibytes(2),
     },
     kernel_mmio: LinearMemoryRegion {
-        base: VAddr::from(0xffff820000000000),
+        base: VAddr::from(0xffff820000000000usize),
         length: tebibytes(2),
     },
     kenrnel_allocator_arena: LinearMemoryRegion {
-        base: VAddr::from(0xffff840000000000),
+        base: VAddr::from(0xffff840000000000usize),
         length: tebibytes(506),
     },
     kernel_image: LinearMemoryRegion {
-        base: VAddr::from(0xffffffff80000000),
+        base: VAddr::from(0xffffffff80000000usize),
         length: gibibytes(2),
     },
 });
 
 static LA_MAP_57BIT: Lazy<LinearAddressMap> = Lazy::new(|| LinearAddressMap {
     null_page: LinearMemoryRegion {
-        base: VAddr::from(0x0000_0000_0000_0000),
+        base: VAddr::from(0x0000_0000_0000_0000usize),
         length: kibibytes(4),
     },
     application: LinearMemoryRegion {
-        base: VAddr::from(0x0000000000001000),
+        base: VAddr::from(0x0000000000001000usize),
         length: pebibytes(128),
     },
     direct_mapping: LinearMemoryRegion {
-        base: VAddr::from(0xffffff8000000000),
+        base: VAddr::from(0xffffff8000000000usize),
         length: pebibytes(128),
     },
     kernel_stack_arena: LinearMemoryRegion {
-        base: VAddr::from(0xff80000000000000),
+        base: VAddr::from(0xff80000000000000usize),
         length: pebibytes(1),
     },
     kernel_mmio: LinearMemoryRegion {
-        base: VAddr::from(0xff88000000000000),
+        base: VAddr::from(0xff88000000000000usize),
         length: pebibytes(1),
     },
     kenrnel_allocator_arena: LinearMemoryRegion {
-        base: VAddr::from(0xff90000000000000),
+        base: VAddr::from(0xff90000000000000usize),
         length: pebibytes(253),
     },
     kernel_image: LinearMemoryRegion {
-        base: VAddr::from(0xffffffff80000000),
+        base: VAddr::from(0xffffffff80000000usize),
         length: gibibytes(2),
     },
 });
@@ -146,7 +146,8 @@ impl LinearAddressMap {
             RegionType::KernelImage
         } else {
             unreachable!(
-                "This should be unreachable because the entire address space is tightly mapped and the VAddr type guarantees a valid address."
+                "This should be unreachable because the entire address space is tightly mapped \
+                 and the VAddr type guarantees a valid address."
             );
         }
     }
@@ -163,7 +164,7 @@ impl LinearAddressMap {
         }
     }
 }
-
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct LinearMemoryRegion {
     pub base: VAddr,
     pub length: usize,
@@ -172,5 +173,11 @@ pub struct LinearMemoryRegion {
 impl LinearMemoryRegion {
     pub fn contains(&self, addr: VAddr) -> bool {
         addr >= self.base && addr < (self.base + (self.length as isize))
+    }
+}
+
+impl Into<(VAddr, VAddr)> for LinearMemoryRegion {
+    fn into(self) -> (VAddr, VAddr) {
+        (self.base, self.base + self.length as isize)
     }
 }

@@ -1,15 +1,12 @@
-mod memory;
-
-use alloc::alloc::{Allocator, GlobalAlloc};
 use core::mem::MaybeUninit;
 
-use spin::{Lazy, Mutex};
+use spin::Mutex;
 use talc::*;
 
 use crate::common::size::mebibytes;
-use crate::cpu::isa::interface::memory::address::{Address, VirtualAddress};
+use crate::cpu::isa::interface::memory::address::VirtualAddress;
 use crate::cpu::isa::memory::paging::PAGE_SIZE;
-use crate::memory::allocator::memory::try_allocate_and_map_range;
+use crate::memory::allocators::memory::try_allocate_and_map_range;
 use crate::memory::linear::VAddr;
 use crate::memory::linear::address_map::LA_MAP;
 use crate::memory::linear::address_map::RegionType::KernelStackArena;
