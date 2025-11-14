@@ -25,32 +25,20 @@ pub struct IsrDesc {
     pub handler: extern "C" fn(),
 }
 
-struct InterruptManager;
+pub struct InterruptManager;
 
 pub enum Error {}
 
 impl InterruptManagerIfce for InterruptManager {
     type Error = Error;
-    type Ipi = ipis::IpiRpc;
     type IsrDesc = IsrDesc;
+    type LocalIntCtlr = x2apic::X2Apic;
 
     fn init_interrupt_structures() -> Result<(), Self::Error> {
         todo!()
     }
 
-    fn init_local_interrupt_controller() -> Result<(), Self::Error> {
-        todo!()
-    }
-
-    fn init_system_interrupt_controller() -> Result<(), Self::Error> {
-        todo!()
-    }
-
     fn register_interrupt_handler(isrd: &Self::IsrDesc) -> Result<(), Self::Error> {
-        todo!()
-    }
-
-    fn send_ipi(lp_list: &[LpId], ipi: Self::Ipi) {
         todo!()
     }
 }
