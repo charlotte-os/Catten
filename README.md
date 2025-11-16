@@ -128,8 +128,7 @@ This ensures that Catten can operate without relying on undocumented Linux drive
 We welcome contributions of all forms—code, design proposals, documentation, and testing.  
 Please join our Discord or Matrix communities if you’d like to get involved.
 
-Community contributions for new hardware are accepted **only** when accompanied by adequate documentation and clean, maintainable code.  
-Undocumented or vendor-specific board support cannot be merged into the core.
+Community contributions for new hardware support will only be accepted when they include inline documentation comments with references to publicly available hardware documentation which may include community reverse engineered documentation along with clean, maintainable code.
 
 ---
 
