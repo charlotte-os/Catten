@@ -93,15 +93,16 @@ Tier 2 platforms must be maintainable without per‑board quirks.
 ## 4. Unsupported Hardware
 
 A platform is unsupported if it:
-- Lacks complete public documentation
-- Uses incomplete or Linux‑tailored ACPI/DT
-- Requires proprietary initialization sequences
-- Cannot boot modified software without vendor keys
-- Requires guessing or undocumented hardware behavior
+- Lacks documentation for **core system components** required for OS bring-up (CPU, interrupt controller, timers, memory controllers, PCIe root complex, USB/XHCI, UARTs, etc.)
+- Uses incomplete or Linux-tailored ACPI/DT for **critical subsystems**
+- Requires undocumented vendor-specific initialization sequences for essential hardware
+- Prevents running modified software without vendor keys
 
-Unsupported platforms **may still be used** via out‑of‑tree static libraries, but cannot be merged into mainline.
+**Important:** A platform is *not* rejected simply because it includes some undocumented peripherals (e.g., GPUs, Wi-Fi NICs, accelerators). These devices will simply remain unsupported by CharlotteOS until proper documentation exists. The presence of such devices does *not* disqualify the rest of the system.
 
-This preserves a single, unified kernel.
+Unsupported platforms may still be used via out-of-tree static libraries, but cannot be merged into mainline.
+
+This preserves a single, unified kernel while avoiding unnecessary platform exclusion.
 
 ---
 
