@@ -1,69 +1,147 @@
-# CharlotteOS - Catten
+# CharlotteOS – Catten
 
-`Catten` is an operating system kernel developed as a key component of the CharlotteOS project but it is designed to be flexible enough that we hope it can also find use in many other places. It is intended to be a monolithic kernel with low-level system call interfaces that borrows ideas from exokernels and Fuchsia. Its design should allow for almost any higher level interface to be layered on top. It also includes a typesafe system namespace (akin to the namespaces found in Fuschsia and Plan 9 but more flexible and typesafe) with URI-like paths which has the added benefit of allowing access to the namespace of another host over a network without having to mount anything locally all while being secured by granular capabilities and a persistent mandatory access control policy.
+`Catten` is the kernel of CharlotteOS, designed as a robust, general-purpose monolithic kernel with a strong emphasis on clarity, safety, and architectural flexibility. While developed as part of CharlotteOS, the kernel is structured so that it may also serve as a foundation for other systems.
 
-`Catten` is still in early development, and core subsystems are actively being built. We welcome contributions—feel free to grab an issue from the tracker, suggest features, or participate in discussions on our repository, Discord server or Matrix instance.
+Catten draws inspiration from exokernels, Fuchsia, and capability-based microkernel designs while remaining monolithic for performance and simplicity. Its low-level system call interface is intentionally minimal, enabling a wide range of higher-level runtimes and user environments to be layered on top.
+
+Catten also provides a typed, capability-secured system namespace with URI-like paths, inspired by concepts from Plan 9 and Fuchsia but extended for stronger typing, clean access semantics, and the ability to access another host’s namespace without mounting. Namespace operations are governed by granular capabilities and a persistent mandatory access control policy.
+
+The kernel is still early in development. Core subsystems are under active construction, and contributions are welcome. Join our discussions on Discord, Matrix, or via the issue tracker if you’re interested in participating.
+
+---
 
 ## Programming Languages
 
-- `Catten` is written in Rust and ISA specific assembly languages
-- x86_64 assembly should use Intel syntax as implemented by `rustc` and `llvm-mc` exclusively
+- Catten is written primarily in Rust, with architecture-specific assembly where required.
+- x86-64 assembly uses Intel syntax as implemented by `rustc`/`llvm-mc`.
+- Minimal C is permitted for vetted components where a high-quality Rust alternative does not exist.
+
+---
 
 ## External Dependencies
 
-- C language dependencies are allowed if vetted by maintainers.
-- Any dependencies in languages other than Rust, C, and assembly are strictly forbidden.
-- Always prefer a high-quality Rust equivalent over an external C library unless there is good
-  reason to do otherwise
+- Rust, C, and assembly are the only allowed implementation languages.
+- Any C dependency must be approved and justified.
+- Non-Rust/C/ASM dependencies are not permitted.
+- Prefer high-quality Rust crates unless native C is unavoidable due to specification or interoperability constraints.
 
-## Target System Requirements
+---
 
-- Processor:
-  - x86_64 (Primary ISA)
-    - Invariant Timestamp Counter
-    - Local APIC supporting x2APIC operating mode
-  - RISC-V64 (Secondary ISA)
-    - RVA23 or later
-    - V extension not required
-- Firmware:
-  - Unified Extensible Firmware Interface (UEFI)
-  - Advanced Configuration and Power Interface (ACPI)
-  - RISC-V Supervisor Binary Interface (SBI)
-  - DTSpec conforming Flattened Devicetree (FDT)
-- Memory:
-  - Recommended: >= 1 GiB
-  - Required: 128 MiB
-- Storage:
-  - Recommended: >= 64 GiB
-  - Required: 4 GiB
-  - Device Types:
-    - Non-Volatile Memory Express (NVMe)
-    - USB Mass Storage Device Class
-- Input and Output:
-  - Display Adapter:
-    - Linear Framebuffer
-      - UEFI Graphics Output Protoocol
-      - FDT `simplefb` node
-  - Keyboard
-    - i8042 compatible PS/2 controller interface
-    - USB Human Interface Device Class
-    - I2C Human Interface Device Class
-  - Serial:
-    - NS16550 compatible UART
-    - USB Communications Device Class Abstract Control Model (Virtual UART over USB)
-- Networking:
-  - USB Communications Device Class Network Control Model (Ethernet over USB)
+## Platform & Firmware Requirements
+
+CharlotteOS aims to support platforms that offer **standardized, documented, and interoperable hardware interfaces**. The focus is on systems where the OS can rely on well-defined firmware and discoverability mechanisms, without requiring vendor-specific hacks or opaque initialization sequences.
+
+### Supported Architectures
+
+#### x86-64 (Primary ISA)
+
+- Invariant Timestamp Counter  
+- Local APIC with x2APIC mode  
+- Full UEFI and ACPI firmware environment
+
+#### RISC-V64 (Secondary ISA)
+
+- RVA23 or later  
+- V extension not required  
+- SBI runtime for early boot  
+- Either ACPI or a **DTSpec-conforming Devicetree**  
+  - Devicetree must reference **publicly documented IP blocks**  
+  - Vendor-specific peripherals require accessible documentation
+
+---
+
+## Firmware Model
+
+Catten supports both ACPI and Devicetree, with equal weight. The format is not the determining factor—**documentation and correctness are.**
+
+### UEFI
+
+- Required for PC/server-class systems on all architectures.
+- Provides boot services, memory descriptors, and framebuffer/console access.
+
+### ACPI
+
+- Expected on PC/server-class RISC-V and all x86-64 systems.
+- ACPI tables must be complete and spec-compliant enough to allow device discovery without vendor-specific workarounds.
+
+### Flattened Devicetree (FDT)
+
+- Fully supported for SoC-style platforms.
+- FDT must conform to DTSpec and accurately describe hardware resources.
+- All `compatible` strings must map to publicly documented hardware blocks or IP cores.
+
+### Documentation Requirement
+
+Whether via ACPI or DT:
+
+- Devices must be identifiable.  
+- Devices must be documented.  
+- “Unknown peripheral at address 0xXXXX” is not acceptable without vendor documentation.
+
+This ensures that Catten can operate without relying on undocumented Linux driver behavior, hard-coded quirks, or vendor-specific hacks.
+
+---
+
+## Hardware Recommendations
+
+### Memory
+
+- Recommended: ≥ 1 GiB  
+- Minimum: 128 MiB
+
+### Storage
+
+- Recommended: ≥ 64 GiB  
+- Minimum: 4 GiB  
+- Supported device classes:
+  - NVMe (PCIe)  
+  - USB Mass Storage (MSC)
+
+### Display
+
+- Linear framebuffer exposed via:
+  - UEFI GOP  
+  - FDT `simplefb` node
+
+### Input Devices
+
+- Keyboards:
+  - i8042 PS/2  
+  - USB HID  
+  - I²C HID (documented ACPI/FDT only)
+- Pointers:
+  - USB HID
+
+### Serial Console
+
+- NS16550-compatible UART  
+- USB CDC-ACM (virtual serial)
+
+### Networking
+
+- USB CDC-NCM (Ethernet over USB)
+
+---
 
 ## Contributing
 
-Please reach out to us on Matrix or Discord if you are interested in contributing.
+We welcome contributions of all forms—code, design proposals, documentation, and testing.  
+Please join our Discord or Matrix communities if you’d like to get involved.
+
+Community contributions for new hardware are accepted **only** when accompanied by adequate documentation and clean, maintainable code.  
+Undocumented or vendor-specific board support cannot be merged into the core.
+
+---
 
 ## Licensing
 
-This kernel is licensed under the GNU Affero General Public License version 3.0 (or at your option, any later version). By contributing to this project you agree to license your contributions under that license and potentially also under alternate paid commercial licenses to raise funds for the project in the future should that be deemed necessary by the maintainers.
+Catten is licensed under the GNU Affero General Public License version 3.0 (or any later version). By contributing, you agree that your work may be distributed under AGPLv3 or later, and may be included in optional commercial licensing arrangements should the project require them for sustainability.
 
-Find us on
-------------
+---
 
-- [Discord](https://discord.gg/vE7bCCKx4X)
-- [Matrix](https://matrix.to/#/#charlotteos:matrix.org)
+## Community
+
+Find us on:
+
+- **Discord:** <https://discord.gg/vE7bCCKx4X>  
+- **Matrix:** <https://matrix.to/#/#charlotteos:matrix.org>
