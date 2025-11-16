@@ -135,7 +135,7 @@ Undocumented or vendor-specific board support cannot be merged into the core.
 
 ## Licensing
 
-Catten is licensed under the GNU Affero General Public License version 3.0 (or any later version). By contributing, you agree that your work may be distributed under AGPLv3 or later, and may be included in optional commercial licensing arrangements should the project require them for sustainability.
+Catten is licensed under the GNU Affero General Public License version 3.0 (or any later version). By contributing, you agree that your work may be distributed under the AGPL version 3.0 or later. Your work will also be included in possible commercial licensing arrangements should the project maintainers and community agree to offer those in the future as a source of funding and ecosystem growth. If you object to the latter use then please state that fact in the relevant commit messages and pull requests or send an email with the subject "Commercial Licensing Opt-Out" with all relevant commit hashes and proof that you were are their current copyright holder to <charlotte-os@outlook.com>.
 
 ---
 
@@ -145,3 +145,5 @@ Find us on:
 
 - **Discord:** <https://discord.gg/vE7bCCKx4X>  
 - **Matrix:** <https://matrix.to/#/#charlotteos:matrix.org>
+- **Reddit** <https://www.reddit.com/r/charlotteos>
+- **E-Mail** <charlotte-os@outlook.com>
