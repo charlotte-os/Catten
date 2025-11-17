@@ -4,7 +4,7 @@ mod id;
 use core::arch::asm;
 
 use super::super::constants::interrupt_vectors::*;
-use crate::cpu::isa::constants::msrs::INTERRUPT_COMMAND_REGISTER;
+use crate::cpu::isa::constants::msrs::{self, INTERRUPT_COMMAND_REGISTER};
 use crate::cpu::isa::interface::interrupts::LocalIntCtlr;
 use crate::cpu::isa::lp::LpId;
 use crate::get_lp_id;
@@ -30,6 +30,18 @@ enum IcrDestShorthand {
     OnlySelf = 0b01,
     AllIncludingSelf = 0b10,
     AllExcludingSelf = 0b11,
+}
+/// # Timer Divisors for the Local APIC Timer
+#[repr(u64)]
+pub enum TimerDivisors {
+    DivBy2 = 0b0000,
+    DivBy4 = 0b0001,
+    DivBy8 = 0b0010,
+    DivBy16 = 0b0011,
+    DivBy32 = 0b1000,
+    DivBy64 = 0b1001,
+    DivBy128 = 0b1010,
+    DivBy1 = 0b1011,
 }
 pub struct X2Apic;
 
@@ -65,10 +77,62 @@ impl X2Apic {
             | ((is_level_triggered as u32) << IS_LEVEL_TRIGGERED_SHIFT)
             | ((dest_shorthand as u32) << DEST_SHORTHAND_SHIFT)
     }
+
+    pub fn set_timer_lvt_entry(periodic: bool) {
+        const TIMER_MODE_SHIFT: u64 = 17;
+        const TIMER_MODE_PERIODIC: u64 = 0b1;
+        const TIMER_MODE_ONE_SHOT: u64 = 0b0;
+        const MASK_BIT_SHIFT: u64 = 16;
+        const TIMER_VECTOR_MASK: u64 = 0xff;
+
+        let timer_lvt_entry = (TIMER_INTERRUPT_VECTOR as u64 & TIMER_VECTOR_MASK)
+            | (if periodic {
+                TIMER_MODE_PERIODIC
+            } else {
+                TIMER_MODE_ONE_SHOT
+            } << TIMER_MODE_SHIFT)
+            | (0 << MASK_BIT_SHIFT); // Unmask the timer interrupt
+        unsafe {
+            msrs::write(msrs::APIC_TIMER_LVTR, timer_lvt_entry);
+        }
+    }
+
+    pub fn set_timer_initial_count(count: u32) {
+        unsafe {
+            msrs::write(msrs::APIC_TIMER_INITIAL_COUNT, count as u64);
+        }
+    }
+
+    pub fn set_timer_divide_configuration(divisor: TimerDivisors) {
+        unsafe {
+            msrs::write(msrs::APIC_TIMER_DIVIDE_CONFIGURATION, divisor as u64);
+        }
+    }
+
+    pub fn read_timer_current_count() -> u32 {
+        unsafe { msrs::read(msrs::APIC_TIMER_CURRENT_COUNT) as u32 }
+    }
 }
 
 impl LocalIntCtlr for X2Apic {
     type Error = Error;
+
+    /// # Initialize the x2APIC Local APIC
+    /// Ref: AMD APM 16.4.7
+    fn init() -> Result<(), Self::Error> {
+        // Set the Spurious Interrupt Vector Register (SIVR) to enable the APIC with Focus CPU Core
+        // Checking and set the spurious interrupt vector to 32
+        const FCC_BIT_SHIFT: u64 = 9;
+        const ASE_BIT_SHIFT: u64 = 8;
+        const VEC_MASK: u64 = 0xff;
+        let sivr_val = SPURIOUS_INTERRUPT_VECTOR as u64 & VEC_MASK
+            | (1 << ASE_BIT_SHIFT) // APIC Software Enable
+            | (1 << FCC_BIT_SHIFT); // Focused CPU Core Checking Enable
+        unsafe {
+            msrs::write(msrs::APIC_SPURIOUS_INTERRUPT_VECTOR, sivr_val);
+        }
+        Ok(())
+    }
 
     /// # Send a unicast IPI to the target logical processor
     ///
