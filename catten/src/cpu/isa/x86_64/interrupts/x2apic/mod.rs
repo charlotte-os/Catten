@@ -91,7 +91,7 @@ impl X2Apic {
             } else {
                 TIMER_MODE_ONE_SHOT
             } << TIMER_MODE_SHIFT)
-            | (0 << MASK_BIT_SHIFT); // Unmask the timer interrupt
+                & !(1u64 << MASK_BIT_SHIFT); // Unmask the timer interrupt
         unsafe {
             msrs::write(msrs::APIC_TIMER_LVTR, timer_lvt_entry);
         }

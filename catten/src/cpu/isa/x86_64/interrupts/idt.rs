@@ -20,13 +20,13 @@ impl Idt {
 
     pub fn set_gate(
         &mut self,
-        index: usize,
+        index: u8,
         isr_ptr: unsafe extern "C" fn(),
         segment_selector: u16,
         is_trap: bool,
         is_present: bool,
     ) {
-        let gate = &mut self.gates[index];
+        let gate = &mut self.gates[index as usize];
         let isr_addr = isr_ptr as u64;
 
         gate.addr0 = u16::try_from(isr_addr & 0xffff).unwrap();
