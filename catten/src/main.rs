@@ -26,6 +26,7 @@
 
 extern crate alloc;
 
+pub mod cabi;
 pub mod common;
 pub mod cpu;
 pub mod drivers;

@@ -18,9 +18,11 @@
 use alloc::collections::vec_deque::VecDeque;
 use alloc::vec::Vec;
 use core::arch::global_asm;
+use core::sync::atomic::AtomicU32;
 
 use spin::Mutex;
 
+use crate::cpu::isa::lp::LpId;
 use crate::cpu::isa::memory::tlb;
 use crate::cpu::scheduler::system_scheduler::SYSTEM_SCHEDULER;
 use crate::cpu::scheduler::threads::ThreadId;
@@ -34,6 +36,15 @@ global_asm!(include_str!("ipis.asm"));
 
 unsafe extern "C" {
     pub fn isr_interprocessor_interrupt();
+}
+
+pub struct IpiRpcReq {
+    pub sender_lp_id: LpId,
+    pub recipient_lp_ids: Vec<LpId>,
+    pub request_id: u64,
+    pub rpc: IpiRpc,
+    pub hash: u64,
+    completion_barrier: AtomicU32,
 }
 
 #[derive(Clone, Debug)]
