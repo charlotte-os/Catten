@@ -1,4 +1,6 @@
 //! # Multi-Processor Management
+pub mod lp_local;
+
 use spin::{Lazy, RwLock};
 
 use crate::environment::boot_protocol::limine::MP;
