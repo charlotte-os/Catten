@@ -40,12 +40,14 @@ pub mod panic;
 pub mod self_test;
 
 use cpu::isa::interface::system_info::CpuInfoIfce;
+#[cfg(target_arch = "x86_64")]
+use cpu::isa::interrupts::x2apic::X2Apic;
 use cpu::isa::system_info::CpuInfo;
-use cpu::multiprocessor;
+use cpu::multiprocessor::startup::*;
 use limine::mp::Cpu;
 use spin::{Barrier, Lazy};
 
-use crate::cpu::isa::timers::tsc::{IS_TSC_INVARIANT, TSC_FREQUENCY_HZ};
+use crate::cpu::isa::timers::tsc::{IS_TSC_INVARIANT, TSC_CYCLE_PERIOD, TSC_FREQUENCY_HZ};
 use crate::cpu::multiprocessor::get_lp_count;
 
 const KERNEL_VERSION: (u64, u64, u64) = (0, 3, 0);
@@ -64,13 +66,13 @@ pub extern "C" fn bsp_main() -> ! {
     logln!("========================================================================");
     logln!("Initializing the system using the bootstrap processor...");
     unsafe {
-        multiprocessor::assign_id();
+        assign_id();
     }
     logln!("BSP assigned ID 0.");
     init::bsp_init();
     logln!("System initialized.");
     logln!("Starting secondary LPs...");
-    multiprocessor::start_secondary_lps().expect("Failed to start secondary LPs");
+    start_secondary_lps().expect("Failed to start secondary LPs");
     INIT_BARRIER.wait();
     self_test::run_self_tests();
     if cfg!(target_arch = "x86_64") {
@@ -80,8 +82,17 @@ pub extern "C" fn bsp_main() -> ! {
             logln!("The x86-64 Timestamp Counter is NOT invariant.");
         }
         logln!(
-            "The x86-64 Timestamp Counter frequency is {} MHz.",
+            "The x86-64 Timestamp Counter frequency is {:?} MHz.",
             (*TSC_FREQUENCY_HZ / 1_000_000)
+        );
+        logln!(
+            "The x86-64 Timestamp Counter period is {:?} picoseconds.",
+            ((*TSC_CYCLE_PERIOD).picosecs)
+        );
+
+        logln!(
+            "The APIC timer resolution is {:?} picoseconds.",
+            (X2Apic::get_timer_resolution().picosecs)
         );
     }
     logln!("System Information:");
@@ -100,7 +111,7 @@ pub extern "C" fn bsp_main() -> ! {
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn ap_main(_cpuinfo: &Cpu) -> ! {
     unsafe {
-        multiprocessor::assign_id();
+        assign_id();
     }
     init::ap_init();
     INIT_BARRIER.wait();
