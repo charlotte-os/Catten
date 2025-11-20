@@ -10,12 +10,12 @@ use core::ffi::c_int;
 
 use spin::Mutex;
 
-use crate::cpu::isa::interrupts::ipis::IpiRpcReq;
-use crate::cpu::isa::lp::IsaData;
+//use crate::cpu::isa::interrupts::ipis::IpiRpcReq;
+//use crate::cpu::isa::lp::IsaData;
 
-pub struct LpLocal {
-    /// ISA specific data for the logical processor.
-    pub isa_data: IsaData,
-    pub c_errno: c_int,
-    pub ipi_req_queue: Arc<Mutex<VecDeque<IpiRpcReq>>>,
-}
+// pub struct LpLocal {
+//     /// ISA specific data for the logical processor.
+//     pub isa_data: IsaData,
+//     pub c_errno: c_int,
+//     pub ipi_req_queue: Arc<Mutex<VecDeque<IpiRpcReq>>>,
+// }

@@ -1,12 +1,16 @@
 //! # x2APIC Local Advanced Programmable Interrupt Controller
 mod id;
 
+use alloc::vec::Vec;
 use core::arch::asm;
+use core::arch::x86_64::__cpuid_count;
 
 use super::super::constants::interrupt_vectors::*;
+use crate::common::time::duration::ExtDuration;
 use crate::cpu::isa::constants::msrs::{self, INTERRUPT_COMMAND_REGISTER};
 use crate::cpu::isa::interface::interrupts::LocalIntCtlr;
 use crate::cpu::isa::lp::LpId;
+use crate::cpu::isa::timers::tsc::{TSC_CYCLE_PERIOD, rdtsc};
 use crate::get_lp_id;
 
 pub enum Error {
@@ -97,6 +101,13 @@ impl X2Apic {
         }
     }
 
+    pub fn mask_timer_lvt_entry() {
+        const MASK_BIT_SHIFT: u64 = 16;
+        let mut apic_timer_lvt_entry = unsafe { msrs::read(msrs::APIC_TIMER_LVTR) };
+        apic_timer_lvt_entry |= 1u64 << MASK_BIT_SHIFT;
+        unsafe { msrs::write(msrs::APIC_TIMER_LVTR, apic_timer_lvt_entry) };
+    }
+
     pub fn set_timer_initial_count(count: u32) {
         unsafe {
             msrs::write(msrs::APIC_TIMER_INITIAL_COUNT, count as u64);
@@ -112,12 +123,39 @@ impl X2Apic {
     pub fn read_timer_current_count() -> u32 {
         unsafe { msrs::read(msrs::APIC_TIMER_CURRENT_COUNT) as u32 }
     }
+
+    pub fn get_timer_resolution() -> ExtDuration {
+        const SAMPLE_TICKS: u32 = 10_000_000;
+        const NUM_SAMPLES: usize = 100;
+
+        let mut samples = Vec::<u64>::new();
+        Self::mask_timer_lvt_entry();
+        Self::set_timer_divide_configuration(TimerDivisors::DivBy1);
+        for _ in 0..NUM_SAMPLES {
+            Self::set_timer_initial_count(SAMPLE_TICKS);
+            let tsc_start = rdtsc();
+            while Self::read_timer_current_count() > 0 {}
+            let tsc_end = rdtsc();
+            let duration = (tsc_end - tsc_start) * (*TSC_CYCLE_PERIOD).picosecs;
+            let apic_timer_duration = duration / SAMPLE_TICKS as u64;
+            samples.push(apic_timer_duration);
+        }
+        let mut sum = 0u64;
+        for sample in samples.iter() {
+            sum += *sample;
+        }
+        let ps = sum / NUM_SAMPLES as u64;
+        ExtDuration {
+            secs: 0,
+            picosecs: ps,
+        }
+    }
 }
 
 impl LocalIntCtlr for X2Apic {
     type Error = Error;
 
-    /// # Initialize the x2APIC Local APIC
+    /// # Initialize the local APIC in x2APIC mode
     /// Ref: AMD APM 16.4.7
     fn init() -> Result<(), Self::Error> {
         // Set the Spurious Interrupt Vector Register (SIVR) to enable the APIC with Focus CPU Core
