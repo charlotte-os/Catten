@@ -3,7 +3,6 @@ mod id;
 
 use alloc::vec::Vec;
 use core::arch::asm;
-use core::arch::x86_64::__cpuid_count;
 
 use super::super::constants::interrupt_vectors::*;
 use crate::common::time::duration::ExtDuration;
