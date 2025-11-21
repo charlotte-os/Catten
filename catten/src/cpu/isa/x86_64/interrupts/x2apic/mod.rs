@@ -46,7 +46,9 @@ pub enum TimerDivisors {
     DivBy128 = 0b1010,
     DivBy1 = 0b1011,
 }
-pub struct X2Apic;
+pub struct X2Apic {
+    timer_resolution: ExtDuration,
+}
 
 impl X2Apic {
     pub fn record_id() {
@@ -123,7 +125,11 @@ impl X2Apic {
         unsafe { msrs::read(msrs::APIC_TIMER_CURRENT_COUNT) as u32 }
     }
 
-    pub fn get_timer_resolution() -> ExtDuration {
+    pub fn get_timer_resolution(&self) -> ExtDuration {
+        self.timer_resolution
+    }
+
+    fn determine_timer_resolution() -> ExtDuration {
         const SAMPLE_TICKS: u32 = 10_000_000;
         const NUM_SAMPLES: usize = 100;
 
@@ -156,7 +162,7 @@ impl LocalIntCtlr for X2Apic {
 
     /// # Initialize the local APIC in x2APIC mode
     /// Ref: AMD APM 16.4.7
-    fn init() -> Result<(), Self::Error> {
+    fn new() -> Self {
         // Set the Spurious Interrupt Vector Register (SIVR) to enable the APIC with Focus CPU Core
         // Checking and set the spurious interrupt vector to 32
         const FCC_BIT_SHIFT: u64 = 9;
@@ -168,7 +174,9 @@ impl LocalIntCtlr for X2Apic {
         unsafe {
             msrs::write(msrs::APIC_SPURIOUS_INTERRUPT_VECTOR, sivr_val);
         }
-        Ok(())
+        X2Apic {
+            timer_resolution: Self::determine_timer_resolution(),
+        }
     }
 
     /// # Send a unicast IPI to the target logical processor

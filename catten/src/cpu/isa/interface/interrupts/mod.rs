@@ -14,7 +14,7 @@ pub trait InterruptManagerIfce {
 pub trait LocalIntCtlr {
     type Error;
     /// Initialize the local interrupt controller
-    fn init() -> Result<(), Self::Error>;
+    fn new() -> Self;
     /// Send an inter-processor interrupt to the specified logical processor
     fn send_unicast_ipi(target_lp: LpId) -> Result<(), Self::Error>;
 }
