@@ -100,7 +100,7 @@ pub extern "C" fn bsp_main() -> ! {
     logln!("CPU Model: {}", (CpuInfo::get_model()));
     logln!("Physical Address bits implemented: {}", (CpuInfo::get_paddr_sig_bits()));
     logln!("Virtual Address bits implemented: {}", (CpuInfo::get_vaddr_sig_bits()));
-    logln!("Nothing left to do. Waiting for interrupts...");
+    logln!("LP{}: Bootstrapping complete. Waiting for interrupts...", (get_lp_id!()));
     halt!()
 }
 /// This is the application processor's entry point into the kernel. The `ap_main` function is
@@ -115,6 +115,6 @@ pub unsafe extern "C" fn ap_main(_cpuinfo: &Cpu) -> ! {
     }
     init::ap_init();
     INIT_BARRIER.wait();
-    logln!("LP{}: Nothing left to do. Waiting for interrupts...", (get_lp_id!()));
+    logln!("LP{}: Bootstrapping complete. Waiting for interrupts...", (get_lp_id!()));
     halt!()
 }
