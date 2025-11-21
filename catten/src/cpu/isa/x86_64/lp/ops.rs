@@ -57,7 +57,7 @@ macro_rules! get_lic_id {
 #[rustfmt::skip]
 pub use get_lic_id;
 
-use core::arch::asm;
+use core::arch::{asm, naked_asm};
 
 use super::LpId;
 use crate::cpu::isa::constants::*;
@@ -92,3 +92,27 @@ macro_rules! get_lp_id {
     }};
 }
 pub use get_lp_id;
+
+#[inline]
+pub extern "C" fn get_lp_local_base() -> VAddr {
+    let ret: u64;
+    unsafe {
+        core::arch::asm!(
+            "rdgsbase {}",
+            out(reg) ret,
+            options(nomem, nostack, preserves_flags)
+        );
+    }
+    VAddr::from(ret)
+}
+
+#[inline]
+pub extern "C" fn set_lp_local_base(base: VAddr) {
+    unsafe {
+        core::arch::asm!(
+            "wrgsbase {}",
+            in(reg) <VAddr as Into<u64>>::into(base),
+            options(nomem, nostack, preserves_flags)
+        )
+    }
+}
