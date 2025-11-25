@@ -15,6 +15,8 @@ use crate::cpu::isa::interrupts::spurious::isr_spurious;
 use crate::cpu::isa::lp::LpId;
 use crate::memory::IdTable;
 
+pub type LocalIntCtlr = x2apic::X2Apic;
+
 pub static BSP_IDT: Mutex<Idt> = Mutex::new(Idt::new());
 pub static IDT_TABLE: Lazy<IdTable<LpId, Mutex<Idt>>> = Lazy::new(IdTable::new);
 

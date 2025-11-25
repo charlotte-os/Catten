@@ -11,6 +11,7 @@ use core::ffi::c_int;
 
 use spin::Mutex;
 
+use crate::cpu::isa::interface::lp::LpIsaDataIfce;
 use crate::cpu::isa::interface::memory::address::VirtualAddress;
 use crate::cpu::isa::lp::lp_isa_data::LpIsaData;
 use crate::cpu::isa::lp::ops::{get_lp_local_base, set_lp_local_base};
@@ -31,7 +32,7 @@ pub struct LpLocal {
 impl LpLocal {
     fn new() -> Self {
         LpLocal {
-            isa_data: LpIsaData::new(),
+            isa_data: <LpIsaData as LpIsaDataIfce>::new(),
             c_errno: 0,
             ipi_req_queue: Arc::new(Mutex::new(VecDeque::new())),
         }
@@ -45,6 +46,17 @@ impl LpLocal {
             let lp_local = Box::new(LpLocal::new());
             set_lp_local_base(VAddr::from_mut(Box::into_raw(lp_local)));
             Ok(())
+        }
+    }
+
+    pub extern "C" fn get() -> &'static LpLocal {
+        let ptr: *const LpLocal;
+        unsafe {
+            core::arch::asm! {
+                "lea {}, gs:[0]",
+                out(reg) ptr
+            }
+            core::mem::transmute::<*const LpLocal, &'static LpLocal>(ptr)
         }
     }
 }

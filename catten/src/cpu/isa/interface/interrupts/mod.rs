@@ -2,7 +2,7 @@ use crate::cpu::isa::lp::LpId;
 pub trait InterruptManagerIfce {
     type Error;
     type IsrDesc;
-    type LocalIntCtlr: LocalIntCtlr;
+    type LocalIntCtlr: LocalIntCtlrIfce;
     /// Initialize interrupt structures (IDT, IVT, etc.)
     fn init_interrupt_structures() -> Result<(), Self::Error>;
     /// Register an interrupt handler using an ISA specific descriptor for where to install it and
@@ -11,7 +11,7 @@ pub trait InterruptManagerIfce {
 }
 
 /// # Local Interrupt Controller Interface
-pub trait LocalIntCtlr {
+pub trait LocalIntCtlrIfce {
     type Error;
     /// Initialize the local interrupt controller
     fn new() -> Self;
