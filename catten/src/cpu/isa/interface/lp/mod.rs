@@ -1,10 +1,5 @@
 //! # x86_64 Logical Processor Control Interface
 
-pub trait CoreStateIfce {
-    extern "C" fn save(&mut self);
-    extern "C" fn load(&self);
-}
-
 /*
  * The following macros are used to logical processor operations in assembly and
  * must be defined in each architecture module.
@@ -19,3 +14,10 @@ pub trait CoreStateIfce {
  *
  * See the x86_64 implementation for examples.
  */
+
+use crate::cpu::isa::interrupts::LocalIntCtlr;
+
+pub trait LpIsaDataIfce {
+    fn new() -> Self;
+    fn get_lic(&mut self) -> &mut LocalIntCtlr;
+}

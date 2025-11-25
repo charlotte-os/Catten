@@ -7,7 +7,7 @@ use core::arch::asm;
 use super::super::constants::interrupt_vectors::*;
 use crate::common::time::duration::ExtDuration;
 use crate::cpu::isa::constants::msrs::{self, INTERRUPT_COMMAND_REGISTER};
-use crate::cpu::isa::interface::interrupts::LocalIntCtlr;
+use crate::cpu::isa::interface::interrupts::LocalIntCtlrIfce;
 use crate::cpu::isa::lp::LpId;
 use crate::cpu::isa::timers::tsc::{TSC_CYCLE_PERIOD, rdtsc};
 use crate::get_lp_id;
@@ -157,7 +157,7 @@ impl X2Apic {
     }
 }
 
-impl LocalIntCtlr for X2Apic {
+impl LocalIntCtlrIfce for X2Apic {
     type Error = Error;
 
     /// # Initialize the local APIC in x2APIC mode

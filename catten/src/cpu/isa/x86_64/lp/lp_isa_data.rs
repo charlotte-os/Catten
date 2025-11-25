@@ -2,14 +2,32 @@ use alloc::sync::Arc;
 
 use spin::Mutex;
 
+use crate::cpu::isa::interface::interrupts::LocalIntCtlrIfce;
+use crate::cpu::isa::interface::lp::LpIsaDataIfce;
+use crate::cpu::isa::interrupts::LocalIntCtlr;
 use crate::cpu::isa::interrupts::idt::Idt;
 use crate::cpu::isa::interrupts::x2apic::X2Apic;
 use crate::cpu::scheduler::lp_schedulers::LocalScheduler;
 use crate::cpu::scheduler::threads::Thread;
 
 pub struct LpIsaData {
-    pub curr_tcb: Arc<Mutex<Thread>>,
+    pub curr_tcb: Option<Arc<Mutex<Thread>>>,
     idt: Idt,
     local_scheduler: LocalScheduler,
-    apic_handle: X2Apic,
+    apic: X2Apic,
+}
+
+impl LpIsaDataIfce for LpIsaData {
+    fn new() -> LpIsaData {
+        LpIsaData {
+            curr_tcb: None,
+            idt: Idt::new(),
+            local_scheduler: LocalScheduler::new_round_robin(),
+            apic: <X2Apic as LocalIntCtlrIfce>::new(),
+        }
+    }
+
+    fn get_lic(&mut self) -> &mut LocalIntCtlr {
+        &mut self.apic
+    }
 }
