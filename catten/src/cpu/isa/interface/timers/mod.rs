@@ -1,30 +1,31 @@
 pub use crate::common::time::duration::ExtDuration;
 
-pub enum LicTimerError {
+pub enum LpTimerError {
     TimerNotPresent,
     DivisorNotSupported,
     DurationOutOfRange,
     DurationNotSet,
     TimerNotStarted,
     TimerAlreadyStarted,
+    TimerStartsAutomatically,
 }
 
-pub trait LicTimer {
+pub trait LpTimerIfce {
     //! # Local Interrupt Controller Timer Interface
 
     type Divisor;
-    type Duration: Into<ExtDuration>;
+    type TickCount;
     type IntDispatchNum;
 
-    fn get_resolution(&self) -> Result<ExtDuration, LicTimerError>;
-    fn set_divisor(&mut self, divisor: Self::Divisor) -> Result<(), LicTimerError>;
-    fn set_duration(&mut self, duration: Self::Duration) -> Result<(), LicTimerError>;
-    fn get_duration(&self) -> Result<Self::Duration, LicTimerError>;
-    fn start(&mut self) -> Result<(), LicTimerError>;
-    fn stop(&mut self) -> Result<(), LicTimerError>;
-    fn reset(&mut self) -> Result<(), LicTimerError>;
-    fn get_interrupt_mask(&mut self) -> Result<bool, LicTimerError>;
-    fn toggle_interrupt_mask(&mut self, mask: bool) -> Result<(), LicTimerError>;
+    fn get_resolution(&self) -> Result<ExtDuration, LpTimerError>;
+    fn set_divisor(&mut self, divisor: Self::Divisor) -> Result<(), LpTimerError>;
+    fn set_duration(&mut self, duration: ExtDuration) -> Result<(), LpTimerError>;
+    fn get_duration(&self) -> Result<ExtDuration, LpTimerError>;
+    fn start(&mut self) -> Result<(), LpTimerError>;
+    fn stop(&mut self) -> Result<(), LpTimerError>;
+    fn reset(&mut self) -> Result<(), LpTimerError>;
+    fn get_interrupt_mask(&mut self) -> Result<bool, LpTimerError>;
+    fn set_interrupt_mask(&mut self, mask: bool) -> Result<(), LpTimerError>;
     extern "C" fn signal_eoi(&mut self) -> i32;
-    fn set_isr_dispatch_number(&mut self, num: Self::IntDispatchNum) -> Result<(), LicTimerError>;
+    fn set_isr_dispatch_number(&mut self, num: Self::IntDispatchNum) -> Result<(), LpTimerError>;
 }

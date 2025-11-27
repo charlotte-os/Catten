@@ -1,15 +1,12 @@
 //! # x2APIC Local Advanced Programmable Interrupt Controller
 mod id;
 
-use alloc::vec::Vec;
 use core::arch::asm;
 
 use super::super::constants::interrupt_vectors::*;
-use crate::common::time::duration::ExtDuration;
 use crate::cpu::isa::constants::msrs::{self, INTERRUPT_COMMAND_REGISTER};
 use crate::cpu::isa::interface::interrupts::LocalIntCtlrIfce;
 use crate::cpu::isa::lp::LpId;
-use crate::cpu::isa::timers::tsc::{TSC_CYCLE_PERIOD, rdtsc};
 use crate::get_lp_id;
 
 pub enum Error {
@@ -34,21 +31,8 @@ enum IcrDestShorthand {
     AllIncludingSelf = 0b10,
     AllExcludingSelf = 0b11,
 }
-/// # Timer Divisors for the Local APIC Timer
-#[repr(u64)]
-pub enum TimerDivisors {
-    DivBy2 = 0b0000,
-    DivBy4 = 0b0001,
-    DivBy8 = 0b0010,
-    DivBy16 = 0b0011,
-    DivBy32 = 0b1000,
-    DivBy64 = 0b1001,
-    DivBy128 = 0b1010,
-    DivBy1 = 0b1011,
-}
-pub struct X2Apic {
-    timer_resolution: ExtDuration,
-}
+
+pub struct X2Apic;
 
 impl X2Apic {
     pub fn record_id() {
@@ -101,60 +85,6 @@ impl X2Apic {
             msrs::write(msrs::APIC_TIMER_LVTR, timer_lvt_entry);
         }
     }
-
-    pub fn mask_timer_lvt_entry() {
-        const MASK_BIT_SHIFT: u64 = 16;
-        let mut apic_timer_lvt_entry = unsafe { msrs::read(msrs::APIC_TIMER_LVTR) };
-        apic_timer_lvt_entry |= 1u64 << MASK_BIT_SHIFT;
-        unsafe { msrs::write(msrs::APIC_TIMER_LVTR, apic_timer_lvt_entry) };
-    }
-
-    pub fn set_timer_initial_count(count: u32) {
-        unsafe {
-            msrs::write(msrs::APIC_TIMER_INITIAL_COUNT, count as u64);
-        }
-    }
-
-    pub fn set_timer_divide_configuration(divisor: TimerDivisors) {
-        unsafe {
-            msrs::write(msrs::APIC_TIMER_DIVIDE_CONFIGURATION, divisor as u64);
-        }
-    }
-
-    pub fn read_timer_current_count() -> u32 {
-        unsafe { msrs::read(msrs::APIC_TIMER_CURRENT_COUNT) as u32 }
-    }
-
-    pub fn get_timer_resolution(&self) -> ExtDuration {
-        self.timer_resolution
-    }
-
-    fn determine_timer_resolution() -> ExtDuration {
-        const SAMPLE_TICKS: u32 = 10_000_000;
-        const NUM_SAMPLES: usize = 100;
-
-        let mut samples = Vec::<u64>::new();
-        Self::mask_timer_lvt_entry();
-        Self::set_timer_divide_configuration(TimerDivisors::DivBy1);
-        for _ in 0..NUM_SAMPLES {
-            Self::set_timer_initial_count(SAMPLE_TICKS);
-            let tsc_start = rdtsc();
-            while Self::read_timer_current_count() > 0 {}
-            let tsc_end = rdtsc();
-            let duration = (tsc_end - tsc_start) * (*TSC_CYCLE_PERIOD).picosecs;
-            let apic_timer_duration = duration / SAMPLE_TICKS as u64;
-            samples.push(apic_timer_duration);
-        }
-        let mut sum = 0u64;
-        for sample in samples.iter() {
-            sum += *sample;
-        }
-        let ps = sum / NUM_SAMPLES as u64;
-        ExtDuration {
-            secs: 0,
-            picosecs: ps,
-        }
-    }
 }
 
 impl LocalIntCtlrIfce for X2Apic {
@@ -174,9 +104,7 @@ impl LocalIntCtlrIfce for X2Apic {
         unsafe {
             msrs::write(msrs::APIC_SPURIOUS_INTERRUPT_VECTOR, sivr_val);
         }
-        X2Apic {
-            timer_resolution: Self::determine_timer_resolution(),
-        }
+        X2Apic {}
     }
 
     /// # Send a unicast IPI to the target logical processor
