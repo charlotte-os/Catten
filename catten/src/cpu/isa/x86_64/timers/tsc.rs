@@ -14,10 +14,7 @@ pub static IS_TSC_INVARIANT: Lazy<bool> =
 pub static TSC_FREQUENCY_HZ: Lazy<u64> = Lazy::new(get_tsc_freq);
 pub static TSC_CYCLE_PERIOD: Lazy<ExtDuration> = Lazy::new(|| {
     let ps = 1_000_000_000_000 / *TSC_FREQUENCY_HZ;
-    ExtDuration {
-        secs: 0,
-        picosecs: ps,
-    }
+    ExtDuration::from_picos(ps as u128)
 });
 
 pub fn rdtsc() -> u64 {

@@ -87,12 +87,7 @@ pub extern "C" fn bsp_main() -> ! {
         );
         logln!(
             "The x86-64 Timestamp Counter period is {:?} picoseconds.",
-            ((*TSC_CYCLE_PERIOD).picosecs)
-        );
-
-        logln!(
-            "The APIC timer resolution is {:?} picoseconds.",
-            (X2Apic::get_timer_resolution().picosecs)
+            ((*TSC_CYCLE_PERIOD).as_picos())
         );
     }
     logln!("System Information:");
