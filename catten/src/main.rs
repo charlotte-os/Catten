@@ -50,7 +50,7 @@ use spin::{Barrier, Lazy};
 use crate::cpu::isa::timers::tsc::{IS_TSC_INVARIANT, TSC_CYCLE_PERIOD, TSC_FREQUENCY_HZ};
 use crate::cpu::multiprocessor::get_lp_count;
 
-const KERNEL_VERSION: (u64, u64, u64) = (0, 3, 0);
+const KERNEL_VERSION: (u64, u64, u64) = (0, 3, 5);
 static INIT_BARRIER: Lazy<Barrier> = Lazy::new(|| Barrier::new(get_lp_count() as usize));
 /// This is the bootstrap processor's entry point into the kernel. The `bsp_main` function is
 /// called by the bootloader after setting up the environment. It is made C ABI compatible so
