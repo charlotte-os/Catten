@@ -1,3 +1,5 @@
+//! # Low-level operations for x86_64 Logical Processors
+
 #[rustfmt::skip]
 #[macro_export]
 macro_rules! halt {
@@ -57,7 +59,7 @@ macro_rules! get_lic_id {
 #[rustfmt::skip]
 pub use get_lic_id;
 
-use core::arch::{asm, naked_asm};
+use core::arch::asm;
 
 use super::LpId;
 use crate::cpu::isa::constants::*;
@@ -115,4 +117,28 @@ pub extern "C" fn set_lp_local_base(base: VAddr) {
             options(nomem, nostack, preserves_flags)
         )
     }
+}
+
+#[inline]
+pub extern "C" fn get_thread_context_ptr() -> VAddr {
+    let ret: u64;
+    unsafe {
+        core::arch::asm!(
+            "rdfsbase {}",
+            out(reg) ret,
+            options(nomem, nostack, preserves_flags)
+        );
+    }
+    VAddr::from(ret)
+}
+
+#[inline]
+pub extern "C" fn set_thread_context_ptr(ctx_ptr: VAddr) {
+    unsafe {
+        core::arch::asm!(
+            "wrfsbase {}",
+            in(reg) <VAddr as Into<u64>>::into(ctx_ptr),
+            options(nomem, nostack, preserves_flags)
+        )
+    };
 }

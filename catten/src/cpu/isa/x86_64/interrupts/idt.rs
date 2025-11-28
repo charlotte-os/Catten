@@ -100,13 +100,13 @@ impl InterruptGate {
 }
 
 #[repr(C, packed)]
-struct Idtr {
+pub struct Idtr {
     size: u16,
     base: u64,
 }
 
 impl Idtr {
-    fn new(size: u16, base: u64) -> Self {
+    pub fn new(size: u16, base: u64) -> Self {
         Idtr {
             size,
             base,
@@ -115,7 +115,7 @@ impl Idtr {
 }
 
 #[inline(always)]
-unsafe fn asm_load_idt(idtr: *const Idtr) {
+pub unsafe fn asm_load_idt(idtr: *const Idtr) {
     unsafe {
         asm!("lidt [rdi]", in("rdi") idtr);
     }
