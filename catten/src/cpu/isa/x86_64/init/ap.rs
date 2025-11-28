@@ -1,11 +1,10 @@
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
-use spin::Mutex;
 use spin::lazy::Lazy;
 
 use super::{INTERRUPT_STACK_SIZE, gdt};
-use crate::cpu::isa::init::gdt::Gdt;
+use crate::cpu::isa::interrupts::idt::{Idt, asm_load_idt};
 use crate::cpu::isa::lp::ops::get_lp_id;
 use crate::cpu::multiprocessor::get_lp_count;
 use crate::logln;
@@ -69,7 +68,7 @@ pub static AP_IDTS: Lazy<Vec<crate::cpu::isa::interrupts::idt::Idt>> = Lazy::new
         logln!("LP{}: Constructing and allocating an IDT", (get_lp_id!()));
         let mut idt = crate::cpu::isa::interrupts::idt::Idt::new();
         logln!("LP{}: Registering fixed interrupt gates.", (get_lp_id!()));
-        crate::cpu::isa::interrupts::register_fixed_isr_gates(&mut idt);
+        crate::cpu::isa::interrupts::fixed::register_fixed_isr_gates(&mut idt);
         logln!("LP{}: Pushing the initialized IDT to the vector.", (get_lp_id!()));
         idts.push(idt);
     }
@@ -77,9 +76,32 @@ pub static AP_IDTS: Lazy<Vec<crate::cpu::isa::interrupts::idt::Idt>> = Lazy::new
     idts
 });
 
+pub static AP_IDTRS: Lazy<Vec<crate::cpu::isa::interrupts::idt::Idtr>> = Lazy::new(|| {
+    logln!("LP{}: Creating the IDTR vector.", (get_lp_id!()));
+    let mut idtrs = Vec::new();
+    logln!("LP{}: Allocating {} IDTR entries.", (get_lp_id!()), (get_lp_count() - 1));
+    for idt in AP_IDTS.iter() {
+        logln!("LP{}: Constructing and allocating an IDTR", (get_lp_id!()));
+        idtrs.push(crate::cpu::isa::interrupts::idt::Idtr::new(
+            (size_of::<Idt>() - 1) as u16,
+            idt as *const Idt as u64,
+        ));
+    }
+    logln!("LP{}: IDTR vector initialized.", (get_lp_id!()));
+    idtrs
+});
+
+pub static INIT_MUTEX: Lazy<spin::Mutex<()>> = Lazy::new(|| {
+    logln!("LP{}: Creating the AP init mutex.", (get_lp_id!()));
+    spin::Mutex::new(())
+});
+
 pub fn init_ap() {
     let lp_id = crate::cpu::isa::lp::ops::get_lp_id!();
-    logln!("LP{}: Init mutex acquired.", lp_id);
+    /* I'm not entirely sure why this function needs to be serialized with this mutex,
+    however it triple faults without it when there are 16 or more LPs.
+    Only remove it when you are certain the underlying issue has been resolved. */
+    let _lock = INIT_MUTEX.lock();
     logln!("LP{}: Computing LP index.", lp_id);
     let ap_index = (lp_id - 1) as usize; // APs start from LP1
     logln!("LP{}: LP index is {}.", lp_id, ap_index);
@@ -88,6 +110,6 @@ pub fn init_ap() {
     unsafe {
         gdt::reload_segment_regs();
     }
-    AP_IDTS[ap_index].load();
+    unsafe { asm_load_idt(&raw const AP_IDTRS[ap_index]) };
     crate::logln!("AP{}: x86-64 logical processor initialization complete", lp_id);
 }

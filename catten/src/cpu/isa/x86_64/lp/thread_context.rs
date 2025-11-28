@@ -15,7 +15,7 @@ use crate::memory::{ADDRESS_SPACE_TABLE, AddressSpaceId, KERNEL_ASID, VAddr};
 
 /// # Interrupt stack frame structure for x86_64 architecture
 /// Note: must be 16 byte aligned as per `AMD APM 8.9.3`
-#[repr(C, packed)]
+#[repr(C, align(16))]
 struct InterruptStackFrame {
     gprs: [u64; 15],
     rip: u64,
@@ -57,8 +57,8 @@ impl InterruptStackFrame {
 
 #[derive(Debug, Clone, Default)]
 pub struct ThreadContext {
-    rsp_cpl0: u64,
     cr3: u64,
+    rsp_cpl0: u64,
     kernel_stack_buf: VAddr,
     user_stack_buf: Option<VAddr>,
 }
