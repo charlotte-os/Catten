@@ -1,6 +1,6 @@
 [package]
 name = "catten"
-version = "0.3.0"
+version = "0.3.5"
 edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -12,7 +12,9 @@ bench = false
 
 [features]
 limine = []
-default = ["limine"]
+acpi = ["uacpi-raw"]
+devicetree = []
+default = ["limine", "acpi", "devicetree"]
 
 [dependencies]
 hashbrown = ">=0.16.0"
@@ -20,7 +22,11 @@ limine = ">=0.5.0"
 os-terminal = ">=0.6.11"
 spin = { version = ">=0.10.0", features = ["ticket_mutex", "lock_api"] }
 talc = { version = ">=4.4.3" }
+<<<<<<< Updated upstream
 uacpi-raw = { git = "https://codeberg.org/CharlotteOS/uacpi-raw.git", branch = "main" }
+=======
+uacpi-raw = { git = "https://codeberg.org/CharlotteOS/uacpi-raw.git", branch = "main", optional = true }
+>>>>>>> Stashed changes
 
 
 [profile.dev]
@@ -28,7 +34,11 @@ debug = "full"
 debug-assertions = true
 panic = "abort"
 lto = false
+<<<<<<< Updated upstream
 opt-level = 3
+=======
+opt-level = 1
+>>>>>>> Stashed changes
 
 [profile.release]
 debug = "none"
