@@ -4,9 +4,9 @@ mod id;
 use core::arch::asm;
 
 use super::super::constants::interrupt_vectors::*;
-use crate::cpu::isa::constants::msrs::{self, INTERRUPT_COMMAND_REGISTER};
 use crate::cpu::isa::interface::interrupts::LocalIntCtlrIfce;
 use crate::cpu::isa::lp::LpId;
+use crate::cpu::isa::x86_64::constants::msrs::{self, INTERRUPT_COMMAND_REGISTER};
 use crate::get_lp_id;
 
 pub enum Error {
