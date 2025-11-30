@@ -1,4 +1,8 @@
+pub mod gic;
+
 use core::arch::{asm, global_asm};
+
+pub use gic::*;
 
 // Include the interrupt vector table assembly
 global_asm!(include_str!("ivt.asm"));
