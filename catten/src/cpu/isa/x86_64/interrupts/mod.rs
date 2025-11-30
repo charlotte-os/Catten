@@ -7,13 +7,8 @@ pub mod x2apic;
 use idt::*;
 use spin::{Lazy, Mutex};
 
-<<<<<<< Updated upstream
-=======
-use crate::cpu::isa::init::gdt::KERNEL_CODE_SELECTOR;
->>>>>>> Stashed changes
 use crate::cpu::isa::interface::interrupts::InterruptManagerIfce;
 use crate::cpu::isa::lp::LpId;
-use crate::cpu::isa::x86_64::constants::interrupt_vectors::SPURIOUS_INTERRUPT_VECTOR;
 use crate::memory::IdTable;
 
 pub type LocalIntCtlr = x2apic::X2Apic;

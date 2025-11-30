@@ -2,6 +2,7 @@ use core::iter::Step;
 use core::ops::{Add, Sub};
 
 use crate::cpu::isa::interface::memory::address::{Address, VirtualAddress};
+use crate::cpu::isa::memory::address::VADDR_SIG_BITS;
 
 #[repr(transparent)]
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
