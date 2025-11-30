@@ -8,13 +8,13 @@ pub struct IoReg8 {
 }
 
 impl IReg8Ifce for IoReg8 {
-    fn read(&self) -> u8 {
+    unsafe fn read(&self) -> u8 {
         unsafe { core::ptr::read_volatile(self.address) }
     }
 }
 
 impl OReg8Ifce for IoReg8 {
-    fn write(&self, value: u8) {
+    unsafe fn write(&self, value: u8) {
         unsafe { core::ptr::write_volatile(self.address, value) }
     }
 }

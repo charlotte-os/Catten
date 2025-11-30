@@ -1,6 +1,4 @@
 //! # Logical Processor Control Interface for AArch64
-use crate::cpu::isa::interface::lp;
-use crate::cpu::isa::system_info::{CpuInfo, CpuInfoIfce};
 
 pub type LpId = u32;
 

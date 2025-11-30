@@ -16,6 +16,8 @@ impl MemoryInterface for MemoryInterfaceImpl {
     type Error = Error;
     type PAddr = address::paddr::PAddr;
     type VAddr = address::vaddr::VAddr;
+
+    const PAGE_SIZE: usize = 4096;
 }
 
 pub enum Error {}
@@ -74,7 +76,7 @@ impl AddressSpaceInterface for AddressSpace {
     fn unmap_page(
         &mut self,
         vaddr: <MemoryInterfaceImpl as MemoryInterface>::VAddr,
-    ) -> Result<MemoryMapping, <MemoryInterfaceImpl as MemoryInterface>::Error> {
+    ) -> Result<PAddr, <MemoryInterfaceImpl as MemoryInterface>::Error> {
         todo!()
     }
 
@@ -93,10 +95,10 @@ impl AddressSpaceInterface for AddressSpace {
         unsafe {
             asm!(
                 // Address translation stage 1 at EL1 without permission check
-                "at s1e1a, {}",
+                "at s1e1a, {vaddr}",
                 "isb", // Weakly ordered ISA is weakly ordered lol
                 "mrrs x0, x1, par_el1",
-                vaddr = in(reg) vaddr,
+                vaddr = in(reg) vaddr.into_ptr(),
                 lateout("x0") par_el1.0,
                 lateout("x1") par_el1.1,
             );

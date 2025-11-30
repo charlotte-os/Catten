@@ -1,6 +1,6 @@
-mod feature_check;
+mod isa_extensions;
 
-use feature_check::*;
+use isa_extensions::*;
 
 use crate::cpu::isa::interface::system_info::CpuInfoIfce;
 
@@ -141,6 +141,11 @@ impl CpuInfoIfce for CpuInfo {
     fn is_extension_supported(extension: Self::IsaExtension) -> bool {
         match extension {
             IsaExtension::FeatD128 => check_feat::d128(),
+            IsaExtension::FeatLPA => check_feat::lpa(),
+            IsaExtension::FeatLPA2 => check_feat::lpa2(),
+            IsaExtension::FeatLVA3 => check_feat::lva3(),
+            IsaExtension::FeatLVA => check_feat::lva(),
+            IsaExtension::FeatNMI => check_feat::nmi(),
         }
     }
 }

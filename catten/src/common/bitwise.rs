@@ -6,9 +6,9 @@ where
     (val & mask) >> shift
 }
 /// Used to compare against bitfields embedded in larger word sizes.
-pub fn mask_shift_cmp<T>(val: T, mask: T, shift: u8, cmp: T) -> bool
+pub fn mask_shift_cmp<T>(val: T, mask: T, shift: T, cmp: T) -> bool
 where
-    T: core::ops::BitAnd<Output = T> + core::ops::Shr<u8, Output = T> + core::cmp::PartialEq + Copy,
+    T: core::ops::BitAnd<Output = T> + core::ops::Shr<T, Output = T> + core::cmp::PartialEq + Copy,
 {
     (val & mask) >> shift == cmp
 }
