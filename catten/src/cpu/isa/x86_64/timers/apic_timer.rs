@@ -1,5 +1,4 @@
 use alloc::vec::Vec;
-use core::ffi::c_int;
 
 use super::tsc::TSC_CYCLE_PERIOD;
 use crate::common::time::duration::ExtDuration;
@@ -159,7 +158,7 @@ impl LpTimerIfce for ApicTimer {
         Ok(())
     }
 
-    extern "C" fn signal_eoi(&mut self) -> core::ffi::c_int {
+    extern "C" fn signal_eoi(&mut self) -> i32 {
         // We use level triggered interrupts for the APIC timer to ensure that we don't miss any
         // timer interrupts due to e.g. SMIs. Thus we must signal an EOI to the local APIC otherwise
         // the timer interrupt will immediately trigger again repeatedly.
