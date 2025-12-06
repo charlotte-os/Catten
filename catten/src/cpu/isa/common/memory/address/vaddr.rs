@@ -51,7 +51,7 @@ impl VAddr {
         self.raw & OFFSET_MASK
     }
 
-    /// Safety: The address must be in canonical form
+    /// Safety: The address must be valid and in canonical form
     pub const unsafe fn from_raw_unchecked(raw: usize) -> Self {
         VAddr {
             raw,
