@@ -1,8 +1,11 @@
 use alloc::vec::Vec;
+use core::ffi::c_int;
 
 use super::tsc::TSC_CYCLE_PERIOD;
 use crate::common::time::duration::ExtDuration;
+use crate::cpu::isa::interface::interrupts::LocalIntCtlrIfce;
 use crate::cpu::isa::interface::timers::{LpTimerError, LpTimerIfce};
+use crate::cpu::isa::interrupts::x2apic::X2Apic;
 //use crate::cpu::isa::interrupts::x2apic::X2Apic;
 use crate::cpu::isa::timers::tsc::rdtsc;
 use crate::cpu::isa::x86_64::constants::msrs;
@@ -43,17 +46,13 @@ impl ApicTimer {
         unsafe { msrs::read(msrs::APIC_TIMER_CURRENT_COUNT) as u32 }
     }
 
-    pub fn get_timer_resolution(&self) -> ExtDuration {
-        self.resolution
-    }
-
-    fn determine_timer_resolution(&mut self) -> ExtDuration {
+    fn determine_timer_resolution(&mut self) {
         const SAMPLE_TICKS: u32 = 10_000_000;
         const NUM_SAMPLES: usize = 100;
 
         let mut samples = Vec::<u128>::new();
         Self::mask_timer_lvt_entry();
-        Self::set_divisor(self, ApicTimerDivisors::DivBy1);
+        let _ = Self::set_divisor(self, ApicTimerDivisors::DivBy1);
         for _ in 0..NUM_SAMPLES {
             Self::set_timer_initial_count(SAMPLE_TICKS);
             let tsc_start = rdtsc();
@@ -68,7 +67,16 @@ impl ApicTimer {
             sum += *sample;
         }
         let ps = sum / NUM_SAMPLES as u128;
-        ExtDuration::from_picos(ps)
+        self.resolution = ExtDuration::from_picos(ps);
+    }
+
+    pub fn new() -> Self {
+        let mut t = ApicTimer {
+            resolution:  ExtDuration::from_secs(0),
+            reset_value: 0,
+        };
+        t.determine_timer_resolution();
+        t
     }
 }
 
@@ -76,6 +84,8 @@ impl LpTimerIfce for ApicTimer {
     type Divisor = ApicTimerDivisors;
     type IntDispatchNum = u8;
     type TickCount = u32;
+
+    const NAME: &'static str = "x86-64 x2APIC Timer";
 
     fn get_resolution(&self) -> Result<ExtDuration, LpTimerError> {
         Ok(self.resolution)
@@ -149,11 +159,11 @@ impl LpTimerIfce for ApicTimer {
         Ok(())
     }
 
-    extern "C" fn signal_eoi(&mut self) -> i32 {
+    extern "C" fn signal_eoi(&mut self) -> core::ffi::c_int {
         // We use level triggered interrupts for the APIC timer to ensure that we don't miss any
         // timer interrupts due to e.g. SMIs. Thus we must signal an EOI to the local APIC otherwise
         // the timer interrupt will immediately trigger again repeatedly.
-        // todo: X2Apic::signal_eoi();
+        X2Apic::signal_eoi();
         0
     }
 

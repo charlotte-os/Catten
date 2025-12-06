@@ -17,4 +17,6 @@ pub trait LocalIntCtlrIfce {
     fn new() -> Self;
     /// Send an inter-processor interrupt to the specified logical processor
     fn send_unicast_ipi(target_lp: LpId) -> Result<(), Self::Error>;
+    /// Signal End of Interrupt
+    fn signal_eoi();
 }

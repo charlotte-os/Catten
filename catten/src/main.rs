@@ -40,8 +40,6 @@ pub mod panic;
 pub mod self_test;
 
 use cpu::isa::interface::system_info::CpuInfoIfce;
-#[cfg(target_arch = "x86_64")]
-use cpu::isa::interrupts::x2apic::X2Apic;
 use cpu::isa::system_info::CpuInfo;
 use cpu::multiprocessor::startup::*;
 use limine::mp::Cpu;

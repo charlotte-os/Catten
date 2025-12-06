@@ -4,6 +4,7 @@ mod id;
 use core::arch::asm;
 
 use super::super::constants::interrupt_vectors::*;
+use crate::cpu::isa::constants::msrs::APIC_EOI_REGISTER;
 use crate::cpu::isa::interface::interrupts::LocalIntCtlrIfce;
 use crate::cpu::isa::lp::LpId;
 use crate::cpu::isa::x86_64::constants::msrs::{self, INTERRUPT_COMMAND_REGISTER};
@@ -93,8 +94,8 @@ impl LocalIntCtlrIfce for X2Apic {
     /// # Initialize the local APIC in x2APIC mode
     /// Ref: AMD APM 16.4.7
     fn new() -> Self {
-        // Set the Spurious Interrupt Vector Register (SIVR) to enable the APIC with Focus CPU Core
-        // Checking and set the spurious interrupt vector to 32
+        // Set the Spurious Interrupt Vector Register (SIVR) to enable the APIC with Focused CPU
+        // Core Checking and set the spurious interrupt vector to 32
         const FCC_BIT_SHIFT: u64 = 9;
         const ASE_BIT_SHIFT: u64 = 8;
         const VEC_MASK: u64 = 0xff;
@@ -137,6 +138,12 @@ impl LocalIntCtlrIfce for X2Apic {
             Ok(())
         } else {
             Err(Error::InvalidLpId)
+        }
+    }
+
+    fn signal_eoi() {
+        unsafe {
+            msrs::write(APIC_EOI_REGISTER, 0);
         }
     }
 }

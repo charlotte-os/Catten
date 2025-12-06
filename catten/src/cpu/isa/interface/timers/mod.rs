@@ -13,6 +13,8 @@ pub enum LpTimerError {
 pub trait LpTimerIfce {
     //! # Local Interrupt Controller Timer Interface
 
+    const NAME: &'static str;
+
     type Divisor;
     type TickCount;
     type IntDispatchNum;
