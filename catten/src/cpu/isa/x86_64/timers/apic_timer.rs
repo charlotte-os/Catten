@@ -9,6 +9,8 @@ use crate::cpu::isa::interrupts::x2apic::X2Apic;
 use crate::cpu::isa::timers::tsc::rdtsc;
 use crate::cpu::isa::x86_64::constants::msrs;
 
+pub type LpTimer = ApicTimer;
+
 /// # Timer Divisors for the Local APIC Timer
 #[repr(u64)]
 pub enum ApicTimerDivisors {

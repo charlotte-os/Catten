@@ -2,8 +2,10 @@
 //!
 //! Make sure to check any necessary CPUID features before using these MSRs as not all of them are
 //! architectural.
+
 #[inline(always)]
 pub unsafe fn read(msr: u32) -> u64 {
+    //! Read from an x86-64 model specific register
     let low: u32;
     let high: u32;
 
@@ -22,6 +24,7 @@ pub unsafe fn read(msr: u32) -> u64 {
 
 #[inline(always)]
 pub unsafe fn write(msr: u32, value: u64) {
+    //! Write to an x86-64 model specific register
     let low = value as u32;
     let high = (value >> 32) as u32;
 
