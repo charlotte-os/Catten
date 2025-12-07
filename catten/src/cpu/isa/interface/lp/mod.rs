@@ -1,7 +1,7 @@
 //! # x86_64 Logical Processor Control Interface
 
 /*
- * The following macros are used to logical processor operations in assembly and
+ * The following macros are used for logical processor operations in assembly and
  * must be defined in each architecture module.
  *
  * halt!() halts the current logical processor.
@@ -16,8 +16,12 @@
  */
 
 use crate::cpu::isa::interrupts::LocalIntCtlr;
+use crate::cpu::isa::timers::LpTimer;
 
 pub trait LpIsaDataIfce {
     fn new() -> Self;
+    fn get() -> &'static Self;
+    fn get_mut() -> &'static mut Self;
     fn get_lic(&mut self) -> &mut LocalIntCtlr;
+    fn get_lp_timer(&mut self) -> &mut LpTimer;
 }
