@@ -14,6 +14,7 @@ use crate::cpu::isa::interface::memory::{AddressSpaceInterface, MemoryInterface,
 use crate::logln;
 use crate::memory::{AddressSpaceId, PAddr};
 
+#[derive(Debug, Clone, Copy)]
 #[repr(transparent)]
 pub struct HwAsid(u16);
 

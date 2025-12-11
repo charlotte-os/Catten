@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 use alloc::sync::Arc;
 
 use spin::Mutex;
@@ -10,6 +11,7 @@ use crate::cpu::isa::interrupts::x2apic::X2Apic;
 use crate::cpu::isa::timers::LpTimer;
 use crate::cpu::isa::timers::apic_timer::ApicTimer;
 use crate::cpu::scheduler::lp_schedulers::LocalScheduler;
+use crate::cpu::scheduler::lp_schedulers::strategy::RoundRobin;
 use crate::cpu::scheduler::threads::Thread;
 
 pub struct LpIsaData {
@@ -25,7 +27,7 @@ impl LpIsaDataIfce for LpIsaData {
         LpIsaData {
             curr_tcb: None,
             idt: Idt::new(),
-            local_scheduler: LocalScheduler::new_round_robin(),
+            local_scheduler: LocalScheduler::new(Box::new(RoundRobin::new())),
             apic: <X2Apic as LocalIntCtlrIfce>::new(),
             timer: ApicTimer::new(),
         }
