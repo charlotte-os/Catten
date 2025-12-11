@@ -82,7 +82,7 @@ This ensures that Catten can operate without relying on undocumented Linux drive
 
 ---
 
-## Hardware Recommendations
+## Supported Hardware
 
 ### Memory
 
