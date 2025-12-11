@@ -39,14 +39,14 @@ pub mod memory;
 pub mod panic;
 pub mod self_test;
 
-use cpu::isa::interface::system_info::CpuInfoIfce;
-use cpu::isa::system_info::CpuInfo;
-use cpu::multiprocessor::startup::*;
 use limine::mp::Cpu;
 use spin::{Barrier, Lazy};
 
+use crate::cpu::isa::interface::system_info::CpuInfoIfce;
+use crate::cpu::isa::system_info::CpuInfo;
 use crate::cpu::isa::timers::tsc::{IS_TSC_INVARIANT, TSC_CYCLE_PERIOD, TSC_FREQUENCY_HZ};
 use crate::cpu::multiprocessor::get_lp_count;
+use crate::cpu::multiprocessor::startup::{assign_id, start_secondary_lps};
 
 const KERNEL_VERSION: (u64, u64, u64) = (0, 3, 5);
 static INIT_BARRIER: Lazy<Barrier> = Lazy::new(|| Barrier::new(get_lp_count() as usize));

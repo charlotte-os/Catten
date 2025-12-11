@@ -5,17 +5,17 @@ use crate::cpu::isa::lp::LpId;
 use crate::cpu::isa::lp::thread_context::ThreadContext;
 use crate::memory::{AddressSpaceId, VAddr};
 
-static mut THREAD_TABLE: Lazy<ThreadTable> = Lazy::new(ThreadTable::new);
-type ThreadTable = IdTable<ThreadId, Thread>;
+pub static mut THREAD_TABLE: Lazy<ThreadTable> = Lazy::new(ThreadTable::new);
+pub type ThreadTable = IdTable<ThreadId, Thread>;
 
 const LP_AFFINITY_COUNT: usize = 8;
 
 pub type ThreadId = usize;
 
 pub struct Thread {
-    is_user: bool,
+    pub is_user: bool,
     context: ThreadContext,
-    asid: AddressSpaceId,
+    pub asid: AddressSpaceId,
     lp_affinity: [LpId; LP_AFFINITY_COUNT],
 }
 
