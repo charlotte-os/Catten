@@ -29,7 +29,7 @@ pub fn test_allocator() {
     }
     logln!("Kernel allocator self-test: Deallocation complete.");
     logln!("Kernel allocator self-test: Allocating 8 KiB...");
-    let ptr = unsafe {
+    let ptr = {
         PRIMARY_ALLOCATOR
             .allocate(Layout::from_size_align(8192, 8).unwrap())
             .unwrap()
