@@ -3,8 +3,6 @@ pub trait InterruptManagerIfce {
     type Error;
     type IsrDesc;
     type LocalIntCtlr: LocalIntCtlrIfce;
-    /// Initialize local interrupt controller
-    fn init_lic() -> Result<(), Self::Error>;
     /// Register an interrupt handler using an ISA specific descriptor for where to install it and
     /// with what attributes
     fn register_interrupt_handler(isrd: &Self::IsrDesc) -> Result<(), Self::Error>;

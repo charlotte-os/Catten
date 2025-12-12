@@ -31,10 +31,6 @@ impl InterruptManagerIfce for InterruptManager {
     type IsrDesc = IsrDesc;
     type LocalIntCtlr = x2apic::X2Apic;
 
-    fn init_lic() -> Result<(), Self::Error> {
-        todo!()
-    }
-
     fn register_interrupt_handler(isrd: &Self::IsrDesc) -> Result<(), Self::Error> {
         todo!()
     }

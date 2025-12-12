@@ -2,6 +2,7 @@ use alloc::vec::Vec;
 
 use super::tsc::TSC_CYCLE_PERIOD;
 use crate::common::time::duration::ExtDuration;
+use crate::cpu::isa::constants::interrupt_vectors::TIMER_INTERRUPT_VECTOR;
 use crate::cpu::isa::interface::interrupts::LocalIntCtlrIfce;
 use crate::cpu::isa::interface::timers::{LpTimerError, LpTimerIfce};
 use crate::cpu::isa::interrupts::x2apic::X2Apic;
@@ -30,13 +31,6 @@ pub struct ApicTimer {
 }
 
 impl ApicTimer {
-    pub fn mask_timer_lvt_entry() {
-        const MASK_BIT_SHIFT: u64 = 16;
-        let mut apic_timer_lvt_entry = unsafe { msrs::read(msrs::APIC_TIMER_LVTR) };
-        apic_timer_lvt_entry |= 1u64 << MASK_BIT_SHIFT;
-        unsafe { msrs::write(msrs::APIC_TIMER_LVTR, apic_timer_lvt_entry) };
-    }
-
     pub fn set_timer_initial_count(count: u32) {
         unsafe {
             msrs::write(msrs::APIC_TIMER_INITIAL_COUNT, count as u64);
@@ -52,7 +46,7 @@ impl ApicTimer {
         const NUM_SAMPLES: usize = 100;
 
         let mut samples = Vec::<u128>::new();
-        Self::mask_timer_lvt_entry();
+        let _ = self.set_interrupt_mask(true);
         let _ = Self::set_divisor(self, ApicTimerDivisors::DivBy1);
         for _ in 0..NUM_SAMPLES {
             Self::set_timer_initial_count(SAMPLE_TICKS);
@@ -77,6 +71,8 @@ impl ApicTimer {
             reset_value: 0,
         };
         t.determine_timer_resolution();
+        t.set_divisor(ApicTimerDivisors::DivBy1);
+        t.set_isr_dispatch_number(TIMER_INTERRUPT_VECTOR);
         t
     }
 }
