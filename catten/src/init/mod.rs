@@ -1,8 +1,13 @@
 //! # Initialization Module
 
+use crate::common::time::duration::ExtDuration;
 use crate::cpu::isa::init::IsaInitializer;
 use crate::cpu::isa::interface::init::InitInterface;
+use crate::cpu::isa::interface::lp::LpIsaDataIfce;
+use crate::cpu::isa::interface::timers::LpTimerIfce;
 use crate::cpu::isa::lp;
+use crate::cpu::isa::timers::apic_timer::ApicTimerDivisors;
+use crate::cpu::multiprocessor::lp_local::LpLocal;
 use crate::logln;
 use crate::memory::PHYSICAL_FRAME_ALLOCATOR;
 use crate::memory::allocators::global_allocator::init_primary_allocator;
@@ -29,6 +34,16 @@ pub fn bsp_init() {
     logln!("Initializing kernel allocator...");
     init_primary_allocator();
     logln!("Intialized kernel allocator.");
+    logln!("Initializing LP local data structure");
+    unsafe {
+        LpLocal::init();
+    }
+    logln!("LP local data structure initialized.");
+    logln!("Starting the LP local timer.");
+    let timer = LpLocal::get_mut().isa_data.get_lp_timer();
+    timer.set_duration(ExtDuration::from_secs(10));
+    timer.start();
+    logln!("LP local timer started with 10s duration.");
     logln!("ISA independent initialization complete.");
     logln!("BSP initialization complete.");
 }
@@ -44,4 +59,16 @@ pub fn ap_init() {
             panic!("LP {}: ISA specific initialization failed: {:?}", lp_id, e);
         }
     }
+    logln!("LP{}: Initializing LP local data structure", lp_id);
+    unsafe {
+        LpLocal::init();
+    }
+    logln!("LP{}: LP local data structure initialized.", lp_id);
+    logln!("LP{}: Starting the LP local timer.", lp_id);
+    let timer = LpLocal::get_mut().isa_data.get_lp_timer();
+    timer.set_interrupt_mask(false);
+    timer.set_duration(ExtDuration::from_secs(10));
+    timer.start();
+    logln!("LP{}: LP local timer started with 10s duration.", lp_id);
+    logln!("LP{}: ISA independent initialization complete.", lp_id);
 }

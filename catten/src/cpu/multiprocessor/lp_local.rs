@@ -14,14 +14,14 @@ use spin::Mutex;
 use crate::cpu::isa::interface::lp::LpIsaDataIfce;
 use crate::cpu::isa::interface::memory::address::VirtualAddress;
 use crate::cpu::isa::lp::lp_isa_data::LpIsaData;
-use crate::cpu::isa::lp::ops::{get_lp_local_base, set_lp_local_base};
+use crate::cpu::isa::lp::ops::set_lp_local_base;
 use crate::cpu::multiprocessor::ipi::IpiRpcReq;
 use crate::memory::VAddr;
 
 pub enum Error {
     AlreadyInitialized,
 }
-
+/// Logical Processor Local Data
 pub struct LpLocal {
     /// ISA specific data for each logical processor.
     pub isa_data: LpIsaData,
@@ -38,18 +38,12 @@ impl LpLocal {
         }
     }
 
-    pub fn init() -> Result<(), Error> {
-        let local_seg_base = get_lp_local_base();
-        if local_seg_base != VAddr::from(0u64) {
-            Err(Error::AlreadyInitialized)
-        } else {
-            let lp_local = Box::new(LpLocal::new());
-            set_lp_local_base(VAddr::from_mut(Box::into_raw(lp_local)));
-            Ok(())
-        }
+    pub unsafe fn init() {
+        let lp_local = Box::new(LpLocal::new());
+        set_lp_local_base(VAddr::from_mut(Box::into_raw(lp_local)));
     }
 
-    pub extern "C" fn get() -> &'static LpLocal {
+    pub fn get() -> &'static LpLocal {
         let ptr: *const LpLocal;
         unsafe {
             core::arch::asm! {
@@ -57,6 +51,17 @@ impl LpLocal {
                 out(reg) ptr
             }
             core::mem::transmute::<*const LpLocal, &'static LpLocal>(ptr)
+        }
+    }
+
+    pub fn get_mut() -> &'static mut LpLocal {
+        let ptr: *mut LpLocal;
+        unsafe {
+            core::arch::asm! {
+                "lea {}, gs:[0]",
+                out(reg) ptr
+            }
+            core::mem::transmute::<*const LpLocal, &'static mut LpLocal>(ptr)
         }
     }
 }
