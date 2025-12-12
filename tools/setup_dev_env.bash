@@ -4,6 +4,7 @@
 
 # What we need to install is:
 # curl,
+# edk2-ovmf, edk2-aarch64, edk2-riscv64
 # git,
 # llvm,
 # clang,
