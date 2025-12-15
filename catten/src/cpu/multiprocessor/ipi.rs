@@ -2,27 +2,14 @@
 //!
 //! The Catten IPI protocol is designed to work using remote procedure calls (RPCs).
 //! This allows for a flexible and extensible way to send IPIs between processors.
-//! The protocol supports both unicast (single target) and multicast (multiple targets) IPIs.
-//! The implementation is kept as similar as possible across different architectures within reason.
-//!
-//! Each logical processor (LP) has its own IPI mailbox, which holds a pointer to the the requested
-//! RPC and its arguments. To send an IPI create the RPC type instance and attempt to write its
-//! address into each target LP's mailbox but only if it is currenlty null using an atomic
-//! compare-and-swap (CAS) operation. If you fail to write even one of the the target LPs'
-//! mailboxes, revert the ones you did write back to null. When writing to multiple mailboxes you
-//! MUST do so in order of ascending LP ID to avoid deadlocks. If you are able to write to all
-//! target mailboxes, then immediately send an IPI interrupt to each target LP to trigger the IPI
-//! ISR and have your RPC be executed. At the end of the IPI ISR the target LP MUST set its
-//! mailbox back to null to indicate it is ready to receive another IPI.
+//! The protocol supports both unicast (single target), multicast (multiple targets), and broadcast
+//! IPIs. The implementation is kept as architecture indepent as possible.
 
 use alloc::boxed::Box;
 use alloc::collections::vec_deque::VecDeque;
-use alloc::vec;
 use alloc::vec::Vec;
-use core::alloc::Layout;
-use core::ptr::{null, slice_from_raw_parts_mut};
+use core::sync::atomic::AtomicPtr;
 use core::sync::atomic::Ordering::*;
-use core::sync::atomic::{AtomicPtr, AtomicU32};
 
 use spin::barrier::Barrier;
 use spin::rwlock::RwLock;
@@ -44,7 +31,7 @@ pub struct IpiRpcReq {
     pub request_id: u64,
     pub rpc: IpiRpc,
     pub hash: u64,
-    completion_barrier: Option<Barrier>,
+    pub completion_barrier: Option<Barrier>,
 }
 
 pub enum Error {
