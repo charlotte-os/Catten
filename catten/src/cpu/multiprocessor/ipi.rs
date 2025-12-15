@@ -17,18 +17,24 @@
 
 use alloc::boxed::Box;
 use alloc::collections::vec_deque::VecDeque;
+use alloc::vec;
 use alloc::vec::Vec;
 use core::alloc::Layout;
-use core::ptr::slice_from_raw_parts_mut;
+use core::ptr::{null, slice_from_raw_parts_mut};
 use core::sync::atomic::Ordering::SeqCst;
 use core::sync::atomic::{AtomicPtr, AtomicU32};
 
+use spin::barrier::Barrier;
+use spin::rwlock::RwLock;
 use spin::{Lazy, Mutex};
 
+use crate::common::collections::boxed_slice::make_boxed_slice;
 use crate::cpu::isa::lp::LpId;
 use crate::cpu::isa::memory::tlb;
+use crate::cpu::multiprocessor::get_lp_count;
 use crate::cpu::scheduler::system_scheduler::SYSTEM_SCHEDULER;
 use crate::cpu::scheduler::threads::ThreadId;
+use crate::get_lp_id;
 use crate::memory::linear::VAddr;
 use crate::memory::{AddressSpaceId, KERNEL_ASID};
 
@@ -38,41 +44,67 @@ pub struct IpiRpcReq {
     pub request_id: u64,
     pub rpc: IpiRpc,
     pub hash: u64,
-    completion_barrier: AtomicU32,
+    completion_barrier: Option<Barrier>,
 }
 
-pub static IPI_RPC_MAILBOXES: Lazy<Box<[IpiRpcMailbox]>> = Lazy::new(|| {
-    /* Getting a Boxed slice of a type that isn't Clone and whose count you only know at runtime
-     * is a major pain in the ass.
-     */
+pub enum Error {
+    MailboxBusy,
+}
 
-    let num_lps = crate::cpu::multiprocessor::get_lp_count() as usize;
-    unsafe {
-        let ptr = alloc::alloc::alloc_zeroed(Layout::from_size_align_unchecked(
-            size_of::<IpiRpcMailbox>() * num_lps,
-            align_of::<IpiRpcMailbox>(),
-        ));
-        Box::from_raw(slice_from_raw_parts_mut(ptr as *mut IpiRpcMailbox, num_lps))
-    }
-});
+pub static IPI_RPC_MAILBOXES: Lazy<IpiRpcMailbox> = Lazy::new(IpiRpcMailbox::new);
 
 pub struct IpiRpcMailbox {
-    req: AtomicPtr<IpiRpcReq>,
+    unicast: Box<[AtomicPtr<IpiRpcReq>]>,
+    multicast: RwLock<Box<[AtomicPtr<IpiRpcReq>]>>,
+    broadcast: AtomicPtr<IpiRpcReq>,
 }
 
 impl IpiRpcMailbox {
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         Self {
-            req: AtomicPtr::new(core::ptr::null_mut()),
+            unicast: make_boxed_slice(get_lp_count() as usize, || {
+                AtomicPtr::<IpiRpcReq>::new(core::ptr::null_mut())
+            }),
+            multicast: RwLock::new(make_boxed_slice(get_lp_count() as usize, || {
+                AtomicPtr::<IpiRpcReq>::new(core::ptr::null_mut())
+            })),
+            broadcast: AtomicPtr::<IpiRpcReq>::new(core::ptr::null_mut()),
         }
     }
 
-    pub fn try_write(&self, req: *mut IpiRpcReq) -> Result<*mut IpiRpcReq, *mut IpiRpcReq> {
-        self.req.compare_exchange(core::ptr::null_mut(), req, SeqCst, SeqCst)
+    pub fn try_write_unicast(&self, dest: LpId, req: *mut IpiRpcReq) -> Result<(), Error> {
+        let result = self.unicast[dest as usize].compare_exchange(
+            core::ptr::null_mut(),
+            req,
+            SeqCst,
+            SeqCst,
+        );
+        if result.is_ok() {
+            Ok(())
+        } else {
+            Err(Error::MailboxBusy)
+        }
     }
 
-    pub fn read(&self) -> *mut IpiRpcReq {
-        self.req.load(SeqCst)
+    pub fn try_write_multicast(&self, dest: Vec<LpId>, req: *mut IpiRpcReq) -> Result<(), Error> {
+        todo!()
+    }
+
+    pub fn try_write_broadcast(&self, req: *mut IpiRpcReq) -> Result<(), Error> {
+        let result = self.broadcast.compare_exchange(core::ptr::null_mut(), req, SeqCst, SeqCst);
+        if result.is_ok() {
+            Ok(())
+        } else {
+            Err(Error::MailboxBusy)
+        }
+    }
+
+    pub fn read_own_unicast(&self) -> *mut IpiRpcReq {
+        self.unicast[get_lp_id!() as usize].load(SeqCst)
+    }
+
+    pub fn read_own_multicast(&self) -> *mut IpiRpcReq {
+        self.multicast.read()[get_lp_id!() as usize].load(SeqCst)
     }
 }
 
