@@ -21,7 +21,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::alloc::Layout;
 use core::ptr::{null, slice_from_raw_parts_mut};
-use core::sync::atomic::Ordering::SeqCst;
+use core::sync::atomic::Ordering::*;
 use core::sync::atomic::{AtomicPtr, AtomicU32};
 
 use spin::barrier::Barrier;
@@ -76,8 +76,8 @@ impl IpiRpcMailbox {
         let result = self.unicast[dest as usize].compare_exchange(
             core::ptr::null_mut(),
             req,
-            SeqCst,
-            SeqCst,
+            AcqRel,
+            Acquire,
         );
         if result.is_ok() {
             Ok(())
@@ -91,7 +91,7 @@ impl IpiRpcMailbox {
     }
 
     pub fn try_write_broadcast(&self, req: *mut IpiRpcReq) -> Result<(), Error> {
-        let result = self.broadcast.compare_exchange(core::ptr::null_mut(), req, SeqCst, SeqCst);
+        let result = self.broadcast.compare_exchange(core::ptr::null_mut(), req, AcqRel, Acquire);
         if result.is_ok() {
             Ok(())
         } else {
@@ -100,11 +100,15 @@ impl IpiRpcMailbox {
     }
 
     pub fn read_own_unicast(&self) -> *mut IpiRpcReq {
-        self.unicast[get_lp_id!() as usize].load(SeqCst)
+        self.unicast[get_lp_id!() as usize].load(Acquire)
     }
 
     pub fn read_own_multicast(&self) -> *mut IpiRpcReq {
-        self.multicast.read()[get_lp_id!() as usize].load(SeqCst)
+        self.multicast.read()[get_lp_id!() as usize].load(Acquire)
+    }
+
+    pub fn read_broadcast(&self) -> *mut IpiRpcReq {
+        self.broadcast.load(Acquire)
     }
 }
 
