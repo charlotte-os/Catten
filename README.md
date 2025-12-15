@@ -39,14 +39,19 @@ CharlotteOS aims to support platforms that offer **standardized, documented, and
 - Local APIC with x2APIC mode  
 - Full UEFI and ACPI firmware environment
 
+#### Aarch64 (Secondary ISA)
+
+- ARMv8.2A or later
+- GICv3 or later
+- Secure Monitor Call interface with PSCI
+- SystemReady Compliant firmware - Full or DT band
+
 #### RISC-V64 (Secondary ISA)
 
 - RVA23 or later  
 - V extension not required  
-- SBI runtime for early boot  
-- Either ACPI or a **DTSpec-conforming Devicetree**  
-  - Devicetree must reference **publicly documented IP blocks**  
-  - Vendor-specific peripherals require accessible documentation
+- Supervisor Binary Interface
+- BRS-I or BRS-B compliant firmware
 
 ---
 
@@ -61,8 +66,8 @@ Catten supports both ACPI and Devicetree, with equal weight. The format is not t
 
 ### ACPI
 
-- Expected on PC/server-class RISC-V and all x86-64 systems.
-- ACPI tables must be complete and spec-compliant enough to allow device discovery without vendor-specific workarounds.
+- Expected on PC/server-class machines across ISAs and all x86-64 systems.
+- ACPI tables must be complete and spec-compliant enough to allow device discovery without vendor-specific workarounds or drivers.
 
 ### Flattened Devicetree (FDT)
 
@@ -84,12 +89,19 @@ This ensures that Catten can operate without relying on undocumented Linux drive
 
 ## Supported Hardware
 
-### Memory
+### Memory[^1]
+
+Embedded:
 
 - Recommended: ≥ 1 GiB  
 - Minimum: 128 MiB
 
-### Storage
+PC and Server:
+
+- Recommended: ≥ 8 GiB
+- Minimum: 4 GiB
+
+### Storage[^1]
 
 - Recommended: ≥ 64 GiB  
 - Minimum: 4 GiB  
@@ -146,3 +158,5 @@ Find us on:
 - **Matrix:** <https://matrix.to/#/#charlotteos:matrix.org>
 - **Reddit** <https://www.reddit.com/r/charlotteos>
 - **E-Mail** <charlotte-os@outlook.com>
+
+[^1]: These requirements are estimates that may change during the course of development.
