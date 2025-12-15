@@ -2,8 +2,8 @@
 //!
 //! The Catten IPI protocol is designed to work using remote procedure calls (RPCs).
 //! This allows for a flexible and extensible way to send IPIs between processors.
-//! The protocol supports both unicast (single target), multicast (multiple targets), and broadcast
-//! IPIs. The implementation is kept as architecture indepent as possible.
+//! The protocol supports unicast (single target), multicast (multiple targets), and broadcast (all
+//! logical processors) IPIs. The implementation is kept as architecture indepent as possible.
 
 use alloc::boxed::Box;
 use alloc::collections::vec_deque::VecDeque;
