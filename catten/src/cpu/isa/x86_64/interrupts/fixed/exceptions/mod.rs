@@ -31,7 +31,7 @@ pub fn load_exceptions(idt: &mut Idt) {
 core::arch::global_asm! {
     include_str!("exceptions.asm"),
 }
-unsafe extern "C" {
+unsafe extern "custom" {
     fn isr_divide_by_zero();
     fn isr_debug();
     fn isr_non_maskable_interrupt();
