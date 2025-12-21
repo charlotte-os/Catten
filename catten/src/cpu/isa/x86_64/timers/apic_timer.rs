@@ -2,7 +2,6 @@ use alloc::vec::Vec;
 
 use super::tsc::TSC_CYCLE_PERIOD;
 use crate::common::time::duration::ExtDuration;
-use crate::cpu::isa::constants::interrupt_vectors::TIMER_INTERRUPT_VECTOR;
 use crate::cpu::isa::interface::interrupts::LocalIntCtlrIfce;
 use crate::cpu::isa::interface::timers::{LpTimerError, LpTimerIfce};
 use crate::cpu::isa::interrupts::x2apic::X2Apic;
@@ -65,14 +64,14 @@ impl ApicTimer {
         self.resolution = ExtDuration::from_picos(ps);
     }
 
-    pub fn new() -> Self {
+    pub fn new(interrupt_vector: <ApicTimer as LpTimerIfce>::IntDispatchNum) -> Self {
         let mut t = ApicTimer {
             resolution:  ExtDuration::from_secs(0),
             reset_value: 0,
         };
         t.determine_timer_resolution();
         t.set_divisor(ApicTimerDivisors::DivBy1);
-        t.set_isr_dispatch_number(TIMER_INTERRUPT_VECTOR);
+        t.set_isr_dispatch_number(interrupt_vector);
         t
     }
 }

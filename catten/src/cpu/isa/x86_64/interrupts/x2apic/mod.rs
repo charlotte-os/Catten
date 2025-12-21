@@ -6,7 +6,9 @@ use core::arch::asm;
 use super::super::constants::interrupt_vectors::*;
 use crate::cpu::isa::constants::msrs::APIC_EOI_REGISTER;
 use crate::cpu::isa::interface::interrupts::LocalIntCtlrIfce;
+use crate::cpu::isa::interface::timers::LpTimerIfce;
 use crate::cpu::isa::lp::LpId;
+use crate::cpu::isa::timers::apic_timer::ApicTimer;
 use crate::cpu::isa::x86_64::constants::msrs::{self, INTERRUPT_COMMAND_REGISTER};
 use crate::get_lp_id;
 
@@ -33,9 +35,30 @@ enum IcrDestShorthand {
     AllExcludingSelf = 0b11,
 }
 
-pub struct X2Apic;
+pub struct X2Apic {
+    pub timer: ApicTimer,
+}
 
 impl X2Apic {
+    /// # Initialize the local APIC in x2APIC mode
+    /// Ref: AMD APM 16.4.7
+    fn new(timer_int_vec: <ApicTimer as LpTimerIfce>::IntDispatchNum) -> Self {
+        // Set the Spurious Interrupt Vector Register (SIVR) to enable the APIC with Focused CPU
+        // Core Checking and set the spurious interrupt vector to 32
+        const FCC_BIT_SHIFT: u64 = 9;
+        const ASE_BIT_SHIFT: u64 = 8;
+        const VEC_MASK: u64 = 0xff;
+        let sivr_val = SPURIOUS_INTERRUPT_VECTOR as u64 & VEC_MASK
+            | (1 << ASE_BIT_SHIFT) // APIC Software Enable
+            | (1 << FCC_BIT_SHIFT); // Focused CPU Core Checking Enable
+        unsafe {
+            msrs::write(msrs::APIC_SPURIOUS_INTERRUPT_VECTOR, sivr_val);
+        }
+        X2Apic {
+            timer: ApicTimer::new(timer_int_vec),
+        }
+    }
+
     pub fn record_id() {
         unsafe {
             id::X2APIC_ID_TABLE.insert(get_lp_id!(), id::LapicId::get_local());
@@ -68,14 +91,17 @@ impl X2Apic {
             | ((dest_shorthand as u32) << DEST_SHORTHAND_SHIFT)
     }
 
-    pub fn set_timer_lvt_entry(periodic: bool) {
+    pub fn set_timer_lvt_entry(
+        interrupt_vector: <ApicTimer as LpTimerIfce>::IntDispatchNum,
+        periodic: bool,
+    ) {
         const TIMER_MODE_SHIFT: u64 = 17;
         const TIMER_MODE_PERIODIC: u64 = 0b1;
         const TIMER_MODE_ONE_SHOT: u64 = 0b0;
         const MASK_BIT_SHIFT: u64 = 16;
         const TIMER_VECTOR_MASK: u64 = 0xff;
 
-        let timer_lvt_entry = (TIMER_INTERRUPT_VECTOR as u64 & TIMER_VECTOR_MASK)
+        let timer_lvt_entry = (interrupt_vector as u64 & TIMER_VECTOR_MASK)
             | (if periodic {
                 TIMER_MODE_PERIODIC
             } else {
@@ -90,23 +116,6 @@ impl X2Apic {
 
 impl LocalIntCtlrIfce for X2Apic {
     type Error = Error;
-
-    /// # Initialize the local APIC in x2APIC mode
-    /// Ref: AMD APM 16.4.7
-    fn new() -> Self {
-        // Set the Spurious Interrupt Vector Register (SIVR) to enable the APIC with Focused CPU
-        // Core Checking and set the spurious interrupt vector to 32
-        const FCC_BIT_SHIFT: u64 = 9;
-        const ASE_BIT_SHIFT: u64 = 8;
-        const VEC_MASK: u64 = 0xff;
-        let sivr_val = SPURIOUS_INTERRUPT_VECTOR as u64 & VEC_MASK
-            | (1 << ASE_BIT_SHIFT) // APIC Software Enable
-            | (1 << FCC_BIT_SHIFT); // Focused CPU Core Checking Enable
-        unsafe {
-            msrs::write(msrs::APIC_SPURIOUS_INTERRUPT_VECTOR, sivr_val);
-        }
-        X2Apic {}
-    }
 
     /// # Send a unicast IPI to the target logical processor
     ///

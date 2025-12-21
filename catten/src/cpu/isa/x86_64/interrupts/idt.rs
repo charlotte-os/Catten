@@ -21,7 +21,7 @@ impl Idt {
     pub fn set_gate(
         &mut self,
         index: u8,
-        isr_ptr: unsafe extern "C" fn(),
+        isr_ptr: unsafe extern "custom" fn(),
         segment_selector: u16,
         is_trap: bool,
         is_present: bool,
