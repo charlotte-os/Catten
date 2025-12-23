@@ -65,6 +65,7 @@ pub extern "C" fn bsp_main() -> ! {
     unsafe {
         multiprocessor::assign_id();
     }
+    logln!("BSP assigned ID 0.");
     init::bsp_init();
     logln!("System initialized.");
     logln!("Starting secondary LPs...");
