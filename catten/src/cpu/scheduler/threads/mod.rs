@@ -1,22 +1,30 @@
+use alloc::vec::Vec;
+
 use spin::Lazy;
 
 use crate::common::collections::id_table::IdTable;
 use crate::cpu::isa::lp::LpId;
 use crate::cpu::isa::lp::thread_context::ThreadContext;
+use crate::event::Completion;
 use crate::memory::{AddressSpaceId, VAddr};
 
-pub static mut THREAD_TABLE: Lazy<ThreadTable> = Lazy::new(ThreadTable::new);
+pub static mut MASTER_THREAD_TABLE: Lazy<ThreadTable> = Lazy::new(ThreadTable::new);
 pub type ThreadTable = IdTable<ThreadId, Thread>;
-
-const LP_AFFINITY_COUNT: usize = 8;
-
 pub type ThreadId = usize;
+
+pub enum ThreadState {
+    Running(LpId),
+    Ready(LpId),
+    NeedsLpAssignment,
+    Blocked(Vec<Completion>),
+    Terminated, //Used while the thread is being cleaned up
+}
 
 pub struct Thread {
     pub is_user: bool,
-    context: ThreadContext,
+    pub context: ThreadContext,
     pub asid: AddressSpaceId,
-    lp_affinity: [LpId; LP_AFFINITY_COUNT],
+    pub state: ThreadState,
 }
 
 impl Thread {
@@ -25,7 +33,7 @@ impl Thread {
             is_user,
             context: ThreadContext::new(asid, entry_point).expect(""),
             asid,
-            lp_affinity: [LpId::default(); LP_AFFINITY_COUNT],
+            state: ThreadState::NeedsLpAssignment,
         }
     }
 }

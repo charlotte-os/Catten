@@ -1,5 +1,6 @@
 //! # Multi-Processor Management
 pub mod ipi;
+pub mod lp;
 pub mod startup;
 
 #[inline]
