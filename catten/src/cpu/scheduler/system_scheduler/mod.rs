@@ -39,7 +39,7 @@ impl SystemScheduler {
 
     /// Yield the current LP's execution to the scheduler
     /// This differs from blocking in that the processor state on entry is discarded
-    pub unsafe fn yield_lp(&self) {
+    pub unsafe fn yield_lp(&self) -> ! {
         todo!()
     }
 

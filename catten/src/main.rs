@@ -48,6 +48,7 @@ use crate::cpu::isa::system_info::CpuInfo;
 use crate::cpu::isa::timers::tsc::{IS_TSC_INVARIANT, TSC_CYCLE_PERIOD, TSC_FREQUENCY_HZ};
 use crate::cpu::multiprocessor::get_lp_count;
 use crate::cpu::multiprocessor::startup::{assign_id, start_secondary_lps};
+use crate::cpu::scheduler::system_scheduler::SYSTEM_SCHEDULER;
 
 const KERNEL_VERSION: (u64, u64, u64) = (0, 3, 5);
 static INIT_BARRIER: Lazy<Barrier> = Lazy::new(|| Barrier::new(get_lp_count() as usize));
@@ -94,10 +95,13 @@ pub extern "C" fn bsp_main() -> ! {
     logln!("CPU Model: {}", (CpuInfo::get_model()));
     logln!("Physical Address bits implemented: {}", (CpuInfo::get_paddr_sig_bits()));
     logln!("Virtual Address bits implemented: {}", (CpuInfo::get_vaddr_sig_bits()));
-    logln!("LP{}: Bootstrapping complete. Waiting for interrupts...", (get_lp_id!()));
-    halt!()
+    logln!(
+        "LP{}: Bootstrapping complete. Yielding the processor to the scheduler.",
+        (get_lp_id!())
+    );
+    unsafe { SYSTEM_SCHEDULER.yield_lp() }
 }
-/// This is the application processor's entry point into the kernel. The `ap_main` function is
+/// This is the application processors' entry point into the kernel. The `ap_main` function is
 /// called by each application processor upon entering the kernel. It initializes the processor and
 /// then hands it off to the scheduler. It is made C ABI compatible so that it can work with the
 /// Limine Boot Protocol MP feature. Other boot protocols may require alternate implementations of
@@ -109,6 +113,9 @@ pub unsafe extern "C" fn ap_main(_cpuinfo: &Cpu) -> ! {
     }
     init::ap_init();
     INIT_BARRIER.wait();
-    logln!("LP{}: Bootstrapping complete. Waiting for interrupts...", (get_lp_id!()));
-    halt!()
+    logln!(
+        "LP{}: Bootstrapping complete. Yielding the processor to the scheduler.",
+        (get_lp_id!())
+    );
+    unsafe { SYSTEM_SCHEDULER.yield_lp() }
 }
