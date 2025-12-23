@@ -57,7 +57,7 @@ build-x86_64-release: Limine
 	rm -rf iso_root
 
 run-x86_64-release: build-x86_64-release
-	qemu-system-x86_64 -enable-kvm -M q35 -cpu host,+invtsc -smp 16 -m 16G -drive if=pflash,format=raw,readonly=on,file=/usr/share/edk2/ovmf/OVMF_CODE.fd -cdrom catten-x86_64-release.iso -boot d -serial stdio
+	qemu-system-x86_64 -enable-kvm -M q35 -cpu host,+invtsc -smp 4 -m 8G -drive if=pflash,format=raw,readonly=on,file=/usr/share/edk2/ovmf/OVMF_CODE.fd -cdrom catten-x86_64-release.iso -boot d -serial stdio
 
 check-x86_64:
 	cd catten && cargo check --target x86_64-unknown-none
