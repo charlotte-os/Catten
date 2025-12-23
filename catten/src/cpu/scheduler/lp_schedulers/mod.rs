@@ -10,7 +10,7 @@ use hashbrown::HashMap;
 use crate::cpu::isa::lp::ops::halt;
 use crate::cpu::isa::memory::paging::HwAsid;
 use crate::cpu::scheduler::lp_schedulers::strategy::LsStratIfce;
-use crate::cpu::scheduler::threads::{THREAD_TABLE, ThreadId};
+use crate::cpu::scheduler::threads::{MASTER_THREAD_TABLE, ThreadId};
 use crate::memory::AddressSpaceId;
 
 type RunQueue = BTreeMap<AddressSpaceId, Vec<ThreadId>>;
@@ -50,7 +50,7 @@ impl LocalScheduler {
     }
 
     pub fn add_thread(&mut self, tid: ThreadId) -> Status {
-        if let Some(thread_ptr) = unsafe { THREAD_TABLE.try_get_element_arc(tid) } {
+        if let Some(thread_ptr) = unsafe { MASTER_THREAD_TABLE.try_get_element_arc(tid) } {
             let asid = thread_ptr.read().asid;
             if let Some(as_threads) = self.run_queue.get_mut(&asid) {
                 as_threads.push(tid);
