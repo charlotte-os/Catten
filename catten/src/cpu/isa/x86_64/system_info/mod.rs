@@ -123,7 +123,7 @@ impl CpuInfoIfce for CpuInfo {
             },
             IsaExtension::Rdpid => unsafe {
                 let cpuid_result = __cpuid_count(0x0000_0007, 0);
-                (cpuid_result.ecx & 1 << 20) != 0
+                (cpuid_result.ecx & 1 << 22) != 0
             },
         }
     }

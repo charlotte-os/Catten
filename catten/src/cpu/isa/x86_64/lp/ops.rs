@@ -83,10 +83,10 @@ pub fn store_lp_id(id: LpId) {
         current processor.The first member of that struct is always the kernel assigned LP ID. When
         entering kernel context e.g. via an interrupt GSBASE is restored using the `swapgs`
         instruction.*/
-        asm!(
-            "mov gs:[0], {lp_id:r}",
-            lp_id = in(reg) id
-        )
+        // asm!(
+        //     "mov gs:[0], {lp_id:r}",
+        //     lp_id = in(reg) id
+        // )
     }
 }
 #[macro_export]
@@ -100,17 +100,18 @@ macro_rules! get_lp_id {
         ) {
             unsafe {
                 core::arch::asm!(
-                    "rdpid {:e}",
-                    out(reg) id,
+                    "rdpid rax",
+                    out("eax") id,
                 );
             }
         } else {
-            unsafe {
-                core::arch::asm!(
-                    "mov {:e}, gs:[0]",
-                    out(reg) id,
-                );
-            }
+            // unsafe {
+            //     core::arch::asm!(
+            //         "mov {:e}, gs:[0]",
+            //         out(reg) id,
+            //     );
+            // }
+            id = 0; //dummy
         }
         id as crate::cpu::isa::lp::LpId
     }};
