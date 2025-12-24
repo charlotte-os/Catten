@@ -95,6 +95,8 @@ macro_rules! get_lp_id {
 }
 pub use get_lp_id;
 
+use crate::memory::VAddr;
+
 #[inline]
 pub extern "C" fn get_lp_local_base() -> VAddr {
     let ret: u64;
