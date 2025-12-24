@@ -3,7 +3,31 @@ use alloc::vec::Vec;
 use core::arch::x86_64::__cpuid_count;
 use core::mem::transmute;
 
+use spin::lazy::Lazy;
+
 use crate::cpu::isa::interface::system_info::CpuInfoIfce;
+
+pub static IS_CPUID_SUPPORTED: Lazy<bool> = Lazy::new(is_cpuid_supported);
+
+#[inline]
+fn is_cpuid_supported() -> bool {
+    let ret: u64;
+    unsafe {
+        core::arch::asm!(
+            "pushfq",
+            "pop rax",
+            "xor rax, {id_mask:r}",
+            "push rax",
+            "popfq",
+            "pushfq",
+            "pop rax",
+            "and rax, {id_mask:r}",
+            id_mask = in(reg) 1 << 21,
+            lateout("rax") ret,
+        );
+        ret != 0
+    }
+}
 
 pub enum IsaExtension {
     /* indicates support for 5-level paging i.e. 57 bit linear addresses */
@@ -12,6 +36,8 @@ pub enum IsaExtension {
      * (TLB shootdown synchronization after `invlpgb`) */
     Invlpgb,
     InvariantTsc,
+    /* TSC_AUX MSR and RDPID instruction */
+    Rdpid,
 }
 
 pub struct CpuInfo;
@@ -76,6 +102,12 @@ impl CpuInfoIfce for CpuInfo {
     }
 
     fn is_extension_supported(extension: Self::IsaExtension) -> bool {
+        if *IS_CPUID_SUPPORTED == false {
+            panic!(
+                "The current x86-64 processor does not support the CPUID instruction which is \
+                 required by the Catten kernel."
+            )
+        }
         match extension {
             IsaExtension::La57 => unsafe {
                 let cpuid_result = __cpuid_count(0x0000_0007, 0);
@@ -88,6 +120,10 @@ impl CpuInfoIfce for CpuInfo {
             IsaExtension::InvariantTsc => unsafe {
                 let feat_ext = __cpuid_count(0x80000007, 0);
                 (feat_ext.edx & (1 << 8)) != 0
+            },
+            IsaExtension::Rdpid => unsafe {
+                let cpuid_result = __cpuid_count(0x0000_0007, 0);
+                (cpuid_result.ecx & 1 << 20) != 0
             },
         }
     }
