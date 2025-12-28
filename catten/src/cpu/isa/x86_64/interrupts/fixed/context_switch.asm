@@ -1,8 +1,7 @@
-.bits 64
-
 .section .text
-.global switch_context
-isr_switch_context:
+
+.global isr_context_switch
+isr_context_switch:
     push rax
     push rbx
     push rcx

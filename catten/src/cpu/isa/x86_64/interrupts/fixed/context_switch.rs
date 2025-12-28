@@ -4,6 +4,7 @@ unsafe extern "custom" {
 }
 core::arch::global_asm!(include_str!("context_switch.asm"));
 
+#[unsafe(no_mangle)]
 pub extern "C" fn set_next_thread() {
     todo!(
         "Get the next thread ID from the local scheduler and load a pointer to the thread's \
