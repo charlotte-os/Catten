@@ -61,57 +61,32 @@ use core::arch::asm;
 
 use super::LpId;
 use crate::cpu::isa::constants::*;
-use crate::cpu::isa::interface::system_info::CpuInfoIfce;
-use crate::cpu::isa::system_info::{CpuInfo, IsaExtension};
 
 pub fn store_lp_id(id: LpId) {
-    if CpuInfo::is_extension_supported(IsaExtension::Rdpid) {
-        let id_upper = ((id as u64) >> 32) as u32;
-        let id_lower = ((id as u64) & (1 << 32) - 1) as u32;
-        unsafe {
-            asm!(
-                "wrmsr",
-                in("eax") id_lower,
-                in("edx") id_upper,
-                in("ecx") msrs::TSC_AUX,
-                options(nostack, preserves_flags)
-            );
-        }
-    }
+    let id_upper = ((id as u64) >> 32) as u32;
+    let id_lower = ((id as u64) & (1 << 32) - 1) as u32;
     unsafe {
-        /* When in kernel context, GSBASE contains a pointer to the LogicalProcessor struct for the
-        current processor.The first member of that struct is always the kernel assigned LP ID. When
-        entering kernel context e.g. via an interrupt GSBASE is restored using the `swapgs`
-        instruction.*/
-        // asm!(
-        //     "mov gs:[0], {lp_id:r}",
-        //     lp_id = in(reg) id
-        // )
+        asm!(
+            "wrmsr",
+            in("eax") id_lower,
+            in("edx") id_upper,
+            in("ecx") msrs::TSC_AUX,
+            options(nostack, preserves_flags)
+        );
     }
 }
+
 #[macro_export]
 macro_rules! get_lp_id {
     () => {{
         let mut id: u32;
-
-        use crate::cpu::isa::interface::system_info::CpuInfoIfce;
-        if crate::cpu::isa::system_info::CpuInfo::is_extension_supported(
-            crate::cpu::isa::system_info::IsaExtension::Rdpid
-        ) {
-            unsafe {
-                core::arch::asm!(
-                    "rdpid rax",
-                    out("eax") id,
-                );
-            }
-        } else {
-            // unsafe {
-            //     core::arch::asm!(
-            //         "mov {:e}, gs:[0]",
-            //         out(reg) id,
-            //     );
-            // }
-            id = 0; //dummy
+        unsafe {
+            core::arch::asm!(
+                "rdtscp",
+                out("edx") _,
+                out("eax") _,
+                out("ecx") id,
+            );
         }
         id as crate::cpu::isa::lp::LpId
     }};
