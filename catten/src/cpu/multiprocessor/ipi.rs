@@ -87,11 +87,11 @@ impl IpiRpcMailbox {
     }
 
     pub fn read_own_unicast(&self) -> *mut IpiRpcReq {
-        self.unicast[get_lp_id!() as usize].load(Acquire)
+        self.unicast[get_lp_id() as usize].load(Acquire)
     }
 
     pub fn read_own_multicast(&self) -> *mut IpiRpcReq {
-        self.multicast.read()[get_lp_id!() as usize].load(Acquire)
+        self.multicast.read()[get_lp_id() as usize].load(Acquire)
     }
 
     pub fn read_broadcast(&self) -> *mut IpiRpcReq {

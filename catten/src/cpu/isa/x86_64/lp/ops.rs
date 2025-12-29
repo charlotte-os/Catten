@@ -38,26 +38,20 @@ macro_rules! unmask_interrupts {
 #[rustfmt::skip]
 pub use unmask_interrupts;
 
-#[rustfmt::skip]
-#[macro_export]
-macro_rules! get_lic_id {
-    () => {{
-        let apic_id: u32;
-        use crate::cpu::isa::constants::*;
-        unsafe {
-            core::arch::asm!(
-                "rdmsr",
-                inlateout("ecx") msrs::LAPIC_ID => _,
-                lateout("eax") apic_id,
-                lateout("edx") _,
-                options(nostack, preserves_flags)
-            );
-        }
-        apic_id
-    }};
+pub fn get_lic_id() -> u32 {
+    let apic_id: u32;
+    use crate::cpu::isa::constants::*;
+    unsafe {
+        core::arch::asm!(
+            "rdmsr",
+            inlateout("ecx") msrs::LAPIC_ID => _,
+            lateout("eax") apic_id,
+            lateout("edx") _,
+            options(nostack, preserves_flags)
+        );
+    }
+    apic_id
 }
-#[rustfmt::skip]
-pub use get_lic_id;
 
 use core::arch::asm;
 
@@ -78,22 +72,18 @@ pub fn store_lp_id(id: LpId) {
     }
 }
 
-#[macro_export]
-macro_rules! get_lp_id {
-    () => {{
-        let mut id: u32;
-        unsafe {
-            core::arch::asm!(
-                "rdtscp",
-                out("edx") _,
-                out("eax") _,
-                out("ecx") id,
-            );
-        }
-        id as crate::cpu::isa::lp::LpId
-    }};
+pub fn get_lp_id() -> LpId {
+    let mut id: u32;
+    unsafe {
+        core::arch::asm!(
+            "rdtscp",
+            out("edx") _,
+            out("eax") _,
+            out("ecx") id,
+        );
+    }
+    id as crate::cpu::isa::lp::LpId
 }
-pub use get_lp_id;
 
 use crate::memory::VAddr;
 

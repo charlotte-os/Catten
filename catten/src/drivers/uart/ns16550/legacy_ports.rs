@@ -2,7 +2,7 @@
 /*
  * These won't work on modern hardware as it no longer uses the ISA bus however they are useful
  * for logging when running under hypervisors like QEMU or Bochs which emulate ISA hardware.
- * Typically modern hardware exposes UARTs via MMIO or PCIe.
+ * Typically modern hardware exposes UARTs via MMIO, PCIe, or USB.
  */
 #[allow(unused)]
 pub static COM1: u16 = 0x3f8;

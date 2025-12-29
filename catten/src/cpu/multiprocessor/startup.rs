@@ -22,7 +22,8 @@ pub fn start_secondary_lps() -> Result<(), MpError> {
     logln!("Starting Secondary LPs...");
     if let Some(res) = MP.get_response() {
         logln!("Obtained multiprocessor response from Limine");
-        if cfg!(target_arch = "x86_64") {
+        #[cfg(target_arch = "x86_64")]
+        {
             if res.flags().contains(limine::mp::ResponseFlags::X2APIC) {
                 logln!("Limine has set all LAPICs to x2APIC mode.")
             } else {
@@ -51,7 +52,7 @@ pub unsafe fn assign_id() {
     store_lp_id(lp_id);
     logln!(
         "Logical Processor with local interrupt controller ID = {} has been designated LP{}.",
-        (get_lic_id!()),
-        (get_lp_id!())
+        (get_lic_id()),
+        (get_lp_id())
     );
 }

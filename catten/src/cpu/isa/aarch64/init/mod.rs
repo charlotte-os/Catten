@@ -13,7 +13,7 @@ impl InitInterface for IsaInitializer {
     type Error = Error;
 
     fn init_bsp() -> Result<(), Self::Error> {
-        init_ap()
+        Self::init_ap()
     }
 
     fn init_ap() -> Result<(), Self::Error> {

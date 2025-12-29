@@ -30,7 +30,7 @@ impl SystemScheduler {
     }
 
     pub fn get_local_scheduler(&self) -> Arc<Mutex<LocalScheduler>> {
-        self.lp_schedulers[&get_lp_id!()].clone()
+        self.lp_schedulers[&get_lp_id()].clone()
     }
 
     pub fn submit_ready_thread(&self, tid: ThreadId) -> Result<LpId, Error> {

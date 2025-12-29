@@ -1,5 +1,7 @@
 mod isa_extensions;
 
+use core::fmt::Display;
+
 use isa_extensions::*;
 
 use crate::cpu::isa::interface::system_info::CpuInfoIfce;
@@ -21,6 +23,29 @@ pub enum Vendor {
     Intel = 0x69,
     Ampere = 0xc0,
     Unrecognized,
+}
+
+impl Display for Vendor {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let name_str = match *self {
+            Vendor::SwReserved => "Software Reserved",
+            Vendor::Arm => "ARM",
+            Vendor::Broadcom => "Broadcom",
+            Vendor::Cavium => "Cavium",
+            Vendor::Dec => "Digital Equipment Corporation",
+            Vendor::Fujitsu => "Fujitsu",
+            Vendor::Infineon => "Infineon Technologies",
+            Vendor::MotorolaFreescale => "Motorola/Freescale",
+            Vendor::Nvidia => "NVIDIA",
+            Vendor::Amcc => "AMCC",
+            Vendor::Qualcomm => "Qualcomm",
+            Vendor::Marvell => "Marvell",
+            Vendor::Intel => "Intel",
+            Vendor::Ampere => "Ampere",
+            Vendor::Unrecognized => "Unrecognized Vendor",
+        };
+        write!(f, "{}", name_str)
+    }
 }
 
 impl From<u8> for Vendor {
@@ -51,6 +76,16 @@ pub struct Model {
     revision: u8,
     variant: u8,
     architecture: u8,
+}
+
+impl Display for Model {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(
+            f,
+            "Part Number: {:#06x}\nRevision: {}\nVariant: {}\nArchitecture: {:#x}\n",
+            self.part_num, self.revision, self.variant, self.architecture
+        )
+    }
 }
 
 #[derive(Debug)]

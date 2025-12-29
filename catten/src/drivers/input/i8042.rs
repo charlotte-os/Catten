@@ -3,7 +3,8 @@
 //! This is the driver for the I8042 PS/2 Controller.
 //! This uses interrupts for I/O so make sure these are handled.
 
-use crate::cpu::isa::io::{IReg8Ifce, IoReg8, OReg8Ifce};
+use crate::cpu::isa::interface::io::{IReg8Ifce, OReg8Ifce};
+use crate::cpu::isa::io::IoReg8;
 
 // I/O Ports.
 const DATA_PORT: u16 = 0x60;

@@ -37,7 +37,7 @@ pub extern "C" fn uacpi_kernel_map(addr: uacpi_phys_addr, len: uacpi_size) -> *m
     }
     let kernel_dyn_region = LA_MAP.get_region(RegionType::KernelAllocatorArena);
     let mut kas = KERNEL_AS.lock();
-    let mapping_addr = match kas.find_free_region(
+    let mapping_addr: VAddr = match kas.find_free_region(
         corrected_len / PAGE_SIZE,
         (kernel_dyn_region.base, kernel_dyn_region.base + kernel_dyn_region.length),
     ) {

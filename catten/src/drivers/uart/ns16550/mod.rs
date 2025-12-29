@@ -4,11 +4,16 @@ mod legacy_ports;
 use core::fmt::{self, Write};
 use core::result::Result;
 
-use spin::{Lazy, Mutex};
+#[cfg(target_arch = "x86_64")]
+use spin::lazy::Lazy;
+#[cfg(target_arch = "x86_64")]
+use spin::mutex::Mutex;
 
 use crate::common::io::Read;
 use crate::cpu::isa::interface::io::{IReg8Ifce, OReg8Ifce};
-use crate::cpu::isa::io::{self, IoReg8};
+#[cfg(target_arch = "x86_64")]
+use crate::cpu::isa::io;
+use crate::cpu::isa::io::IoReg8;
 use crate::drivers::uart::Uart;
 
 #[cfg(target_arch = "x86_64")]

@@ -61,7 +61,7 @@ impl X2Apic {
 
     pub fn record_id() {
         unsafe {
-            id::X2APIC_ID_TABLE.insert(get_lp_id!(), id::LapicId::get_local());
+            id::X2APIC_ID_TABLE.insert(get_lp_id(), id::LapicId::get_local());
         }
     }
 

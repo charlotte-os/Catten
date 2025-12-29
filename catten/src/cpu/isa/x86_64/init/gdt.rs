@@ -253,7 +253,7 @@ impl Tss {
 
 /* Safety: Do not ever access or mutate a TSS from any LP other than the one that uses it */
 unsafe fn get_tss() -> *mut Tss {
-    let lp_id = get_lp_id!();
+    let lp_id = get_lp_id();
     if lp_id == 0 {
         &raw const (*super::bsp::BSP_TSS) as *mut Tss
     } else {
