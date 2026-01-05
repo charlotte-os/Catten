@@ -20,7 +20,9 @@ impl MemoryInterface for MemoryInterfaceImpl {
     const PAGE_SIZE: usize = 4096;
 }
 
-pub enum Error {}
+pub enum Error {
+    UnmappedAddress,
+}
 
 pub struct AddressSpace {
     /// user space translation table base register
@@ -93,6 +95,8 @@ impl AddressSpaceInterface for AddressSpace {
     ) -> Result<PAddr, <MemoryInterfaceImpl as MemoryInterface>::Error> {
         let mut par_el1 = (0u64, 0u64);
         unsafe {
+            /* Aarch64 supports hardware address translation using the `at` instruction and the
+             * PAR_EL1 register */
             asm!(
                 // Address translation stage 1 at EL1 without permission check
                 "at s1e1a, {vaddr}",
@@ -105,9 +109,9 @@ impl AddressSpaceInterface for AddressSpace {
         }
         if par_el1.0 & 1 == 1 {
             // Check F bit
-            Err(Error {})
+            Err(Error::UnmappedAddress)
         } else {
-            Ok(PAddr(
+            Ok(PAddr::from(
                 if is_d128_set(par_el1) {
                     par_el1.1
                 } else {
