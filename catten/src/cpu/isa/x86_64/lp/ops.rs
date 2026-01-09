@@ -40,7 +40,7 @@ pub use unmask_interrupts;
 
 pub fn get_lic_id() -> u32 {
     let apic_id: u32;
-    use crate::cpu::isa::constants::*;
+    use crate::cpu::isa::lp::msrs;
     unsafe {
         core::arch::asm!(
             "rdmsr",
@@ -56,7 +56,7 @@ pub fn get_lic_id() -> u32 {
 use core::arch::asm;
 
 use super::LpId;
-use crate::cpu::isa::constants::*;
+use crate::cpu::isa::lp::msrs;
 
 pub fn store_lp_id(id: LpId) {
     let id_upper = ((id as u64) >> 32) as u32;
@@ -125,7 +125,7 @@ pub extern "C" fn get_thread_context_ptr() -> VAddr {
 }
 
 #[inline]
-pub extern "C" fn set_thread_context_ptr(ctx_ptr: VAddr) {
+pub unsafe extern "C" fn set_thread_context_ptr(ctx_ptr: VAddr) {
     unsafe {
         core::arch::asm!(
             "wrfsbase {}",

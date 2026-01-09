@@ -69,8 +69,16 @@ impl FrameBufferInfo {
 
         let dx = isize::abs(x1 - x0);
         let dy = -isize::abs(y1 - y0);
-        let sx = if x0 < x1 { 1 } else { -1 };
-        let sy = if y0 < y1 { 1 } else { -1 };
+        let sx = if x0 < x1 {
+            1
+        } else {
+            -1
+        };
+        let sy = if y0 < y1 {
+            1
+        } else {
+            -1
+        };
         let mut err = dx + dy; // error value e_xy
 
         loop {

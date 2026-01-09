@@ -37,8 +37,8 @@ isr_context_switch:
     pop rax
     iretq
 
-.global enter_init_thread_ctx
-enter_init_thread_ctx:
+.global isr_wake_lp
+isr_wake_lp:
     call set_next_thread  # Call scheduler to get the next thread and set fs:[0] to its context base
     mov rsp, fs:[0]  # Load the next thread's stack pointer from its context
     pop r15
@@ -56,4 +56,4 @@ enter_init_thread_ctx:
     pop rcx
     pop rbx
     pop rax
-    ret
+    iretq

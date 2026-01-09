@@ -4,11 +4,10 @@ pub mod context_switch;
 pub mod exceptions;
 pub mod ipis;
 pub mod spurious;
+pub mod vector_assignments;
 
-use crate::cpu::isa::constants::interrupt_vectors::{
-    CONTEXT_SWITCH_VECTOR,
-    SPURIOUS_INTERRUPT_VECTOR,
-};
+use vector_assignments::*;
+
 use crate::cpu::isa::init::gdt::KERNEL_CODE_SELECTOR;
 use crate::cpu::isa::interrupts::idt::Idt;
 
@@ -28,4 +27,5 @@ pub fn register_fixed_isr_gates(idt: &mut Idt) {
         false,
         true,
     );
+    idt.set_gate(WAKE_LP_VECTOR, context_switch::isr_wake_lp, KERNEL_CODE_SELECTOR, false, true);
 }

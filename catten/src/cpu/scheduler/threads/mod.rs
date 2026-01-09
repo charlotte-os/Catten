@@ -3,6 +3,7 @@ use alloc::vec::Vec;
 use spin::Lazy;
 
 use crate::common::collections::id_table::IdTable;
+use crate::cpu::isa::interface::memory::address::VirtualAddress;
 use crate::cpu::isa::lp::LpId;
 use crate::cpu::isa::lp::thread_context::ThreadContext;
 use crate::event::Completion;
@@ -31,9 +32,15 @@ impl Thread {
     pub fn new(is_user: bool, asid: AddressSpaceId, entry_point: VAddr) -> Self {
         Thread {
             is_user,
-            context: ThreadContext::new(asid, entry_point).expect(""),
+            context: ThreadContext::new(asid, entry_point).expect("Error creating thread context"),
             asid,
             state: ThreadState::NeedsLpAssignment,
         }
+    }
+
+    pub unsafe fn get_context_vaddr(&self) -> VAddr {
+        /* Safety: Make sure that the thread is still live before using this pointer.
+        The safest thing to do is treat the return value as a temporary. */
+        VAddr::from_ptr(&self.context)
     }
 }

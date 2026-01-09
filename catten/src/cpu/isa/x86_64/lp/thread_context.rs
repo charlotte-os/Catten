@@ -1,5 +1,7 @@
 use core::mem::offset_of;
 
+use crate::memory::allocators::stack_allocator;
+
 const INIT_KERNEL_STACK_PAGES: usize = 16;
 
 use crate::cpu::isa::init::gdt::{
@@ -67,11 +69,11 @@ pub struct ThreadContext {
 #[derive(Debug)]
 pub enum Error {
     AddressSpaceNotFound,
-    StackAllocError(crate::memory::allocators::stack_allocator::Error),
+    StackAllocError(stack_allocator::Error),
 }
 
-impl From<crate::memory::allocators::stack_allocator::Error> for Error {
-    fn from(err: crate::memory::allocators::stack_allocator::Error) -> Self {
+impl From<stack_allocator::Error> for Error {
+    fn from(err: stack_allocator::Error) -> Self {
         Error::StackAllocError(err)
     }
 }

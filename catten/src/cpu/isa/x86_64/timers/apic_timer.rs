@@ -7,7 +7,7 @@ use crate::cpu::isa::interface::timers::{LpTimerError, LpTimerIfce};
 use crate::cpu::isa::interrupts::x2apic::X2Apic;
 //use crate::cpu::isa::interrupts::x2apic::X2Apic;
 use crate::cpu::isa::timers::tsc::rdtsc;
-use crate::cpu::isa::x86_64::constants::msrs;
+use crate::cpu::isa::x86_64::lp::msrs;
 
 pub type LpTimer = ApicTimer;
 

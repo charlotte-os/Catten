@@ -3,13 +3,13 @@ mod id;
 
 use core::arch::asm;
 
-use super::super::constants::interrupt_vectors::*;
-use crate::cpu::isa::constants::msrs::APIC_EOI_REGISTER;
 use crate::cpu::isa::interface::interrupts::LocalIntCtlrIfce;
 use crate::cpu::isa::interface::timers::LpTimerIfce;
+use crate::cpu::isa::interrupts::fixed::vector_assignments::*;
 use crate::cpu::isa::lp::LpId;
+use crate::cpu::isa::lp::msrs::APIC_EOI_REGISTER;
 use crate::cpu::isa::timers::apic_timer::ApicTimer;
-use crate::cpu::isa::x86_64::constants::msrs::{self, INTERRUPT_COMMAND_REGISTER};
+use crate::cpu::isa::x86_64::lp::msrs::{self, INTERRUPT_COMMAND_REGISTER};
 use crate::get_lp_id;
 
 pub enum Error {
